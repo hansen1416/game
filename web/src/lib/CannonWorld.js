@@ -135,15 +135,15 @@ export default class CannonWorld {
 		const z = -PLAYER_Z;
 
 		this.boxTarget({ x: 10, y: y, z: z }, 5);
-		this.boxTarget({ x: 8, y: y, z: z }, 1000);
-		this.boxTarget({ x: 6, y: y, z: z });
-		this.boxTarget({ x: 4, y: y, z: z });
-		this.boxTarget({ x: 2, y: y, z: z });
-		this.boxTarget({ x: -2, y: y, z: z });
-		this.boxTarget({ x: -4, y: y, z: z });
-		this.boxTarget({ x: -6, y: y, z: z });
-		this.boxTarget({ x: -8, y: y, z: z });
-		this.boxTarget({ x: -10, y: y, z: z });
+		this.boxTarget({ x: 8, y: y, z: z }, 5);
+		this.boxTarget({ x: 6, y: y, z: z }, 5);
+		this.boxTarget({ x: 4, y: y, z: z }, 5);
+		this.boxTarget({ x: 2, y: y, z: z }, 5);
+		this.boxTarget({ x: -2, y: y, z: z }, 0.001);
+		this.boxTarget({ x: -4, y: y, z: z }, 1000);
+		this.boxTarget({ x: -6, y: y, z: z }, 1000);
+		this.boxTarget({ x: -8, y: y, z: z }, 1000);
+		this.boxTarget({ x: -10, y: y, z: z }, 1000);
 	}
 
 	onFrameUpdate() {

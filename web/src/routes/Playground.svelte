@@ -61,7 +61,7 @@
 
 		cannonWorld.addGround();
 
-		if (false) {
+		if (true) {
 			invokeCamera(video, () => {
 				cameraReady = true;
 			});
