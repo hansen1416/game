@@ -61,7 +61,7 @@
 
 		cannonWorld.addGround();
 
-		if (true) {
+		if (false) {
 			invokeCamera(video, () => {
 				cameraReady = true;
 			});
@@ -113,8 +113,6 @@
 
 			threeScene.scene.add(player2);
 
-			cannonWorld.daneelBody(player2);
-
 			// all models ready
 			cameraReady = true;
 			mannequinReady = true;
@@ -125,6 +123,8 @@
 			handsWaitingRight = true;
 			handsAvailableRight = true;
 		});
+
+		cannonWorld.createTargets();
 	});
 
 	onDestroy(() => {

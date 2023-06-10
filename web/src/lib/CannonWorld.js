@@ -74,24 +74,14 @@ export default class CannonWorld {
 
 	daneelBody(glb) {
 		// const meshes = {};
-
 		// mesh.traverse(function (node) {
 		// 	if (node.isMesh) {
 		// 		meshes[node.name] = node;
 		// 	}
 		// });
-
 		// const meshKey = "Wolf3D_Body";
-
-		const w = 0.6,
-			h = 0.9,
-			d = 0.2;
-
-		const shape = new CANNON.Box(new CANNON.Vec3(w, h, d));
-
 		// if you have another dynamic body with a non-zero mass and it collides with the static body,
 		// it may still pass through due to numerical errors in the physics simulation.
-
 		// // Set up contact material for collisions
 		// var groundMaterial = new CANNON.Material();
 		// var contactMaterial = new CANNON.ContactMaterial(groundMaterial, groundMaterial, {
@@ -101,16 +91,20 @@ export default class CannonWorld {
 		//     contactEquationRelaxation: 4 // Increase relaxation for better stability
 		// });
 		// world.addContactMaterial(contactMaterial);
+	}
+
+	boxTarget(pos = { x: 0, y: 0, z: 0 }, size = { w: 0.6, h: 0.9, d: 0.2 }) {
+		const { x, y, z } = pos;
+		const { w, h, d } = size;
+
+		const shape = new CANNON.Box(new CANNON.Vec3(w, h, d));
+
 		const body = new CANNON.Body({
 			mass: 0, // kg
 			shape: shape,
 		});
 
-		const world_pos = new THREE.Vector3();
-
-		glb.getWorldPosition(world_pos);
-
-		body.position.set(world_pos.x, world_pos.y + 0.9, world_pos.z);
+		body.position.set(x, y, z);
 
 		this.world.addBody(body);
 
@@ -119,12 +113,21 @@ export default class CannonWorld {
 			new THREE.MeshBasicMaterial({ color: 0xff0000 })
 		);
 
-		mesh.position.set(world_pos.x, world_pos.y + 0.9, world_pos.z);
+		mesh.position.set(x, y, z);
 
 		this.scene.add(mesh);
 
 		this.rigid.push(body);
 		this.mesh.push(mesh);
+	}
+
+	createTargets() {
+		this.boxTarget();
+		this.boxTarget();
+		this.boxTarget();
+		this.boxTarget();
+		this.boxTarget();
+		this.boxTarget();
 	}
 
 	onFrameUpdate() {
