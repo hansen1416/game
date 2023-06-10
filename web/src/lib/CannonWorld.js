@@ -1,7 +1,12 @@
 import * as CANNON from "cannon-es";
 import * as THREE from "three";
 // import { ConvexGeometry } from "three/addons/geometries/ConvexGeometry.js";
-import { GROUND_LEVEL, FLOOR_WIDTH, FLOOR_HEIGHT } from "../utils/constants";
+import {
+	GROUND_LEVEL,
+	FLOOR_WIDTH,
+	FLOOR_HEIGHT,
+	PLAYER_Z,
+} from "../utils/constants";
 
 let debug;
 
@@ -72,45 +77,49 @@ export default class CannonWorld {
 		this.scene.add(groundMesh);
 	}
 
-	daneelBody(glb) {
-		// const meshes = {};
-		// mesh.traverse(function (node) {
-		// 	if (node.isMesh) {
-		// 		meshes[node.name] = node;
-		// 	}
-		// });
-		// const meshKey = "Wolf3D_Body";
-		// if you have another dynamic body with a non-zero mass and it collides with the static body,
-		// it may still pass through due to numerical errors in the physics simulation.
-		// // Set up contact material for collisions
-		// var groundMaterial = new CANNON.Material();
-		// var contactMaterial = new CANNON.ContactMaterial(groundMaterial, groundMaterial, {
-		//     friction: 0.3,
-		//     restitution: 0.5,
-		//     contactEquationStiffness: 1e9, // Increase stiffness to reduce penetration
-		//     contactEquationRelaxation: 4 // Increase relaxation for better stability
-		// });
-		// world.addContactMaterial(contactMaterial);
-	}
+	// daneelBody(glb) {
+	// 	// const meshes = {};
+	// 	// mesh.traverse(function (node) {
+	// 	// 	if (node.isMesh) {
+	// 	// 		meshes[node.name] = node;
+	// 	// 	}
+	// 	// });
+	// 	// const meshKey = "Wolf3D_Body";
+	// 	// if you have another dynamic body with a non-zero mass and it collides with the static body,
+	// 	// it may still pass through due to numerical errors in the physics simulation.
+	// 	// // Set up contact material for collisions
+	// 	// var groundMaterial = new CANNON.Material();
+	// 	// var contactMaterial = new CANNON.ContactMaterial(groundMaterial, groundMaterial, {
+	// 	//     friction: 0.3,
+	// 	//     restitution: 0.5,
+	// 	//     contactEquationStiffness: 1e9, // Increase stiffness to reduce penetration
+	// 	//     contactEquationRelaxation: 4 // Increase relaxation for better stability
+	// 	// });
+	// 	// world.addContactMaterial(contactMaterial);
+	// }
 
-	boxTarget(pos = { x: 0, y: 0, z: 0 }, size = { w: 0.6, h: 0.9, d: 0.2 }) {
+	boxTarget(
+		pos = { x: 0, y: 0, z: 0 },
+		mass = 0,
+		size = { w: 0.6, h: 0.9, d: 0.2 }
+	) {
 		const { x, y, z } = pos;
 		const { w, h, d } = size;
 
 		const shape = new CANNON.Box(new CANNON.Vec3(w, h, d));
 
 		const body = new CANNON.Body({
-			mass: 0, // kg
+			mass: mass, // kg
 			shape: shape,
 		});
 
 		body.position.set(x, y, z);
-
+		z;
 		this.world.addBody(body);
 
 		const mesh = new THREE.Mesh(
 			new THREE.BoxGeometry(w * 2, h * 2, d * 2),
-			new THREE.MeshBasicMaterial({ color: 0xff0000 })
+			new THREE.MeshBasicMaterial({ color: 0xa8c0ff })
 		);
 
 		mesh.position.set(x, y, z);
@@ -122,12 +131,19 @@ export default class CannonWorld {
 	}
 
 	createTargets() {
-		this.boxTarget();
-		this.boxTarget();
-		this.boxTarget();
-		this.boxTarget();
-		this.boxTarget();
-		this.boxTarget();
+		const y = GROUND_LEVEL + 0.9;
+		const z = -PLAYER_Z;
+
+		this.boxTarget({ x: 10, y: y, z: z }, 5);
+		this.boxTarget({ x: 8, y: y, z: z }, 1000);
+		this.boxTarget({ x: 6, y: y, z: z });
+		this.boxTarget({ x: 4, y: y, z: z });
+		this.boxTarget({ x: 2, y: y, z: z });
+		this.boxTarget({ x: -2, y: y, z: z });
+		this.boxTarget({ x: -4, y: y, z: z });
+		this.boxTarget({ x: -6, y: y, z: z });
+		this.boxTarget({ x: -8, y: y, z: z });
+		this.boxTarget({ x: -10, y: y, z: z });
 	}
 
 	onFrameUpdate() {
