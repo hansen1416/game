@@ -1,10 +1,15 @@
 import * as CANNON from "cannon-es";
 import * as THREE from "three";
-import { ConvexGeometry } from "three/addons/geometries/ConvexGeometry.js";
-import { GROUND_LEVEL, FLOOR_WIDTH, FLOOR_HEIGHT } from "./constants";
-import CannonDebugger from "cannon-es-debugger";
-import ThreeScene from "./ThreeScene";
+// import { ConvexGeometry } from "three/addons/geometries/ConvexGeometry.js";
+import { GROUND_LEVEL, FLOOR_WIDTH, FLOOR_HEIGHT } from "../utils/constants";
 
+let debug;
+
+if (import.meta.env.DEV) {
+	const module = await import(`../utils/debugger`);
+
+	debug = module.cannonDebugger;
+}
 export default class CannonWorld {
 	constructor(scene) {
 		this.scene = scene;
@@ -32,8 +37,10 @@ export default class CannonWorld {
 
 		this.rigid = [];
 		this.mesh = [];
-		// @ts-ignore
-		// this.debuggerInstance = new CannonDebugger(this.scene, this.world);
+
+		if (debug) {
+			this.debuggerInstance = debug(this.scene, this.world);
+		}
 	}
 
 	addGround() {
@@ -123,7 +130,9 @@ export default class CannonWorld {
 	onFrameUpdate() {
 		this.world.fixedStep();
 
-		// this.debuggerInstance.update();
+		if (debug) {
+			this.debuggerInstance.update();
+		}
 
 		for (let i in this.rigid) {
 			this.mesh[i].position.copy(this.rigid[i].position);

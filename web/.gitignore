@@ -33,9 +33,4 @@ tmp/
 tmp*
 .env
 
-AvatarWebKit-main
-MotioNet
-kalidokit
-blazepose-main
-
-DigiHuman
+dist

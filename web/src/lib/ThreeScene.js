@@ -44,7 +44,7 @@ export default class ThreeScene {
 		this.camera.zoom = 60; // zoom in by 50%
 		this.camera.position.set(840, 969, -width);
 
-		console.log(Math.sin(THREE.MathUtils.degToRad(30)) * width);
+		// console.log(Math.sin(THREE.MathUtils.degToRad(30)) * width);
 
 		// for walk testing
 		// this.camera.zoom = 195;

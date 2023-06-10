@@ -2,13 +2,13 @@
 	import { onDestroy, onMount } from "svelte";
 	import * as THREE from "three"; // @ts-ignore
 	import { cloneDeep } from "lodash";
-	import { GROUND_LEVEL, FLOOR_WIDTH, PLAYER_Z } from "../lib/constants";
+	import { GROUND_LEVEL, FLOOR_WIDTH, PLAYER_Z } from "../utils/constants";
 	import {
 		ballMesh,
 		createPoseLandmarker,
 		loadGLTF,
 		invokeCamera,
-	} from "../lib/ropes";
+	} from "../utils/ropes";
 	import ThreeScene from "../lib/ThreeScene";
 	import CannonWorld from "../lib/CannonWorld";
 	import PoseToRotation from "../lib/PoseToRotation";

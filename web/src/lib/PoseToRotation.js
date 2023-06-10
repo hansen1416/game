@@ -1,5 +1,5 @@
 import * as THREE from "three";
-import { clamp, BlazePoseKeypointsValues, MDMJoints } from "./ropes";
+import { clamp, BlazePoseKeypointsValues, MDMJoints } from "../utils/ropes";
 
 function quaternionFromBasis(xaxis0, yaxis0, zaxis0, xaxis1, yaxis1, zaxis1) {
 	/**
