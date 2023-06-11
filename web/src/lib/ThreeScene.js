@@ -42,7 +42,7 @@ export default class ThreeScene {
 		// // far angle for throw testing
 
 		this.camera.zoom = 60; // zoom in by 50%
-		this.camera.position.set(0, width * 0.2, -width * 1.2);
+		this.camera.position.set(0, width * 0.1, -width * 1.2);
 
 		// console.log(width);
 

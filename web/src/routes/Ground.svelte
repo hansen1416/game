@@ -13,6 +13,7 @@
 	import CannonWorld from "../lib/CannonWorld";
 	import PoseToRotation from "../lib/PoseToRotation";
 	import Toss from "../lib/Toss";
+	import { poissonDiskSampling } from "../lib/PoissonSampling";
 	// import Deque from "../lib/Deque";
 
 	// const data_recorder = new Deque();
@@ -80,7 +81,7 @@
 		]).then(([dors, daneel]) => {
 			// player1
 			player1 = dors.scene.children[0];
-			player1.position.set(0, GROUND_LEVEL, PLAYER_Z);
+			player1.position.set(0, GROUND_LEVEL, 0);
 
 			player1.traverse(function (node) {
 				if (node.isMesh) {
@@ -124,7 +125,11 @@
 			handsAvailableRight = true;
 		});
 
-		cannonWorld.createTargets();
+		const points = poissonDiskSampling(100, 100, 10, 100);
+
+		cannonWorld.createTargets(points);
+
+		// console.log(points);
 	});
 
 	onDestroy(() => {

@@ -1,6 +1,7 @@
 <script>
 	import { Router, Route } from "svelte-routing";
 	import Playground from "./routes/Playground.svelte";
+	import Ground from "./routes/Ground.svelte";
 </script>
 
 <Router>
@@ -12,4 +13,5 @@
 
 	<!-- <Route path="/blog/:id" component={BlogPost} /> -->
 	<Route path="/playground" component={Playground} />
+	<Route path="/ground" component={Ground} />
 </Router>

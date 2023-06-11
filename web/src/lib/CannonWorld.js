@@ -3,15 +3,15 @@ import * as THREE from "three";
 // import { ConvexGeometry } from "three/addons/geometries/ConvexGeometry.js";
 import {
 	GROUND_LEVEL,
-	FLOOR_WIDTH,
-	FLOOR_HEIGHT,
+	GROUND_WIDTH,
+	GROUND_HEIGHT,
 	PLAYER_Z,
 } from "../utils/constants";
 
 let debug;
 
 if (import.meta.env.DEV) {
-	const module = await import(`../utils/debugger`);
+	const module = await import(/* @vite-ignore */ `../utils/debugger`);
 
 	debug = module.cannonDebugger;
 }
@@ -63,14 +63,13 @@ export default class CannonWorld {
 
 		this.world.addBody(groundBody);
 
-		const flootDepth = 0.2;
 		// Create a Three.js ground plane mesh
 		const groundMesh = new THREE.Mesh(
-			new THREE.BoxGeometry(FLOOR_WIDTH, FLOOR_HEIGHT, flootDepth),
+			new THREE.PlaneGeometry(GROUND_WIDTH, GROUND_HEIGHT),
 			new THREE.MeshStandardMaterial({ color: 0x363795 })
 		);
 
-		groundMesh.position.set(0, GROUND_LEVEL - flootDepth / 2, 0);
+		groundMesh.position.set(0, GROUND_LEVEL, 0);
 		groundMesh.rotation.set(-Math.PI / 2, 0, 0);
 		groundMesh.receiveShadow = true;
 
@@ -101,7 +100,7 @@ export default class CannonWorld {
 	boxTarget(
 		pos = { x: 0, y: 0, z: 0 },
 		mass = 0,
-		size = { w: 0.6, h: 0.9, d: 0.2 }
+		size = { w: 0.5, h: 0.5, d: 0.5 }
 	) {
 		const { x, y, z } = pos;
 		const { w, h, d } = size;
@@ -130,20 +129,14 @@ export default class CannonWorld {
 		this.mesh.push(mesh);
 	}
 
-	createTargets() {
+	createTargets(points) {
 		const y = GROUND_LEVEL + 0.9;
-		const z = -PLAYER_Z;
+		// const z = -PLAYER_Z;
+		const mess = 10;
 
-		this.boxTarget({ x: 10, y: y, z: z }, 5);
-		this.boxTarget({ x: 8, y: y, z: z }, 5);
-		this.boxTarget({ x: 6, y: y, z: z }, 5);
-		this.boxTarget({ x: 4, y: y, z: z }, 5);
-		this.boxTarget({ x: 2, y: y, z: z }, 5);
-		this.boxTarget({ x: -2, y: y, z: z }, 0.001);
-		this.boxTarget({ x: -4, y: y, z: z }, 1000);
-		this.boxTarget({ x: -6, y: y, z: z }, 1000);
-		this.boxTarget({ x: -8, y: y, z: z }, 1000);
-		this.boxTarget({ x: -10, y: y, z: z }, 1000);
+		for (let p of points) {
+			this.boxTarget({ x: p.x - 50, y: y, z: p.y - 50 }, mess);
+		}
 	}
 
 	onFrameUpdate() {
