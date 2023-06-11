@@ -125,11 +125,9 @@
 			handsAvailableRight = true;
 		});
 
-		const points = poissonDiskSampling(100, 100, 10, 100);
+		const points = poissonDiskSampling(100, 100, 20, 30);
 
 		cannonWorld.createTargets(points);
-
-		// console.log(points);
 	});
 
 	onDestroy(() => {

@@ -99,7 +99,7 @@ export default class CannonWorld {
 
 	boxTarget(
 		pos = { x: 0, y: 0, z: 0 },
-		mass = 0,
+		prop = { mass: 10, color: 0xa8c0ff },
 		size = { w: 0.5, h: 0.5, d: 0.5 }
 	) {
 		const { x, y, z } = pos;
@@ -108,7 +108,7 @@ export default class CannonWorld {
 		const shape = new CANNON.Box(new CANNON.Vec3(w, h, d));
 
 		const body = new CANNON.Body({
-			mass: mass, // kg
+			mass: prop.mass, // kg
 			shape: shape,
 		});
 
@@ -118,7 +118,7 @@ export default class CannonWorld {
 
 		const mesh = new THREE.Mesh(
 			new THREE.BoxGeometry(w * 2, h * 2, d * 2),
-			new THREE.MeshBasicMaterial({ color: 0xa8c0ff })
+			new THREE.MeshBasicMaterial({ color: prop.color })
 		);
 
 		mesh.position.set(x, y, z);
@@ -132,10 +132,13 @@ export default class CannonWorld {
 	createTargets(points) {
 		const y = GROUND_LEVEL + 0.9;
 		// const z = -PLAYER_Z;
-		const mess = 10;
+		const mass = 10;
 
 		for (let p of points) {
-			this.boxTarget({ x: p.x - 50, y: y, z: p.y - 50 }, mess);
+			this.boxTarget(
+				{ x: p.x - 50, y: y, z: p.y - 50 },
+				{ mass: mass, color: 0xff0099 }
+			);
 		}
 	}
 
