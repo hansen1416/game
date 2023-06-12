@@ -1,25 +1,50 @@
 import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
-import { ParametricGeometry } from "three/addons/geometries/ParametricGeometry.js";
+// import { ParametricGeometry } from "three/addons/geometries/ParametricGeometry.js";
 
-function rampFunction(u, v, pos) {
-	const alpha = 2 * Math.PI * u,
-		r = v < 0.5 ? 2 : 3;
+// function rampFunction(u, v, pos) {
+// 	const alpha = 2 * Math.PI * u,
+// 		r = v < 0.5 ? 2 : 3;
 
-	if (v < 0.1 || v > 0.9) pos.y = 0;
-	else
-		pos.y =
-			0.5 +
-			0.3 * Math.sin(2 * alpha) +
-			0.1 * Math.cos(3 * alpha) +
-			0.1 * Math.cos(9 * alpha);
+// 	if (v < 0.1 || v > 0.9) pos.y = 0;
+// 	else
+// 		pos.y =
+// 			0.5 +
+// 			0.3 * Math.sin(2 * alpha) +
+// 			0.1 * Math.cos(3 * alpha) +
+// 			0.1 * Math.cos(9 * alpha);
 
-	pos.x = r * Math.cos(alpha);
-	pos.z = r * Math.sin(alpha);
-}
+// 	pos.x = r * Math.cos(alpha);
+// 	pos.z = r * Math.sin(alpha);
+// }
+
+// function generateTerrain() {
+// 	// control how smooth is the geometry
+// 	const N = 100;
+
+// 	const geometry = new ParametricGeometry(rampFunction, N, 5);
+// 	geometry.computeVertexNormals();
+
+// 	const ramp = new THREE.Mesh(
+// 		geometry,
+// 		new THREE.MeshLambertMaterial({
+// 			color: "Aquamarine",
+// 			side: THREE.DoubleSide,
+// 		})
+// 	);
+// 	this.scene.add(ramp);
+// }
+let instance;
 
 export default class ThreeScene {
 	constructor(canvas, width, height) {
+		// make it a singleton, so we only have 1 threejs scene
+		if (instance) {
+			return instance;
+		} else {
+			instance = this;
+		}
+
 		this.scene = new THREE.Scene();
 
 		this.scene.add(new THREE.AxesHelper(1));
@@ -82,22 +107,5 @@ export default class ThreeScene {
 		this.controls.update();
 
 		this.renderer.render(this.scene, this.camera);
-	}
-
-	generateTerrain() {
-		// control how smooth is the geometry
-		const N = 100;
-
-		const geometry = new ParametricGeometry(rampFunction, N, 5);
-		geometry.computeVertexNormals();
-
-		const ramp = new THREE.Mesh(
-			geometry,
-			new THREE.MeshLambertMaterial({
-				color: "Aquamarine",
-				side: THREE.DoubleSide,
-			})
-		);
-		this.scene.add(ramp);
 	}
 }

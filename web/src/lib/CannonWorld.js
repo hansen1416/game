@@ -1,21 +1,27 @@
 import * as CANNON from "cannon-es";
 import * as THREE from "three";
 // import { ConvexGeometry } from "three/addons/geometries/ConvexGeometry.js";
-import {
-	GROUND_LEVEL,
-	GROUND_WIDTH,
-	GROUND_HEIGHT,
-} from "../utils/constants";
+import { GROUND_LEVEL, GROUND_WIDTH, GROUND_HEIGHT } from "../utils/constants";
 
 let debug;
-
+// debug only in dev envirionment
 if (import.meta.env.DEV) {
 	const module = await import(/* @vite-ignore */ `../utils/debugger`);
 
 	debug = module.cannonDebugger;
 }
+
+let instance;
+
 export default class CannonWorld {
 	constructor(scene) {
+		// make it a singleton, so we only have 1 threejs scene
+		if (instance) {
+			return instance;
+		} else {
+			instance = this;
+		}
+
 		this.scene = scene;
 
 		this.world = new CANNON.World({
