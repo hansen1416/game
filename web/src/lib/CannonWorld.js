@@ -5,7 +5,6 @@ import {
 	GROUND_LEVEL,
 	GROUND_WIDTH,
 	GROUND_HEIGHT,
-	PLAYER_Z,
 } from "../utils/constants";
 
 let debug;
