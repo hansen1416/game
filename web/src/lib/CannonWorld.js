@@ -61,40 +61,30 @@ export default class CannonWorld {
 		}
 	}
 
+	/**
+	 *
+	 * @param {CANNON.Body} body
+	 */
 	addStaticBody(body) {
-		this.world.addBody(body)
+		this.world.addBody(body);
+	}
+
+	/**
+	 *
+	 * @param {CANNON.Body} body
+	 * @param {THREE.Mesh} mesh
+	 */
+	addItemBody(body, mesh) {
+		this.world.addBody(body);
+
+		this.rigid.push(body);
+		this.mesh.push(mesh);
 	}
 }
 
 /**
 
-addGround() {
-		// add floor
-		const groundBody = new CANNON.Body({ mass: 0 });
-		// @ts-ignore
-		// groundBody.material = planeContactMaterial;
-		groundBody.position.set(0, GROUND_LEVEL, 0);
-		groundBody.quaternion.setFromAxisAngle(
-			new CANNON.Vec3(1, 0, 0),
-			-Math.PI / 2
-		);
 
-		groundBody.addShape(new CANNON.Plane());
-
-		this.world.addBody(groundBody);
-
-		// Create a Three.js ground plane mesh
-		const groundMesh = new THREE.Mesh(
-			new THREE.PlaneGeometry(GROUND_WIDTH, GROUND_HEIGHT),
-			new THREE.MeshStandardMaterial({ color: 0x363795 })
-		);
-
-		groundMesh.position.set(0, GROUND_LEVEL, 0);
-		groundMesh.rotation.set(-Math.PI / 2, 0, 0);
-		groundMesh.receiveShadow = true;
-
-		this.scene.add(groundMesh);
-	}
 
 	// daneelBody(glb) {
 	// 	// const meshes = {};
@@ -117,50 +107,8 @@ addGround() {
 	// 	// world.addContactMaterial(contactMaterial);
 	// }
 
-	boxTarget(
-		pos = { x: 0, y: 0, z: 0 },
-		prop = { mass: 10, color: 0xa8c0ff },
-		size = { w: 0.5, h: 0.5, d: 0.5 }
-	) {
-		const { x, y, z } = pos;
-		const { w, h, d } = size;
+	
 
-		const shape = new CANNON.Box(new CANNON.Vec3(w, h, d));
-
-		const body = new CANNON.Body({
-			mass: prop.mass, // kg
-			shape: shape,
-		});
-
-		body.position.set(x, y, z);
-		z;
-		this.world.addBody(body);
-
-		const mesh = new THREE.Mesh(
-			new THREE.BoxGeometry(w * 2, h * 2, d * 2),
-			new THREE.MeshBasicMaterial({ color: prop.color })
-		);
-
-		mesh.position.set(x, y, z);
-
-		this.scene.add(mesh);
-
-		this.rigid.push(body);
-		this.mesh.push(mesh);
-	}
-
-	createTargets(points) {
-		const y = GROUND_LEVEL + 0.9;
-		// const z = -PLAYER_Z;
-		const mass = 10;
-
-		for (let p of points) {
-			this.boxTarget(
-				{ x: p.x - 50, y: y, z: p.y - 50 },
-				{ mass: mass, color: 0xff0099 }
-			);
-		}
-	}
 
 
 	//  The value of linearDamping can be set to any non-negative number, 

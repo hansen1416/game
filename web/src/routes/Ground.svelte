@@ -12,9 +12,11 @@
 	import ThreeScene from "../lib/ThreeScene";
 	import CannonWorld from "../lib/CannonWorld";
 	import WorldBuilder from "../lib/WorldBuilders";
+	import ItemBuilder from "../lib/ItemBuilder";
 	import PoseToRotation from "../lib/PoseToRotation";
 	import Toss from "../lib/Toss";
-	import { poissonDiskSampling } from "../lib/PoissonSampling";
+
+	import CannonDebugger from "cannon-es-debugger";
 
 	/**
 	 * what do I need?
@@ -54,7 +56,9 @@
 	 * use Observer for Architect
 	 */
 
-	let threeScene, cannonWorld, worldBuilder;
+	let debug;
+
+	let threeScene, cannonWorld, itemBuilder;
 	let video, canvas;
 
 	let player1,
@@ -98,6 +102,14 @@
 		cannonWorld = new CannonWorld();
 
 		new WorldBuilder(threeScene, cannonWorld).addGround().build();
+
+		itemBuilder = new ItemBuilder(threeScene, cannonWorld);
+
+		itemBuilder.spreadItems();
+
+		if (import.meta.env.DEV) {
+			debug = CannonDebugger(threeScene.scene, cannonWorld.world);
+		}
 
 		if (false) {
 			invokeCamera(video, () => {
@@ -161,10 +173,6 @@
 			handsWaitingRight = true;
 			handsAvailableRight = true;
 		});
-
-		const points = poissonDiskSampling(100, 100, 20, 30);
-
-		// cannonWorld.createTargets(points);
 	});
 
 	onDestroy(() => {
@@ -199,6 +207,10 @@
 		threeScene.onFrameUpdate();
 
 		cannonWorld.onFrameUpdate();
+
+		if (debug) {
+			debug.update();
+		}
 
 		if (handsWaitingLeft) {
 			if (handsEmptyCounterLeft < handsWaitingThreshold) {

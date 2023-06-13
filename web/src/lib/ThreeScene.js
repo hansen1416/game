@@ -37,6 +37,13 @@ import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 let instance;
 
 export default class ThreeScene {
+	/**
+	 * 
+	 * @param {HTMLCanvasElement} canvas 
+	 * @param {number} width 
+	 * @param {number} height 
+	 * @returns 
+	 */
 	constructor(canvas, width, height) {
 		// make it a singleton, so we only have 1 threejs scene
 		if (instance) {
@@ -109,8 +116,22 @@ export default class ThreeScene {
 		this.renderer.render(this.scene, this.camera);
 	}
 
+	/**
+	 *
+	 * @param {THREE.Mesh} mesh
+	 */
 	addStaticMesh(mesh) {
 		mesh.receiveShadow = true;
+
+		this.scene.add(mesh);
+	}
+
+	/**
+	 *
+	 * @param {THREE.Mesh} mesh
+	 */
+	addItemMesh(mesh) {
+		mesh.castShadow = true;
 
 		this.scene.add(mesh);
 	}
