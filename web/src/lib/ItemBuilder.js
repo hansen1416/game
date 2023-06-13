@@ -3,7 +3,7 @@ import * as THREE from "three";
 import { GROUND_LEVEL, GROUND_WIDTH, GROUND_HEIGHT } from "../utils/constants";
 import ThreeScene from "./ThreeScene";
 import CannonWorld from "./CannonWorld";
-import { poissonDiskSampling } from "../lib/PoissonSampling";
+import { poissonDiskSampling } from "../utils/poissonSampling";
 
 export default class ItemBuilder {
 	/**

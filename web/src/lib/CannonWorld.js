@@ -1,13 +1,5 @@
 import * as CANNON from "cannon-es";
 
-let debug;
-// debug only in dev envirionment
-if (import.meta.env.DEV) {
-	const module = await import(/* @vite-ignore */ `../utils/debugger`);
-
-	debug = module.cannonDebugger;
-}
-
 let instance;
 
 export default class CannonWorld {
@@ -42,18 +34,10 @@ export default class CannonWorld {
 
 		this.rigid = [];
 		this.mesh = [];
-
-		// if (debug) {
-		// 	this.debuggerInstance = debug(this.scene, this.world);
-		// }
 	}
 
 	onFrameUpdate() {
 		this.world.fixedStep();
-
-		if (debug) {
-			// this.debuggerInstance.update();
-		}
 
 		for (let i in this.rigid) {
 			this.mesh[i].position.copy(this.rigid[i].position);
