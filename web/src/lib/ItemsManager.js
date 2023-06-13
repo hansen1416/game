@@ -1,26 +1,34 @@
-import * as CANNON from "cannon-es";
 import * as THREE from "three";
-import { GROUND_LEVEL, GROUND_WIDTH, GROUND_HEIGHT } from "../utils/constants";
+import * as CANNON from "cannon-es";
+import { GROUND_LEVEL } from "../utils/constants";
 import ThreeScene from "./ThreeScene";
 import CannonWorld from "./CannonWorld";
 import { poissonDiskSampling } from "../utils/poissonSampling";
 
-export default class ItemBuilder {
+let instance;
+
+export default class ItemsManager {
 	/**
 	 *
 	 * @param {ThreeScene} renderer
 	 * @param {CannonWorld} physics
 	 */
 	constructor(renderer, physics) {
+		if (instance) {
+			return instance;
+		} else {
+			instance = this;
+		}
+
 		this.renderer = renderer;
 		this.physics = physics;
 	}
 
-    /**
-     * 
-     * @param {object} pos 
-     * @param {object} prop 
-     */
+	/**
+	 *
+	 * @param {{x: number, y: number, z: number}} pos
+	 * @param {{color: number}} prop
+	 */
 	addItem(pos, prop) {
 		const { x, y, z } = pos;
 		const { w, h, d } = { w: 0.5, h: 0.5, d: 0.5 };
@@ -44,10 +52,10 @@ export default class ItemBuilder {
 		this.physics.addItemBody(body, mesh);
 	}
 
-    spreadItems() {
-        const points = poissonDiskSampling(100, 100, 20, 30);
+	spreadItems() {
+		const points = poissonDiskSampling(100, 100, 20, 30);
 
-        const y = GROUND_LEVEL + 0.9;
+		const y = GROUND_LEVEL + 0.9;
 
 		for (let p of points) {
 			this.addItem(
@@ -55,5 +63,5 @@ export default class ItemBuilder {
 				{ color: 0xff0099 }
 			);
 		}
-    }
+	}
 }

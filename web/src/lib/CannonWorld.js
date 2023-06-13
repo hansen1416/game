@@ -64,6 +64,18 @@ export default class CannonWorld {
 		this.rigid.push(body);
 		this.mesh.push(mesh);
 	}
+
+	/**
+	 *
+	 * @param {CANNON.Body} body
+	 * @param {THREE.Object3D} mesh
+	 */
+	addPlayerBody(body, mesh) {
+		this.world.addBody(body);
+
+		this.rigid.push(body);
+		this.mesh.push(mesh);
+	}
 }
 
 /**

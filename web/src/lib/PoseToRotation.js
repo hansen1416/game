@@ -173,7 +173,7 @@ function torsoRotation(left_shoulder2, right_shoulder2, left_hip2, right_hip2) {
 //      */
 
 export default class PoseToRotation {
-	constructor(bones, capture_type) {
+	constructor(bones, capture_type = "mediapipe") {
 		this.bones = bones;
 		// this.local_vectors = {};
 

@@ -11,8 +11,9 @@
 	} from "../utils/ropes";
 	import ThreeScene from "../lib/ThreeScene";
 	import CannonWorld from "../lib/CannonWorld";
-	import WorldBuilder from "../lib/WorldBuilders";
-	import ItemBuilder from "../lib/ItemBuilder";
+	import StageBuilder from "../lib/StageBuilder";
+	import ItemsManager from "../lib/ItemsManager";
+	import PlayerController from "../lib/PlayerController";
 	import PoseToRotation from "../lib/PoseToRotation";
 	import Toss from "../lib/Toss";
 
@@ -58,7 +59,15 @@
 
 	let debug;
 
-	let threeScene, cannonWorld, itemBuilder;
+	/** @type {ThreeScene} */
+	let threeScene;
+	/** @type {CannonWorld} */
+	let cannonWorld;
+	/** @type {ItemsManager} */
+	let itemsManager;
+	/** @type {PlayerController} */
+	let playerController;
+
 	let video, canvas;
 
 	let player1,
@@ -101,11 +110,13 @@
 
 		cannonWorld = new CannonWorld();
 
-		new WorldBuilder(threeScene, cannonWorld).addGround().build();
+		new StageBuilder(threeScene, cannonWorld).addGround().build();
 
-		itemBuilder = new ItemBuilder(threeScene, cannonWorld);
+		itemsManager = new ItemsManager(threeScene, cannonWorld);
 
-		itemBuilder.spreadItems();
+		itemsManager.spreadItems();
+
+		playerController = new PlayerController(threeScene, cannonWorld);
 
 		if (import.meta.env.DEV) {
 			debug = CannonDebugger(threeScene.scene, cannonWorld.world);
@@ -129,22 +140,12 @@
 			// loadGLTF(process.env.PUBLIC_URL + "/glb/monster.glb"),
 		]).then(([dors, daneel]) => {
 			// player1
-			player1 = dors.scene.children[0];
-			player1.position.set(0, GROUND_LEVEL, 0);
 
-			player1.traverse(function (node) {
-				if (node.isMesh) {
-					node.castShadow = true;
-				}
+			playerController.addPlayer(dors.scene.children[0], {x:0, y:GROUND_LEVEL, z:0});
 
-				if (node.isBone) {
-					player1Bones[node.name] = node;
-				}
-			});
+			// poseToRotation = new PoseToRotation(player1Bones, "mediapipe");
 
-			poseToRotation = new PoseToRotation(player1Bones, "mediapipe");
-
-			threeScene.scene.add(player1);
+			// threeScene.scene.add(player1);
 
 			// player2
 			player2 = daneel.scene.children[0];
@@ -211,7 +212,7 @@
 		if (debug) {
 			debug.update();
 		}
-
+/**
 		if (handsWaitingLeft) {
 			if (handsEmptyCounterLeft < handsWaitingThreshold) {
 				handsEmptyCounterLeft += 1;
@@ -267,7 +268,7 @@
 			handsAvailableRight = false;
 			handsWaitingRight = false;
 		}
-
+*/
 		animationPointer = requestAnimationFrame(animate);
 	}
 
@@ -318,7 +319,7 @@
 				if (velocity) {
 					// making ball move
 
-					cannonWorld.project(handBallMeshLeft, velocity);
+					// cannonWorld.project(handBallMeshLeft, velocity);
 
 					handsWaitingLeft = true;
 					handBallMeshLeft = null;
@@ -343,7 +344,7 @@
 				if (velocity) {
 					// making ball move
 
-					cannonWorld.project(handBallMeshRight, velocity);
+					// cannonWorld.project(handBallMeshRight, velocity);
 
 					handsWaitingRight = true;
 					handBallMeshRight = null;
@@ -400,7 +401,7 @@
 					const direction = new THREE.Vector3(0, 0.1, 2).normalize();
 					const speed = 36;
 
-					cannonWorld.project(mesh, direction.multiplyScalar(speed));
+					// cannonWorld.project(mesh, direction.multiplyScalar(speed));
 				}}>throw</button
 			>
 

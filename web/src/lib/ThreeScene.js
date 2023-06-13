@@ -135,4 +135,11 @@ export default class ThreeScene {
 
 		this.scene.add(mesh);
 	}
+	/**
+	 *
+	 * @param {THREE.Object3D} player_obj
+	 */
+	addPlayerObj(player_obj) {
+		this.scene.add(player_obj);
+	}
 }

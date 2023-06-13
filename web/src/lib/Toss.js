@@ -1,4 +1,4 @@
-import Deque from "./Deque";
+import Deque from "../utils/Deque";
 import * as THREE from "three";
 
 export default class Toss {
