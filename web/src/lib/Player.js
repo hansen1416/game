@@ -59,7 +59,4 @@ export default class Player {
 	}
 
 	updateState() {}
-
-	// call this in each animaiton frame
-	onFrameUpdate() {}
 }

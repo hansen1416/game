@@ -139,30 +139,30 @@
 			loadGLTF("/glb/daneel.glb"),
 			// loadGLTF(process.env.PUBLIC_URL + "/glb/monster.glb"),
 		]).then(([dors, daneel]) => {
-			// player1
 
-			playerController.addPlayer(dors.scene.children[0], {x:0, y:GROUND_LEVEL, z:0});
+			// player1
+			playerController.addPlayer(dors.scene.children[0], {
+				x: 0,
+				y: GROUND_LEVEL,
+				z: 0,
+			});
 
 			// poseToRotation = new PoseToRotation(player1Bones, "mediapipe");
 
-			// threeScene.scene.add(player1);
-
 			// player2
-			player2 = daneel.scene.children[0];
-			player2.position.set(0, GROUND_LEVEL, -PLAYER_Z);
-			player2.rotation.set(0, -Math.PI, 0);
-
-			player2.traverse(function (node) {
-				if (node.isMesh) {
-					node.castShadow = true;
+			playerController.addPlayer(
+				daneel.scene.children[0],
+				{
+					x: 0,
+					y: GROUND_LEVEL,
+					z: -PLAYER_Z,
+				},
+				{
+					x: 0,
+					y: -Math.PI,
+					z: 0,
 				}
-
-				if (node.isBone) {
-					player2Bones[node.name] = node;
-				}
-			});
-
-			threeScene.scene.add(player2);
+			);
 
 			// all models ready
 			cameraReady = true;
@@ -212,7 +212,7 @@
 		if (debug) {
 			debug.update();
 		}
-/**
+		/**
 		if (handsWaitingLeft) {
 			if (handsEmptyCounterLeft < handsWaitingThreshold) {
 				handsEmptyCounterLeft += 1;

@@ -10,6 +10,13 @@ export default class PlayerController {
 	 * @type {{[key: string]: Player}}
 	 */
 	players = {};
+	/**
+	 * @type {PlayerMain}
+	 */
+	main_player;
+
+	//
+	lateral = 20;
 
 	/**
 	 *
@@ -44,6 +51,7 @@ export default class PlayerController {
 
 		if (is_main) {
 			player = new PlayerMain(model, position, rotation);
+			this.main_player = player;
 		} else {
 			player = new Player(model, position, rotation);
 		}
@@ -56,4 +64,28 @@ export default class PlayerController {
 
 		this.players[player.uuid] = player;
 	}
+
+	/**
+	 *
+	 * @param {object} pose3D
+	 * @param {object} pose2D
+	 * @param {boolean} lower_body
+	 * @returns
+	 */
+	playerMainPose2Bone(pose3D, pose2D, lower_body = false) {
+		if (!this.main_player) {
+			return;
+		}
+
+		this.main_player.pose2totation.applyPoseToBone(pose3D, lower_body);
+
+		// this.main_player.pose2totation.applyPosition(pose2D, this.lateral);
+	}
+
+	// todo, we need the speed
+	// each player has a speed, calculate the next position for each player based on their speed
+	//
+
+	// call this in each animaiton frame
+	onFrameUpdate() {}
 }

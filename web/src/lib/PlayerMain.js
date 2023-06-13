@@ -1,6 +1,7 @@
 import * as THREE from "three";
 import Deque from "../utils/Deque";
 import Player from "./Player";
+import PoseToRotation from "./PoseToRotation";
 
 let instance;
 
@@ -24,6 +25,8 @@ export default class PlayerMain extends Player {
 		} else {
 			instance = this;
 		}
+
+        this.pose2totation = new PoseToRotation(this.bones)
 	}
 
 	/**

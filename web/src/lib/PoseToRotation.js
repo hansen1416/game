@@ -173,6 +173,11 @@ function torsoRotation(left_shoulder2, right_shoulder2, left_hip2, right_hip2) {
 //      */
 
 export default class PoseToRotation {
+	/**
+	 *
+	 * @param {{[key: string]: THREE.Bone}} bones
+	 * @param {string} capture_type
+	 */
 	constructor(bones, capture_type = "mediapipe") {
 		this.bones = bones;
 		// this.local_vectors = {};
@@ -184,10 +189,11 @@ export default class PoseToRotation {
 		}
 	}
 
-	// updatePose(pose3D) {
-	// 	this.pose3D = pose3D
-	// }
-
+	/**
+	 *
+	 * @param {Array} pose3D
+	 * @param {boolean} lower_body
+	 */
 	applyPoseToBone(pose3D, lower_body = false) {
 		this.pose3D = pose3D;
 
@@ -342,6 +348,16 @@ export default class PoseToRotation {
 		}
 	}
 
+	/**
+	 * 
+	 * @param {string} bone_name 
+	 * @param {string} parent_bone_name 
+	 * @param {string} start_joint_name 
+	 * @param {string} end_joint_name 
+	 * @param {THREE.Euler} init_euler 
+	 * @param {THREE.Vector3} up_vector 
+	 * @param {object} angle_restrain 
+	 */
 	rotateLimb(
 		bone_name,
 		parent_bone_name,
