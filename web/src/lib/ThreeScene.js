@@ -108,4 +108,10 @@ export default class ThreeScene {
 
 		this.renderer.render(this.scene, this.camera);
 	}
+
+	addStaticMesh(mesh) {
+		mesh.receiveShadow = true;
+
+		this.scene.add(mesh);
+	}
 }

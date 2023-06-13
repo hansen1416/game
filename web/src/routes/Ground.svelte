@@ -11,6 +11,7 @@
 	} from "../utils/ropes";
 	import ThreeScene from "../lib/ThreeScene";
 	import CannonWorld from "../lib/CannonWorld";
+	import WorldBuilder from "../lib/WorldBuilders";
 	import PoseToRotation from "../lib/PoseToRotation";
 	import Toss from "../lib/Toss";
 	import { poissonDiskSampling } from "../lib/PoissonSampling";
@@ -53,7 +54,9 @@
 	 * use Observer for Architect
 	 */
 
-	let threeScene, cannonWorld, video, canvas;
+	let threeScene, cannonWorld, worldBuilder;
+	let video, canvas;
+
 	let player1,
 		player1Bones = {};
 
@@ -92,9 +95,11 @@
 	onMount(() => {
 		threeScene = new ThreeScene(canvas, sceneWidth, sceneHeight);
 
-		cannonWorld = new CannonWorld(threeScene.scene);
+		cannonWorld = new CannonWorld();
 
-		if (true) {
+		new WorldBuilder(threeScene, cannonWorld).addGround().build();
+
+		if (false) {
 			invokeCamera(video, () => {
 				cameraReady = true;
 			});
@@ -159,7 +164,7 @@
 
 		const points = poissonDiskSampling(100, 100, 20, 30);
 
-		cannonWorld.createTargets(points);
+		// cannonWorld.createTargets(points);
 	});
 
 	onDestroy(() => {
