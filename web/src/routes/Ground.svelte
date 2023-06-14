@@ -14,7 +14,6 @@
 	import StageBuilder from "../lib/StageBuilder";
 	import ItemsManager from "../lib/ItemsManager";
 	import PlayerController from "../lib/PlayerController";
-	import PoseToRotation from "../lib/PoseToRotation";
 	import Toss from "../lib/Toss";
 
 	import CannonDebugger from "cannon-es-debugger";
@@ -178,6 +177,8 @@
 
 	onDestroy(() => {
 		cancelAnimationFrame(animationPointer);
+
+		playerController.destructor()
 	});
 
 	// when mannequin, model and camera are erady, start animation loop
@@ -208,6 +209,8 @@
 		threeScene.onFrameUpdate();
 
 		cannonWorld.onFrameUpdate();
+
+		playerController.onFrameUpdate();
 
 		if (debug) {
 			debug.update();

@@ -142,4 +142,11 @@ export default class ThreeScene {
 	addPlayerObj(player_obj) {
 		this.scene.add(player_obj);
 	}
+	/**
+	 *
+	 * @param {THREE.Object3D} player_obj
+	 */
+	removePlayerObj(player_obj) {
+		console.info('todo remove', player_obj)
+	}
 }

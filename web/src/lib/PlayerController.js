@@ -7,9 +7,14 @@ let instance;
 
 export default class PlayerController {
 	/**
-	 * @type {{[key: string]: Player}}
+	 * @type {Player[]}
 	 */
-	players = {};
+	players = [];
+	/**
+	 * @type {{[key: string]: number}}
+	 */
+	players_mapping = {};
+
 	/**
 	 * @type {PlayerMain}
 	 */
@@ -32,6 +37,13 @@ export default class PlayerController {
 
 		this.renderer = renderer;
 		this.physics = physics;
+	}
+
+	destructor() {
+
+		// todo clear all players, from this class, threejs scene, cannon world
+		
+		console.log('PlayerController destructor')
 	}
 
 	/**
@@ -62,7 +74,37 @@ export default class PlayerController {
 			this.physics.addPlayerBody(player.body, player.mesh);
 		}
 
-		this.players[player.uuid] = player;
+		this.players.push(player);
+		this.players_mapping[player.uuid] = this.players.length - 1;
+	}
+
+	/**
+	 *
+	 * @param {string} uuid
+	 */
+	removePlayer(uuid) {
+
+		const player = this.players[this.players_mapping[uuid]];
+
+		this.renderer.removePlayerObj(player.mesh);
+
+		if (player.body) {
+			this.physics.removePlayerBody(player.body);
+		}
+
+		// how to effctively remove the player from array
+		const idx = this.players_mapping[uuid];
+
+		// remove Player instance from `this.players`, also update 
+		if (idx >= 0) {
+			this.players.splice(idx, 1);
+
+			for (let i = idx; i < this.players.length; i++) {
+				this.players_mapping[this.players[i].uuid] = i;
+			}
+		}
+
+		delete this.players_mapping[uuid];
 	}
 
 	/**
@@ -87,5 +129,13 @@ export default class PlayerController {
 	//
 
 	// call this in each animaiton frame
-	onFrameUpdate() {}
+	onFrameUpdate() {
+		for (let i = 0; i < this.players.length; i++) {
+			if (this.players[i].speed) {
+				const speed = this.players[i].speed.clone();
+
+				// todo calculate the next position based on the speed vector and current position
+			}
+		}
+	}
 }

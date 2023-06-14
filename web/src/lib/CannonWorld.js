@@ -76,6 +76,13 @@ export default class CannonWorld {
 		this.rigid.push(body);
 		this.mesh.push(mesh);
 	}
+	/**
+	 *
+	 * @param {CANNON.Body} body
+	 */
+	removePlayerBody(body) {
+		console.info("todo remove", body);
+	}
 }
 
 /**

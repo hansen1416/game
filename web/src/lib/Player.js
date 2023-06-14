@@ -1,7 +1,6 @@
 import * as THREE from "three";
 import * as CANNON from "cannon-es";
 
-
 export const STATE_ENUM = {
 	0: "idle",
 };
@@ -24,9 +23,13 @@ export default class Player {
 	 */
 	body;
 
+	uuid = "";
 	state = 0;
 	pose = 0;
-	uuid = "";
+	/**
+	 * @type {THREE.Vector3}
+	 */
+	speed;
 
 	/**
 	 *
@@ -58,5 +61,4 @@ export default class Player {
 		this.uuid = model.uuid;
 	}
 
-	updateState() {}
 }
