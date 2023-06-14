@@ -1,3 +1,4 @@
+import * as THREE from "three";
 import Player from "./Player";
 import PlayerMain from "./PlayerMain";
 import ThreeScene from "./ThreeScene";
@@ -133,6 +134,12 @@ export default class PlayerController {
 		for (let i = 0; i < this.players.length; i++) {
 			if (this.players[i].speed) {
 				const speed = this.players[i].speed.clone();
+
+				const wpos = new THREE.Vector3();
+
+				this.players[i].mesh.getWorldPosition(wpos);
+
+				this.players[i].mesh.position.copy(wpos);
 
 				// todo calculate the next position based on the speed vector and current position
 			}
