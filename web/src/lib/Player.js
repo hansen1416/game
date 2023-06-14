@@ -60,5 +60,4 @@ export default class Player {
 		this.mesh = model;
 		this.uuid = model.uuid;
 	}
-
 }

@@ -349,14 +349,14 @@ export default class PoseToRotation {
 	}
 
 	/**
-	 * 
-	 * @param {string} bone_name 
-	 * @param {string} parent_bone_name 
-	 * @param {string} start_joint_name 
-	 * @param {string} end_joint_name 
-	 * @param {THREE.Euler} init_euler 
-	 * @param {THREE.Vector3} up_vector 
-	 * @param {object} angle_restrain 
+	 *
+	 * @param {string} bone_name
+	 * @param {string} parent_bone_name
+	 * @param {string} start_joint_name
+	 * @param {string} end_joint_name
+	 * @param {THREE.Euler} init_euler
+	 * @param {THREE.Vector3} up_vector
+	 * @param {object} angle_restrain
 	 */
 	rotateLimb(
 		bone_name,

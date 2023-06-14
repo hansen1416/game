@@ -6,7 +6,6 @@ import PoseToRotation from "./PoseToRotation";
 let instance;
 
 export default class PlayerMain extends Player {
-	
 	hands_track = new Deque();
 	// lower `max_deque_length` faster speed
 	max_deque_length = 20;
@@ -26,7 +25,7 @@ export default class PlayerMain extends Player {
 			instance = this;
 		}
 
-        this.pose2totation = new PoseToRotation(this.bones)
+		this.pose2totation = new PoseToRotation(this.bones);
 	}
 
 	/**

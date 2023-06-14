@@ -38,11 +38,11 @@ let instance;
 
 export default class ThreeScene {
 	/**
-	 * 
-	 * @param {HTMLCanvasElement} canvas 
-	 * @param {number} width 
-	 * @param {number} height 
-	 * @returns 
+	 *
+	 * @param {HTMLCanvasElement} canvas
+	 * @param {number} width
+	 * @param {number} height
+	 * @returns
 	 */
 	constructor(canvas, width, height) {
 		// make it a singleton, so we only have 1 threejs scene
@@ -147,6 +147,6 @@ export default class ThreeScene {
 	 * @param {THREE.Object3D} player_obj
 	 */
 	removePlayerObj(player_obj) {
-		console.info('todo remove', player_obj)
+		console.info("todo remove", player_obj);
 	}
 }

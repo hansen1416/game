@@ -138,13 +138,17 @@
 			loadGLTF("/glb/daneel.glb"),
 			// loadGLTF(process.env.PUBLIC_URL + "/glb/monster.glb"),
 		]).then(([dors, daneel]) => {
-
 			// player1
-			playerController.addPlayer(dors.scene.children[0], {
-				x: 0,
-				y: GROUND_LEVEL,
-				z: 0,
-			});
+			playerController.addPlayer(
+				dors.scene.children[0],
+				{
+					x: 0,
+					y: GROUND_LEVEL,
+					z: 0,
+				},
+				{ x: 0, y: 0, z: 0 },
+				true
+			);
 
 			// poseToRotation = new PoseToRotation(player1Bones, "mediapipe");
 
@@ -178,7 +182,7 @@
 	onDestroy(() => {
 		cancelAnimationFrame(animationPointer);
 
-		playerController.destructor()
+		playerController.destructor();
 	});
 
 	// when mannequin, model and camera are erady, start animation loop
@@ -278,6 +282,7 @@
 	function onPoseCallback(result) {
 		if (result && result.worldLandmarks && result.worldLandmarks[0]) {
 			const pose3D = cloneDeep(result.worldLandmarks[0]);
+			const pose2D = cloneDeep(result.landmarks[0]);
 
 			// data_recorder.addBack({ data: pose3D, t: performance.now() });
 
@@ -299,6 +304,19 @@
 				v["z"] *= -width_ratio;
 			}
 
+			// todo set speed
+			// change player state based on the pose
+			// do toss based on the player's pose
+			// where to store the mainplayer's pose cache?
+			// and how to send the toss to items manager? probably through gamemedia
+			// maybe also need callback on the items when collide
+
+			// // playerController.main_player.speed = new THREE.Vector3(0, 0, 0.1);
+
+			playerController.playerMainPose2Bone(pose3D, pose2D, false);
+
+			return;
+			/**
 			poseToRotation.applyPoseToBone(pose3D, true);
 
 			// move the position of model
@@ -361,6 +379,7 @@
 					handBallMeshRight.position.copy(tmpvec);
 				}
 			}
+*/
 		}
 
 		poseDetectorAvailable = true;

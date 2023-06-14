@@ -41,10 +41,9 @@ export default class PlayerController {
 	}
 
 	destructor() {
-
 		// todo clear all players, from this class, threejs scene, cannon world
-		
-		console.log('PlayerController destructor')
+
+		console.log("PlayerController destructor");
 	}
 
 	/**
@@ -84,7 +83,6 @@ export default class PlayerController {
 	 * @param {string} uuid
 	 */
 	removePlayer(uuid) {
-
 		const player = this.players[this.players_mapping[uuid]];
 
 		this.renderer.removePlayerObj(player.mesh);
@@ -96,7 +94,7 @@ export default class PlayerController {
 		// how to effctively remove the player from array
 		const idx = this.players_mapping[uuid];
 
-		// remove Player instance from `this.players`, also update 
+		// remove Player instance from `this.players`, also update
 		if (idx >= 0) {
 			this.players.splice(idx, 1);
 
@@ -138,6 +136,8 @@ export default class PlayerController {
 				const wpos = new THREE.Vector3();
 
 				this.players[i].mesh.getWorldPosition(wpos);
+
+				wpos.add(speed);
 
 				this.players[i].mesh.position.copy(wpos);
 

@@ -51,4 +51,3 @@ export default class StageBuilder {
 		// do something when build process complete
 	}
 }
-
