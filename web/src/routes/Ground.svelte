@@ -220,6 +220,7 @@
 
 
 // console.log(controlGroup.position.add(new THREE.Vector3(0,0,0.1)))
+// threeScene.camera.position.add( threeScene.camera.getWorldDirection() );
 
 		// ========= captured pose logic
 
