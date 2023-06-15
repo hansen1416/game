@@ -104,6 +104,8 @@
 	const sceneWidth = document.documentElement.clientWidth;
 	const sceneHeight = document.documentElement.clientHeight;
 
+	let controlGroup = new THREE.Group()
+
 	onMount(() => {
 		threeScene = new ThreeScene(canvas, sceneWidth, sceneHeight);
 
@@ -139,11 +141,16 @@
 			// loadGLTF(process.env.PUBLIC_URL + "/glb/monster.glb"),
 		]).then(([dors, daneel]) => {
 			// add camera to the main player
-			dors.scene.children[0].add(threeScene.camera)
+
+			controlGroup.add(dors.scene.children[0])
+			controlGroup.add(threeScene.camera)
+
+			// dors.scene.children[0].add(threeScene.camera)
 
 			// player1
 			playerController.addPlayer(
-				dors.scene.children[0],
+				// dors.scene.children[0],
+				controlGroup,
 				{
 					x: 0,
 					y: GROUND_LEVEL,
@@ -207,15 +214,18 @@
 				performance.now(),
 				onPoseCallback
 			);
+
+			playerController.onFrameUpdate();
 		}
+
+
+// console.log(controlGroup.position.add(new THREE.Vector3(0,0,0.1)))
 
 		// ========= captured pose logic
 
 		threeScene.onFrameUpdate();
 
 		cannonWorld.onFrameUpdate();
-
-		playerController.onFrameUpdate();
 
 		if (debug) {
 			debug.update();
@@ -281,43 +291,44 @@
 	}
 
 	function onPoseCallback(result) {
-		if (result && result.worldLandmarks && result.worldLandmarks[0]) {
-			const pose3D = cloneDeep(result.worldLandmarks[0]);
-			const pose2D = cloneDeep(result.landmarks[0]);
-
-			// data_recorder.addBack({ data: pose3D, t: performance.now() });
-
-			// if (data_recorder.size() > 30) {
-			// 	data_recorder.removeFront();
-			// }
-
-			// if (data_recorder.size() === 30) {
-			// 	big_obj.push(data_recorder.toArray());
-			// }
-
-			const width_ratio = 30;
-			const height_ratio = (width_ratio * 480) / 640;
-
-			// multiply x,y by differnt factor
-			for (let v of pose3D) {
-				v["x"] *= width_ratio;
-				v["y"] *= -height_ratio;
-				v["z"] *= -width_ratio;
-			}
-
-			// todo set speed
-			// change player state based on the pose
-			// do toss based on the player's pose
-			// where to store the mainplayer's pose cache?
-			// and how to send the toss to items manager? probably through gamemedia
-			// maybe also need callback on the items when collide
-
-			// // playerController.main_player.speed = new THREE.Vector3(0, 0, 0.1);
-
-			playerController.playerMainPose2Bone(pose3D, pose2D, false);
-
+		if (!result || !result.worldLandmarks || !result.worldLandmarks[0]) {
+			poseDetectorAvailable = true;
 			return;
-			/**
+		}
+
+		const pose3D = cloneDeep(result.worldLandmarks[0]);
+		const pose2D = cloneDeep(result.landmarks[0]);
+
+		// data_recorder.addBack({ data: pose3D, t: performance.now() });
+
+		// if (data_recorder.size() > 30) {
+		// 	data_recorder.removeFront();
+		// }
+
+		// if (data_recorder.size() === 30) {
+		// 	big_obj.push(data_recorder.toArray());
+		// }
+
+		const width_ratio = 30;
+		const height_ratio = (width_ratio * 480) / 640;
+
+		// multiply x,y by differnt factor
+		for (let v of pose3D) {
+			v["x"] *= width_ratio;
+			v["y"] *= -height_ratio;
+			v["z"] *= -width_ratio;
+		}
+
+		// todo set speed
+		// change player state based on the pose
+		// do toss based on the player's pose
+		// where to store the mainplayer's pose cache?
+		// and how to send the toss to items manager? probably through gamemedia
+		// maybe also need callback on the items when collide
+
+		playerController.playerMainPose2Bone(pose3D, pose2D, false);
+
+		/**
 			poseToRotation.applyPoseToBone(pose3D, true);
 
 			// move the position of model
@@ -381,7 +392,6 @@
 				}
 			}
 */
-		}
 
 		poseDetectorAvailable = true;
 	}
@@ -434,13 +444,13 @@
 						runAnimation = !runAnimation;
 
 						// console.log(big_obj);
-					}}>stop animation</button
+					}}>Pause</button
 				>
 			{:else}
 				<button
 					on:click={() => {
 						runAnimation = !runAnimation;
-					}}>run animation</button
+					}}>Run</button
 				>
 			{/if}
 

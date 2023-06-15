@@ -23,14 +23,21 @@ export default class ThreeScene {
 
 		this.scene.add(new THREE.AxesHelper(1));
 
-		this.camera = new THREE.OrthographicCamera(
-			width / -2, // left
-			width / 2, // right
-			height / 2, // top
-			height / -2, // bottom
-			0.1, // near
-			width * 2 // far
-		);
+		// this.camera = new THREE.OrthographicCamera(
+		// 	width / -2, // left
+		// 	width / 2, // right
+		// 	height / 2, // top
+		// 	height / -2, // bottom
+		// 	0.1, // near
+		// 	width * 2 // far
+		// );
+
+		this.camera = new THREE.PerspectiveCamera(
+			75,
+			width / height,
+			0.01,
+			100
+		)
 
 		// this.camera.position.set(0, 10, -width);
 		// this.camera.zoom = 160; // zoom in by 50%
@@ -43,8 +50,8 @@ export default class ThreeScene {
 		// this.camera.zoom = 60; // zoom in by 50%
 		// this.camera.position.set(0, width * 0.1, -width * 1.2);
 
-		this.camera.zoom = 60; // zoom in by 50%
-		this.camera.position.set(0, 2, -30);
+		// this.camera.zoom = 60; // zoom in by 50%
+		this.camera.position.set(0, 2, -6);
 
 		// for walk testing
 		// this.camera.zoom = 195;

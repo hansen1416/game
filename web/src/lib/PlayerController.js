@@ -120,6 +120,8 @@ export default class PlayerController {
 
 		this.main_player.pose2totation.applyPoseToBone(pose3D, lower_body);
 
+		this.main_player.speed = new THREE.Vector3(0, 0, 0.1);
+
 		// this.main_player.pose2totation.applyPosition(pose2D, this.lateral);
 	}
 
@@ -141,7 +143,10 @@ export default class PlayerController {
 
 				this.players[i].mesh.position.copy(wpos);
 
-				// todo calculate the next position based on the speed vector and current position
+				// this.renderer.camera.position.add(speed)
+				// this.renderer.camera.lookAt(wpos)
+				// this.renderer.camera.updateProjectionMatrix();
+				
 			}
 		}
 	}
