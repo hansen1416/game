@@ -138,6 +138,9 @@
 			loadGLTF("/glb/daneel.glb"),
 			// loadGLTF(process.env.PUBLIC_URL + "/glb/monster.glb"),
 		]).then(([dors, daneel]) => {
+			// add camera to the main player
+			dors.scene.children[0].add(threeScene.camera)
+
 			// player1
 			playerController.addPlayer(
 				dors.scene.children[0],
@@ -149,8 +152,6 @@
 				{ x: 0, y: 0, z: 0 },
 				true
 			);
-
-			// poseToRotation = new PoseToRotation(player1Bones, "mediapipe");
 
 			// player2
 			playerController.addPlayer(

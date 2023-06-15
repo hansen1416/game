@@ -1,39 +1,6 @@
 import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
-// import { ParametricGeometry } from "three/addons/geometries/ParametricGeometry.js";
 
-// function rampFunction(u, v, pos) {
-// 	const alpha = 2 * Math.PI * u,
-// 		r = v < 0.5 ? 2 : 3;
-
-// 	if (v < 0.1 || v > 0.9) pos.y = 0;
-// 	else
-// 		pos.y =
-// 			0.5 +
-// 			0.3 * Math.sin(2 * alpha) +
-// 			0.1 * Math.cos(3 * alpha) +
-// 			0.1 * Math.cos(9 * alpha);
-
-// 	pos.x = r * Math.cos(alpha);
-// 	pos.z = r * Math.sin(alpha);
-// }
-
-// function generateTerrain() {
-// 	// control how smooth is the geometry
-// 	const N = 100;
-
-// 	const geometry = new ParametricGeometry(rampFunction, N, 5);
-// 	geometry.computeVertexNormals();
-
-// 	const ramp = new THREE.Mesh(
-// 		geometry,
-// 		new THREE.MeshLambertMaterial({
-// 			color: "Aquamarine",
-// 			side: THREE.DoubleSide,
-// 		})
-// 	);
-// 	this.scene.add(ramp);
-// }
 let instance;
 
 export default class ThreeScene {
@@ -73,10 +40,11 @@ export default class ThreeScene {
 		// this.camera.position.set(600, 600, -width);
 		// // far angle for throw testing
 
-		this.camera.zoom = 60; // zoom in by 50%
-		this.camera.position.set(0, width * 0.1, -width * 1.2);
+		// this.camera.zoom = 60; // zoom in by 50%
+		// this.camera.position.set(0, width * 0.1, -width * 1.2);
 
-		// console.log(width);
+		this.camera.zoom = 60; // zoom in by 50%
+		this.camera.position.set(0, 2, -30);
 
 		// for walk testing
 		// this.camera.zoom = 195;
