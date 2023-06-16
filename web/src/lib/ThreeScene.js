@@ -1,9 +1,17 @@
 import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 
+export const SceneProperties = {
+	camera_height: 1,
+	camera_far_z: 4,
+}
+
+Object.freeze(SceneProperties);
+
 let instance;
 
 export default class ThreeScene {
+
 	/**
 	 *
 	 * @param {HTMLCanvasElement} canvas
@@ -51,7 +59,7 @@ export default class ThreeScene {
 		// this.camera.position.set(0, width * 0.1, -width * 1.2);
 
 		// this.camera.zoom = 60; // zoom in by 50%
-		this.camera.position.set(0, 2, -6);
+		this.camera.position.set(0, SceneProperties.camera_height, -SceneProperties.camera_far_z);
 
 		// for walk testing
 		// this.camera.zoom = 195;

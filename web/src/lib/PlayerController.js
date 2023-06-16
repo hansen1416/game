@@ -1,7 +1,7 @@
 import * as THREE from "three";
 import Player from "./Player";
 import PlayerMain from "./PlayerMain";
-import ThreeScene from "./ThreeScene";
+import ThreeScene, { SceneProperties } from "./ThreeScene";
 import CannonWorld from "./CannonWorld";
 
 let instance;
@@ -107,9 +107,9 @@ export default class PlayerController {
 	}
 
 	/**
-	 *	this function is called in the onPoseCallback, 
+	 *	this function is called in the onPoseCallback,
 	 *  so it's a bit slower than requestAnimationFrame
-	 * 
+	 *
 	 * @param {object} pose3D
 	 * @param {object} pose2D
 	 * @param {boolean} lower_body
@@ -120,14 +120,34 @@ export default class PlayerController {
 			return;
 		}
 
+		// we also need the direction that the user is facing, to caluclate the speed on the x axis
 		this.main_player.pose2totation.applyPoseToBone(pose3D, lower_body);
 
-		this.main_player.speed = new THREE.Vector3(0, 0, 0.1);
+		// there will be a initial speed, which will be modified by user torse orientation
+		const speed = new THREE.Vector3(0.05, 0, 0.1);
 
-		this.main_player.mesh.position.add(this.main_player.speed);
+		// the user's character movement
+		this.main_player.mesh.position.add(speed);
 
-		this.renderer.camera.position.add(this.main_player.speed)
-		this.renderer.camera.lookAt(this.main_player.mesh.position)
+		// note: the speed.z can be 0, the atan will be Math.PI/2
+		// use absolute value to calculate the angle, so theta always lower than Math.PI/2
+		// use the sign of x/z to control the diff instead
+		const theta = Math.atan(Math.abs(speed.x) / Math.abs(speed.z));
+
+		// the x offset of camera, always behind the back of player
+		// when x is 0, the z offset is a default value
+		this.renderer.camera.position.x =
+			this.main_player.mesh.position.x +
+			(speed.x > 0 ? -1 : 1) *
+				Math.sin(theta) *
+				SceneProperties.camera_far_z;
+		this.renderer.camera.position.z =
+			this.main_player.mesh.position.z +
+			(speed.z > 0 ? -1 : 1) *
+				Math.cos(theta) *
+				SceneProperties.camera_far_z;
+
+		this.renderer.camera.lookAt(this.main_player.mesh.position);
 	}
 
 	// todo, we need the speed
