@@ -124,7 +124,7 @@ export default class PlayerController {
 		this.main_player.pose2totation.applyPoseToBone(pose3D, lower_body);
 
 		// there will be a initial speed, which will be modified by user torse orientation
-		const speed = new THREE.Vector3(0.05, 0, 0.1);
+		const speed = new THREE.Vector3(0, 0, 0.1);
 
 		// the user's character movement
 		this.main_player.mesh.position.add(speed);
@@ -149,10 +149,6 @@ export default class PlayerController {
 
 		this.renderer.camera.lookAt(this.main_player.mesh.position);
 	}
-
-	// todo, we need the speed
-	// each player has a speed, calculate the next position for each player based on their speed
-	//
 
 	// call this in each animaiton frame
 	onFrameUpdate() {
