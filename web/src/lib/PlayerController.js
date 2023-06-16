@@ -66,6 +66,9 @@ export default class PlayerController {
 			this.main_player = player;
 		} else {
 			player = new Player(model, position, rotation);
+
+			this.players.push(player);
+			this.players_mapping[player.uuid] = this.players.length - 1;
 		}
 
 		this.renderer.addPlayerObj(player.mesh);
@@ -73,9 +76,6 @@ export default class PlayerController {
 		if (player.body) {
 			this.physics.addPlayerBody(player.body, player.mesh);
 		}
-
-		this.players.push(player);
-		this.players_mapping[player.uuid] = this.players.length - 1;
 	}
 
 	/**
@@ -107,7 +107,9 @@ export default class PlayerController {
 	}
 
 	/**
-	 *
+	 *	this function is called in the onPoseCallback, 
+	 *  so it's a bit slower than requestAnimationFrame
+	 * 
 	 * @param {object} pose3D
 	 * @param {object} pose2D
 	 * @param {boolean} lower_body
@@ -122,7 +124,7 @@ export default class PlayerController {
 
 		this.main_player.speed = new THREE.Vector3(0, 0, 0.1);
 
-		// this.main_player.pose2totation.applyPosition(pose2D, this.lateral);
+		this.main_player.mesh.position.add(this.main_player.speed);
 	}
 
 	// todo, we need the speed
@@ -133,20 +135,7 @@ export default class PlayerController {
 	onFrameUpdate() {
 		for (let i = 0; i < this.players.length; i++) {
 			if (this.players[i].speed) {
-				const speed = this.players[i].speed.clone();
-
-				const wpos = new THREE.Vector3();
-
-				this.players[i].mesh.getWorldPosition(wpos);
-
-				wpos.add(speed);
-
-				this.players[i].mesh.position.copy(wpos);
-
-				// this.renderer.camera.position.add(speed)
-				// this.renderer.camera.lookAt(wpos)
-				// this.renderer.camera.updateProjectionMatrix();
-				
+				this.players[i].mesh.position.add(this.players[i].speed);
 			}
 		}
 	}

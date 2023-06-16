@@ -86,7 +86,7 @@ export default class ThreeScene {
 	}
 
 	onFrameUpdate() {
-		this.controls.update();
+		// this.controls.update();
 
 		this.renderer.render(this.scene, this.camera);
 	}

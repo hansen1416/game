@@ -104,8 +104,6 @@
 	const sceneWidth = document.documentElement.clientWidth;
 	const sceneHeight = document.documentElement.clientHeight;
 
-	let controlGroup = new THREE.Group()
-
 	onMount(() => {
 		threeScene = new ThreeScene(canvas, sceneWidth, sceneHeight);
 
@@ -123,7 +121,7 @@
 			debug = CannonDebugger(threeScene.scene, cannonWorld.world);
 		}
 
-		if (false) {
+		if (true) {
 			invokeCamera(video, () => {
 				cameraReady = true;
 			});
@@ -140,17 +138,10 @@
 			loadGLTF("/glb/daneel.glb"),
 			// loadGLTF(process.env.PUBLIC_URL + "/glb/monster.glb"),
 		]).then(([dors, daneel]) => {
-			// add camera to the main player
-
-			controlGroup.add(dors.scene.children[0])
-			controlGroup.add(threeScene.camera)
-
-			// dors.scene.children[0].add(threeScene.camera)
 
 			// player1
 			playerController.addPlayer(
-				// dors.scene.children[0],
-				controlGroup,
+				dors.scene.children[0],
 				{
 					x: 0,
 					y: GROUND_LEVEL,
@@ -174,6 +165,9 @@
 					z: 0,
 				}
 			);
+
+			// assign speed to another player
+			// playerController.players[0].speed = new THREE.Vector3(0.01, 0, -0.1)
 
 			// all models ready
 			cameraReady = true;
@@ -214,19 +208,13 @@
 				performance.now(),
 				onPoseCallback
 			);
-
-			playerController.onFrameUpdate();
 		}
-
-
-// console.log(controlGroup.position.add(new THREE.Vector3(0,0,0.1)))
-// threeScene.camera.position.add( threeScene.camera.getWorldDirection() );
-
-		// ========= captured pose logic
 
 		threeScene.onFrameUpdate();
 
 		cannonWorld.onFrameUpdate();
+
+		playerController.onFrameUpdate();
 
 		if (debug) {
 			debug.update();
