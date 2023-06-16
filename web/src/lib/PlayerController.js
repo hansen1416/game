@@ -121,10 +121,22 @@ export default class PlayerController {
 		}
 
 		// we also need the direction that the user is facing, to caluclate the speed on the x axis
-		this.main_player.pose2totation.applyPoseToBone(pose3D, lower_body);
+		const shoulder_rotation = this.main_player.pose2totation.applyPoseToBone(pose3D, lower_body);
+
+		console.log(shoulder_rotation)
 
 		// there will be a initial speed, which will be modified by user torse orientation
 		const speed = new THREE.Vector3(0, 0, 0.1);
+
+		const alpha = Math.atan(Math.abs(speed.z) / Math.abs(speed.x));
+		const beta = alpha - shoulder_rotation
+
+		const speed_scalar = Math.sqrt(speed.x ** 2 + speed.z**2)
+
+		speed.x = speed_scalar * Math.cos(beta)
+		speed.z = speed_scalar * Math.sin(beta)
+
+		console.log(speed)
 
 		// the user's character movement
 		this.main_player.mesh.position.add(speed);
