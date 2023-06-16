@@ -125,6 +125,9 @@ export default class PlayerController {
 		this.main_player.speed = new THREE.Vector3(0, 0, 0.1);
 
 		this.main_player.mesh.position.add(this.main_player.speed);
+
+		this.renderer.camera.position.add(this.main_player.speed)
+		this.renderer.camera.lookAt(this.main_player.mesh.position)
 	}
 
 	// todo, we need the speed
