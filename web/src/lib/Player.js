@@ -29,7 +29,24 @@ export default class Player {
 	/**
 	 * @type {THREE.Vector3}
 	 */
-	speed;
+	#speed = new THREE.Vector3();
+
+	get speed() {
+		return this.#speed;
+	}
+
+	/**
+	 *
+	 * @param {{[key: string]: number}} obj
+	 */
+	updateSpeed(obj) {
+		if (obj.x !== undefined) {
+			this.#speed.x = obj.x;
+		}
+		if (obj.z !== undefined) {
+			this.#speed.z = obj.z;
+		}
+	}
 
 	/**
 	 *

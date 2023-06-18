@@ -138,7 +138,6 @@
 			loadGLTF("/glb/daneel.glb"),
 			// loadGLTF(process.env.PUBLIC_URL + "/glb/monster.glb"),
 		]).then(([dors, daneel]) => {
-
 			// player1
 			playerController.addPlayer(
 				dors.scene.children[0],
@@ -150,6 +149,9 @@
 				{ x: 0, y: 0, z: 0 },
 				true
 			);
+
+			// give main player an initial value
+			playerController.main_player.updateSpeed({ z: 0.1 });
 
 			// player2
 			playerController.addPlayer(
