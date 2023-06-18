@@ -143,6 +143,14 @@ export default class PlayerController {
 				Math.abs(this.main_player.speed.z)
 		);
 
+		// given two shoulder positions, calculate the middle orthogonal vector
+		// const direction = new THREE.Vector2().subVectors(point2, point1).normalize();
+		// const orthogonal1 = new THREE.Vector2(-direction.y, direction.x).normalize();
+		// const orthogonal2 = new THREE.Vector2(direction.y, -direction.x).normalize();
+		// and multiply a scalar to the vector which towards back,
+		// and add to the players position
+		// we should have the camera position, which is always at the back of player
+
 		// the x offset of camera, always behind the back of player
 		// when x is 0, the z offset is a default value
 		this.renderer.camera.position.x =
