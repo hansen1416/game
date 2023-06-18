@@ -31,23 +31,6 @@ export default class Player {
 	 */
 	#speed = new THREE.Vector3();
 
-	get speed() {
-		return this.#speed;
-	}
-
-	/**
-	 *
-	 * @param {{[key: string]: number}} obj
-	 */
-	updateSpeed(obj) {
-		if (obj.x !== undefined) {
-			this.#speed.x = obj.x;
-		}
-		if (obj.z !== undefined) {
-			this.#speed.z = obj.z;
-		}
-	}
-
 	/**
 	 *
 	 * @param {THREE.Object3D} model
@@ -76,5 +59,38 @@ export default class Player {
 
 		this.mesh = model;
 		this.uuid = model.uuid;
+	}
+
+	get speed() {
+		return this.#speed;
+	}
+
+	/**
+	 *
+	 * @param {{[key: string]: number}} obj
+	 */
+	updateSpeed(obj) {
+		if (obj.x !== undefined) {
+			this.#speed.x = obj.x;
+		}
+		if (obj.z !== undefined) {
+			this.#speed.z = obj.z;
+		}
+	}
+
+	/**
+	 *
+	 * @param {number} rad
+	 */
+	changeSpeedDirection(rad) {
+		if (rad < 0.1) {
+			return;
+		}
+
+		const cos_val = Math.cos(rad);
+		const sin_val = Math.sin(rad);
+
+		this.#speed.x = this.#speed.x * cos_val + this.#speed.z * sin_val;
+		this.#speed.z = -this.#speed.x * sin_val + this.#speed.z * cos_val;
 	}
 }

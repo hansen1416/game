@@ -127,15 +127,8 @@ export default class PlayerController {
 		// console.log("shoulder angle", shoulder_rotation);
 
 		// there will be a initial speed, which will be modified by user torse orientation
-		// const speed = new THREE.Vector3(0, 0, 0.1);
 
-		// const alpha = Math.atan(Math.abs(speed.z) / Math.abs(speed.x));
-		// const beta = alpha - shoulder_rotation;
-
-		// const speed_scalar = Math.sqrt(speed.x ** 2 + speed.z ** 2);
-
-		// speed.x = speed_scalar * Math.cos(beta)
-		// speed.z = speed_scalar * Math.sin(beta)
+		this.main_player.changeSpeedDirection(shoulder_rotation / 5);
 
 		// console.log(speed);
 
