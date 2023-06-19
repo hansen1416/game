@@ -30,7 +30,7 @@ export default class PlayerMain extends Player {
 		this.pose2totation = new PoseToRotation(this.bones);
 
 		// give main player an initial value
-		this.initSpeed(new THREE.Vector3(0, 0, INIT_SPEED_SCALAR));
+		this.initSpeed(new THREE.Vector3(0, 0, 1));
 	}
 
 	/**
@@ -66,7 +66,7 @@ export default class PlayerMain extends Player {
 		// there is always very small changes in the shoulder position
 		// set a threshold so that if the change is smaller than it
 		// we won't change speed direction
-		const change_direction_threshold = 0.1;
+		const change_direction_threshold = 0.2;
 
 		const velo = new THREE.Vector3().subVectors(
 			end_vec.clone().normalize(),
@@ -79,21 +79,27 @@ export default class PlayerMain extends Player {
 
 		const angle = end_vec.angleTo(new THREE.Vector3(-1, 0, 0))
 
-
-		console.log(angle)
+		// console.log(angle)
 
 		// if (velo.length() > change_direction_threshold && velo.z * end_vec.z > 0) {
-		if (velo.length() > change_direction_threshold && velo.z * end_vec.z > 0) {
+		if (angle > change_direction_threshold) {
 
-			if (velo.z > 0 && end_vec.z > 0) {
+			
 
-				// const new_speed = this.rotateHorizontalSpeed(velo.length())
+			if (end_vec.z > 0) {
+
+				const q = new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0,1,0), -angle)
+
+				this.rotateHorizontalSpeed(q)
+
+				this.mesh.applyQuaternion
 
 				// console.log(new_speed)
+				// todo we also need to rotate the model
 
 
-			} else if (velo.z < 0 && end_vec.z < 0) {
-
+			} else if (end_vec.z < 0) {
+				this.rotateHorizontalSpeed(angle)
 			}
 
 			return
@@ -110,12 +116,10 @@ export default class PlayerMain extends Player {
 	}
 
 	move() {
-		const speed_dir = this.calculateSpeedDirection();
+		this.calculateSpeedDirection();
 
-		if (speed_dir) {
-			this.updateSpeed(speed_dir);
-		}
+		// console.log(this.speed, this.speed.length())
 
-		this.mesh.position.add(this.speed);
+		this.mesh.position.add(this.speed.clone().multiplyScalar(INIT_SPEED_SCALAR));
 	}
 }

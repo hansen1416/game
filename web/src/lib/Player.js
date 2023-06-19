@@ -75,13 +75,15 @@ export default class Player {
 
 	/**
 	 * 
-	 * @param {number} angle 
+	 * @param {THREE.Quaternion} quat 
 	 * @returns 
 	 */
-	rotateHorizontalSpeed(angle) {
-		const new_speed = this.#speed.clone().applyAxisAngle(new THREE.Vector3(0,1,0), angle)
+	rotateHorizontalSpeed(quat) {
+		const new_speed = this.#speed.clone().applyQuaternion(quat).normalize()
 
-		this.#speed.lerp(new_speed, 0.3)
+		// console.log(new_speed, new_speed.length())
+
+		this.#speed.lerp(new_speed, 0.1)
 	}
 
 	/**
