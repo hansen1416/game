@@ -66,8 +66,27 @@ export default class Player {
 	}
 
 	/**
+	 * 
+	 * @param {THREE.Vector3} vec 
+	 */
+	initSpeed(vec) {
+		this.#speed.copy(vec)
+	}
+
+	/**
+	 * 
+	 * @param {number} angle 
+	 * @returns 
+	 */
+	rotateHorizontalSpeed(angle) {
+		const new_speed = this.#speed.clone().applyAxisAngle(new THREE.Vector3(0,1,0), angle)
+
+		this.#speed.lerp(new_speed, 0.3)
+	}
+
+	/**
 	 *
-	 * @param {{[key: string]: number}} obj
+	 * @param {{x?: number, z?: number}} obj
 	 */
 	updateSpeed(obj) {
 		if (obj.x !== undefined) {

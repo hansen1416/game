@@ -150,9 +150,6 @@
 				true
 			);
 
-			// give main player an initial value
-			playerController.main_player.updateSpeed({ z: 0.1 });
-
 			// player2
 			playerController.addPlayer(
 				daneel.scene.children[0],
