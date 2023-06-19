@@ -124,28 +124,14 @@ export default class PlayerController {
 		// const shoulder_rotation =
 		this.main_player.pose2totation.applyPoseToBone(pose3D, lower_body);
 
-		// there will be a initial speed, which will be modified by user torse orientation
-
-		// this.main_player.changeSpeedDirection(shoulder_rotation / 5);
-
-		// console.log(speed);
-
-		// the user's character movement
-		this.main_player.mesh.position.add(this.main_player.speed);
-
-		// note: the speed.z can be 0, the atan will be Math.PI/2
-		// use absolute value to calculate the angle, so theta always lower than Math.PI/2
-		// use the sign of x/z to control the diff instead
-		// const theta = Math.atan(
-		// 	Math.abs(this.main_player.speed.x) /
-		// 		Math.abs(this.main_player.speed.z)
-		// );
-
+		// keep a track of shoulder movement, used to calculate speed direction and camera position
 		this.main_player.updateShoulderTrack();
 
-		this._cameraFollow();
+		// there will be a initial speed, which will be modified by user torse orientation
+		// the user's character movement
+		this.main_player.move();
 
-		this.renderer.camera.lookAt(this.main_player.mesh.position);
+		this._cameraFollow();
 	}
 
 	/**
@@ -198,6 +184,7 @@ export default class PlayerController {
 		);
 
 		this.renderer.camera.position.lerp(camera_target_pos, 0.1);
+		this.renderer.camera.lookAt(this.main_player.mesh.position);
 	}
 
 	// call this in each animaiton frame
