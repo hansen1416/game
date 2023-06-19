@@ -31,6 +31,8 @@ export default class Player {
 	 */
 	#speed = new THREE.Vector3();
 
+	#speed_scalar = 0.1;
+
 	/**
 	 *
 	 * @param {THREE.Object3D} model
@@ -66,24 +68,24 @@ export default class Player {
 	}
 
 	/**
-	 * 
-	 * @param {THREE.Vector3} vec 
+	 *
+	 * @param {THREE.Vector3} vec
 	 */
 	initSpeed(vec) {
-		this.#speed.copy(vec)
+		this.#speed.copy(vec);
 	}
 
 	/**
-	 * 
-	 * @param {THREE.Quaternion} quat 
-	 * @returns 
+	 *
+	 * @param {THREE.Quaternion} quat
+	 * @returns
 	 */
 	rotateHorizontalSpeed(quat) {
-		const new_speed = this.#speed.clone().applyQuaternion(quat).normalize()
+		const new_speed = this.#speed.clone().applyQuaternion(quat).normalize();
 
 		// console.log(new_speed, new_speed.length())
 
-		this.#speed.lerp(new_speed, 0.1)
+		this.#speed.lerp(new_speed, 0.1);
 	}
 
 	/**
@@ -113,5 +115,11 @@ export default class Player {
 
 		this.#speed.x = this.#speed.x * cos_val + this.#speed.z * sin_val;
 		this.#speed.z = -this.#speed.x * sin_val + this.#speed.z * cos_val;
+	}
+
+	move() {
+		this.mesh.position.add(
+			this.#speed.normalize().multiplyScalar(this.#speed_scalar)
+		);
 	}
 }

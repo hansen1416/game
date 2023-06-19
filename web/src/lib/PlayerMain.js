@@ -5,7 +5,7 @@ import PoseToRotation from "./PoseToRotation";
 
 let instance;
 
-const INIT_SPEED_SCALAR = 0.1;
+// const INIT_SPEED_SCALAR = 0.1;
 
 export default class PlayerMain extends Player {
 	#hands_track = new Deque(10);
@@ -30,7 +30,7 @@ export default class PlayerMain extends Player {
 		this.pose2totation = new PoseToRotation(this.bones);
 
 		// give main player an initial value
-		this.initSpeed(new THREE.Vector3(0, 0, 1));
+		// this.initSpeed(new THREE.Vector3(0, 0, 1));
 	}
 
 	/**
@@ -52,74 +52,88 @@ export default class PlayerMain extends Player {
 	}
 
 	currentShoulderVector() {
-		return this.#shoulder_track.peekBack();
-	}
+		// return this.#shoulder_track.peekBack();
+		const left_shoulder_pos = new THREE.Vector3();
+		const right_shoulder_pos = new THREE.Vector3();
 
-	calculateSpeedDirection() {
-		const start_vec = this.#shoulder_track.peekFront();
-		const end_vec = this.#shoulder_track.peekBack();
+		this.bones.LeftShoulder.getWorldPosition(left_shoulder_pos);
+		this.bones.RightShoulder.getWorldPosition(right_shoulder_pos);
 
-		if (!start_vec || !end_vec) {
-			return;
-		}
-
-		// there is always very small changes in the shoulder position
-		// set a threshold so that if the change is smaller than it
-		// we won't change speed direction
-		const change_direction_threshold = 0.2;
-
-		const velo = new THREE.Vector3().subVectors(
-			end_vec.clone().normalize(),
-			start_vec.clone().normalize()
+		return new THREE.Vector3().subVectors(
+			right_shoulder_pos,
+			left_shoulder_pos
 		);
-
-		// `velo.z` and `end_vec.z` both lt 0, it means the torse towards right and rotate to right
-		// `velo.z` and `end_vec.z` both gt 0, it means the torse towards left and rotate to left
-		// so `velo.z` and `end_vec.z` have the same sign, we do rotation
-
-		const angle = end_vec.angleTo(new THREE.Vector3(-1, 0, 0))
-
-		// console.log(angle)
-
-		// if (velo.length() > change_direction_threshold && velo.z * end_vec.z > 0) {
-		if (angle > change_direction_threshold) {
-
-			
-
-			if (end_vec.z > 0) {
-
-				const q = new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0,1,0), -angle)
-
-				this.rotateHorizontalSpeed(q)
-
-				this.mesh.applyQuaternion
-
-				// console.log(new_speed)
-				// todo we also need to rotate the model
-
-
-			} else if (end_vec.z < 0) {
-				this.rotateHorizontalSpeed(angle)
-			}
-
-			return
-
-			// we also need to know if torse is turing to left/right or restore from left/right
-			const speed_dir = new THREE.Vector3(end_vec.z, 0, -end_vec.x)
-				.normalize()
-				.multiplyScalar(INIT_SPEED_SCALAR);
-
-			return speed_dir;
-		} else {
-			return;
-		}
 	}
 
-	move() {
-		this.calculateSpeedDirection();
+	// calculateSpeedDirection() {
+	// 	const start_vec = this.#shoulder_track.peekFront();
+	// 	const end_vec = this.#shoulder_track.peekBack();
 
-		// console.log(this.speed, this.speed.length())
+	// 	if (!start_vec || !end_vec) {
+	// 		return;
+	// 	}
 
-		this.mesh.position.add(this.speed.clone().multiplyScalar(INIT_SPEED_SCALAR));
-	}
+	// 	// there is always very small changes in the shoulder position
+	// 	// set a threshold so that if the change is smaller than it
+	// 	// we won't change speed direction
+	// 	const change_direction_threshold = 0.1;
+
+	// 	const velo = new THREE.Vector3().subVectors(
+	// 		end_vec.clone().normalize(),
+	// 		start_vec.clone().normalize()
+	// 	);
+
+	// 	// `velo.z` and `end_vec.z` both lt 0, it means the torse towards right and rotate to right
+	// 	// `velo.z` and `end_vec.z` both gt 0, it means the torse towards left and rotate to left
+	// 	// so `velo.z` and `end_vec.z` have the same sign, we do rotation
+
+	// 	const shoulder_vec = new THREE.Vector3().subVectors(
+	// 		this.bones.RightShoulder.position,
+	// 		this.bones.LeftShoulder.position
+	// 	);
+
+	// 	const angle = shoulder_vec.angleTo(new THREE.Vector3(-1, 0, 0));
+
+	// 	console.log(angle);
+
+	// 	// if (velo.length() > change_direction_threshold && velo.z * end_vec.z > 0) {
+	// 	if (angle > change_direction_threshold) {
+	// 		if (end_vec.z > 0) {
+	// 			// this.rotateHorizontalSpeed(q)
+	// 			// this.mesh.applyQuaternion;
+	// 			// console.log(new_speed)
+	// 			// todo we also need to rotate the model
+	// 		} else if (end_vec.z < 0) {
+	// 			// this.rotateHorizontalSpeed(angle);
+	// 		}
+
+	// 		const q = new THREE.Quaternion().setFromAxisAngle(
+	// 			new THREE.Vector3(0, 1, 0),
+	// 			((end_vec.z > 0 ? 1 : -1) * angle) / 10
+	// 		);
+	// 		// console.log(q);
+	// 		// this.mesh.applyQuaternion(q);
+
+	// 		return;
+
+	// 		// we also need to know if torse is turing to left/right or restore from left/right
+	// 		const speed_dir = new THREE.Vector3(end_vec.z, 0, -end_vec.x)
+	// 			.normalize()
+	// 			.multiplyScalar(INIT_SPEED_SCALAR);
+
+	// 		return speed_dir;
+	// 	} else {
+	// 		return;
+	// 	}
+	// }
+
+	// updateSpeed() {
+	// 	const end_vec = this.currentShoulderVector();
+
+	// 	const speed_dir = new THREE.Vector3(
+	// 		end_vec.z,
+	// 		0,
+	// 		-end_vec.x
+	// 	).normalize();
+	// }
 }

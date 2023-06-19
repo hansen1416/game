@@ -3,6 +3,7 @@ import Player from "./Player";
 import PlayerMain from "./PlayerMain";
 import ThreeScene, { SceneProperties } from "./ThreeScene";
 import CannonWorld from "./CannonWorld";
+import { BlazePoseKeypointsValues } from "../utils/ropes";
 
 let instance;
 
@@ -124,14 +125,47 @@ export default class PlayerController {
 		// const shoulder_rotation =
 		this.main_player.pose2totation.applyPoseToBone(pose3D, lower_body);
 
-		// keep a track of shoulder movement, used to calculate speed direction and camera position
-		this.main_player.updateShoulderTrack();
-
 		// there will be a initial speed, which will be modified by user torse orientation
 		// the user's character movement
+		// this.main_player.move();
+
+		const shoulder_vector = new THREE.Vector3(
+			pose3D[BlazePoseKeypointsValues["RIGHT_SHOULDER"]].x -
+				pose3D[BlazePoseKeypointsValues["LEFT_SHOULDER"]].x,
+			pose3D[BlazePoseKeypointsValues["RIGHT_SHOULDER"]].y -
+				pose3D[BlazePoseKeypointsValues["LEFT_SHOULDER"]].y,
+			pose3D[BlazePoseKeypointsValues["RIGHT_SHOULDER"]].z -
+				pose3D[BlazePoseKeypointsValues["LEFT_SHOULDER"]].z
+		).normalize();
+
+		const angle = shoulder_vector.angleTo(new THREE.Vector3(-1, 0, 0));
+
+		const sign = shoulder_vector.z > 0 ? 1 : -1;
+
+		// console.log(angle, sign);
+
+		if (angle > 0.1) {
+			this.main_player.mesh.applyQuaternion(
+				new THREE.Quaternion().setFromAxisAngle(
+					new THREE.Vector3(0, 1, 0),
+					(sign * angle) / 10
+				)
+			);
+		}
+
+		// keep a track of shoulder movement, used to calculate speed direction and camera position
+		// this.main_player.updateShoulderTrack();
+
+		const shoulder_vec = this.main_player.currentShoulderVector();
+
+		this.main_player.updateSpeed({
+			x: shoulder_vec.z,
+			z: -shoulder_vec.x,
+		});
+
 		this.main_player.move();
 
-		this._cameraFollow();
+		this._cameraFollow(shoulder_vec);
 	}
 
 	/**
@@ -150,23 +184,7 @@ export default class PlayerController {
 
 		slerp by 0.1 each step, so the camera is smooth
 	 */
-	_cameraFollow() {
-		// calculate camera direction
-
-		// const left_shoulder_pos = new THREE.Vector3()
-		// const right_shoulder_pos = new THREE.Vector3()
-
-		// this.main_player.bones.LeftShoulder.getWorldPosition(left_shoulder_pos)
-		// this.main_player.bones.RightShoulder.getWorldPosition(right_shoulder_pos)
-
-		// new THREE.Vector3().subVectors(right_shoulder_pos, left_shoulder_pos);
-
-		const shoulder_vector = this.main_player.currentShoulderVector();
-
-		if (!shoulder_vector) {
-			return;
-		}
-
+	_cameraFollow(shoulder_vector) {
 		const camera_dir = new THREE.Vector3(
 			-shoulder_vector.z,
 			0,
