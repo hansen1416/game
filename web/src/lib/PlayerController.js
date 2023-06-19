@@ -128,7 +128,7 @@ export default class PlayerController {
 
 		// there will be a initial speed, which will be modified by user torse orientation
 
-		this.main_player.changeSpeedDirection(shoulder_rotation / 5);
+		// this.main_player.changeSpeedDirection(shoulder_rotation / 5);
 
 		// console.log(speed);
 
@@ -138,33 +138,52 @@ export default class PlayerController {
 		// note: the speed.z can be 0, the atan will be Math.PI/2
 		// use absolute value to calculate the angle, so theta always lower than Math.PI/2
 		// use the sign of x/z to control the diff instead
-		const theta = Math.atan(
-			Math.abs(this.main_player.speed.x) /
-				Math.abs(this.main_player.speed.z)
-		);
+		// const theta = Math.atan(
+		// 	Math.abs(this.main_player.speed.x) /
+		// 		Math.abs(this.main_player.speed.z)
+		// );
 
-		// given two shoulder positions, calculate the middle orthogonal vector
-		// const direction = new THREE.Vector2().subVectors(point2, point1).normalize();
-		// const orthogonal1 = new THREE.Vector2(-direction.y, direction.x).normalize();
-		// const orthogonal2 = new THREE.Vector2(direction.y, -direction.x).normalize();
-		// and multiply a scalar to the vector which towards back,
-		// and add to the players position
-		// we should have the camera position, which is always at the back of player
 
-		// the x offset of camera, always behind the back of player
-		// when x is 0, the z offset is a default value
-		this.renderer.camera.position.x =
-			this.main_player.mesh.position.x +
-			(this.main_player.speed.x > 0 ? -1 : 1) *
-				Math.sin(theta) *
-				SceneProperties.camera_far_z;
-		this.renderer.camera.position.z =
-			this.main_player.mesh.position.z +
-			(this.main_player.speed.z > 0 ? -1 : 1) *
-				Math.cos(theta) *
-				SceneProperties.camera_far_z;
+		this._cameraFollow()
 
 		this.renderer.camera.lookAt(this.main_player.mesh.position);
+	}
+
+	/**
+		given two shoulder positions, calculate the middle orthogonal vector
+
+		const direction = new THREE.Vector2().subVectors(point2, point1).normalize();
+		const orthogonal1 = new THREE.Vector2(-direction.y, direction.x).normalize();
+		const orthogonal2 = new THREE.Vector2(direction.y, -direction.x).normalize();
+
+		note that for main player, the +x is to the left hand side, +z is toward the screen.
+		so the vector towards the player's back is (-z, y, x)
+
+		and multiply a scalar to the vector which towards back,
+		and add to the players position
+		we should have the camera position, which is always at the back of player
+
+		slerp by 0.1 each step, so the camera is smooth
+	 */
+	_cameraFollow() {
+		// calculate camera direction
+
+		const left_shoulder_pos = new THREE.Vector3()
+		const right_shoulder_pos = new THREE.Vector3()
+
+		this.main_player.bones.LeftShoulder.getWorldPosition(left_shoulder_pos)
+		this.main_player.bones.RightShoulder.getWorldPosition(right_shoulder_pos)
+
+		const shoulder_vector = new THREE.Vector3().subVectors(right_shoulder_pos, left_shoulder_pos);
+
+		const camera_dir = new THREE.Vector3(-shoulder_vector.z, 0, shoulder_vector.x).normalize().multiplyScalar(SceneProperties.camera_far_z);
+
+		// camera_dir.multiplyScalar(SceneProperties.camera_far_z)
+
+		const camera_target_pos = new THREE.Vector3(this.main_player.mesh.position.x + camera_dir.x, 
+			this.renderer.camera.position.y, this.main_player.mesh.position.z + camera_dir.z)
+
+		this.renderer.camera.position.lerp(camera_target_pos, 0.1) 
 	}
 
 	// call this in each animaiton frame
