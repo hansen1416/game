@@ -121,10 +121,8 @@ export default class PlayerController {
 		}
 
 		// we also need the direction that the user is facing, to caluclate the speed on the x axis
-		const shoulder_rotation =
-			this.main_player.pose2totation.applyPoseToBone(pose3D, lower_body);
-
-		// console.log("shoulder angle", shoulder_rotation);
+		// const shoulder_rotation =
+		this.main_player.pose2totation.applyPoseToBone(pose3D, lower_body);
 
 		// there will be a initial speed, which will be modified by user torse orientation
 
@@ -143,8 +141,9 @@ export default class PlayerController {
 		// 		Math.abs(this.main_player.speed.z)
 		// );
 
+		this.main_player.updateShoulderTrack();
 
-		this._cameraFollow()
+		this._cameraFollow();
 
 		this.renderer.camera.lookAt(this.main_player.mesh.position);
 	}
@@ -168,22 +167,37 @@ export default class PlayerController {
 	_cameraFollow() {
 		// calculate camera direction
 
-		const left_shoulder_pos = new THREE.Vector3()
-		const right_shoulder_pos = new THREE.Vector3()
+		// const left_shoulder_pos = new THREE.Vector3()
+		// const right_shoulder_pos = new THREE.Vector3()
 
-		this.main_player.bones.LeftShoulder.getWorldPosition(left_shoulder_pos)
-		this.main_player.bones.RightShoulder.getWorldPosition(right_shoulder_pos)
+		// this.main_player.bones.LeftShoulder.getWorldPosition(left_shoulder_pos)
+		// this.main_player.bones.RightShoulder.getWorldPosition(right_shoulder_pos)
 
-		const shoulder_vector = new THREE.Vector3().subVectors(right_shoulder_pos, left_shoulder_pos);
+		// new THREE.Vector3().subVectors(right_shoulder_pos, left_shoulder_pos);
 
-		const camera_dir = new THREE.Vector3(-shoulder_vector.z, 0, shoulder_vector.x).normalize().multiplyScalar(SceneProperties.camera_far_z);
+		const shoulder_vector = this.main_player.currentShoulderVector();
+
+		if (!shoulder_vector) {
+			return;
+		}
+
+		const camera_dir = new THREE.Vector3(
+			-shoulder_vector.z,
+			0,
+			shoulder_vector.x
+		)
+			.normalize()
+			.multiplyScalar(SceneProperties.camera_far_z);
 
 		// camera_dir.multiplyScalar(SceneProperties.camera_far_z)
 
-		const camera_target_pos = new THREE.Vector3(this.main_player.mesh.position.x + camera_dir.x, 
-			this.renderer.camera.position.y, this.main_player.mesh.position.z + camera_dir.z)
+		const camera_target_pos = new THREE.Vector3(
+			this.main_player.mesh.position.x + camera_dir.x,
+			this.renderer.camera.position.y,
+			this.main_player.mesh.position.z + camera_dir.z
+		);
 
-		this.renderer.camera.position.lerp(camera_target_pos, 0.1) 
+		this.renderer.camera.position.lerp(camera_target_pos, 0.1);
 	}
 
 	// call this in each animaiton frame

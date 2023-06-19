@@ -6,9 +6,9 @@ import PoseToRotation from "./PoseToRotation";
 let instance;
 
 export default class PlayerMain extends Player {
-	hands_track = new Deque();
-	// lower `max_deque_length` faster speed
-	max_deque_length = 20;
+	#hands_track = new Deque(10);
+
+	#shoulder_track = new Deque(10);
 
 	/**
 	 *
@@ -31,5 +31,22 @@ export default class PlayerMain extends Player {
 	/**
 	 * record motion history of the past 20 frames
 	 */
-	motionCache() {}
+	updateShoulderTrack() {
+		const left_shoulder_pos = new THREE.Vector3();
+		const right_shoulder_pos = new THREE.Vector3();
+
+		this.bones.LeftShoulder.getWorldPosition(left_shoulder_pos);
+		this.bones.RightShoulder.getWorldPosition(right_shoulder_pos);
+
+		this.#shoulder_track.addBack(
+			new THREE.Vector3().subVectors(
+				right_shoulder_pos,
+				left_shoulder_pos
+			)
+		);
+	}
+
+	currentShoulderVector() {
+		return this.#shoulder_track.peekBack();
+	}
 }

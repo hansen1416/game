@@ -3,8 +3,8 @@ import * as THREE from "three";
 
 export default class Toss {
 	constructor() {
-		this.left_hand_track = new Deque();
-		this.right_hand_track = new Deque();
+		this.left_hand_track = new Deque(10);
+		this.right_hand_track = new Deque(10);
 		// lower `max_deque_length` faster speed
 		this.max_deque_length = 10;
 	}
@@ -160,9 +160,9 @@ export default class Toss {
 
 	clearTrack(left = false) {
 		if (left) {
-			this.left_hand_track = new Deque();
+			this.left_hand_track = new Deque(10);
 		} else {
-			this.right_hand_track = new Deque();
+			this.right_hand_track = new Deque(10);
 		}
 	}
 

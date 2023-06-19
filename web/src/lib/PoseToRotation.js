@@ -347,11 +347,11 @@ export default class PoseToRotation {
 			);
 		}
 
-		// calculate the shoulder orientation, used for speed direction
-		const zd = this.pose3D[this.joints_map["LEFT_SHOULDER"]].z - this.pose3D[this.joints_map["RIGHT_SHOULDER"]].z
-		const xd = Math.abs(this.pose3D[this.joints_map["LEFT_SHOULDER"]].x - this.pose3D[this.joints_map["RIGHT_SHOULDER"]].x)
+		// // calculate the shoulder orientation, used for speed direction
+		// const zd = this.pose3D[this.joints_map["LEFT_SHOULDER"]].z - this.pose3D[this.joints_map["RIGHT_SHOULDER"]].z
+		// const xd = Math.abs(this.pose3D[this.joints_map["LEFT_SHOULDER"]].x - this.pose3D[this.joints_map["RIGHT_SHOULDER"]].x)
 
-		return Math.atan(zd / xd);
+		// return Math.atan(zd / xd);
 	}
 
 	/**

@@ -1,5 +1,10 @@
 export default class Deque {
-	constructor() {
+	/**
+	 *
+	 * @param {number} max_size
+	 */
+	constructor(max_size = 0) {
+		this.max_size = max_size;
 		this.items = {};
 		this.frontIndex = 0;
 		this.backIndex = -1;
@@ -9,12 +14,20 @@ export default class Deque {
 	addFront(item) {
 		this.frontIndex--;
 		this.items[this.frontIndex] = item;
+
+		if (this.max_size > 0 && this.size() > this.max_size) {
+			this.removeBack();
+		}
 	}
 
 	// Adds an item to the back of the deque
 	addBack(item) {
 		this.backIndex++;
 		this.items[this.backIndex] = item;
+
+		if (this.max_size > 0 && this.size() > this.max_size) {
+			this.removeFront();
+		}
 	}
 
 	// Removes and returns the front item of the deque
@@ -80,7 +93,7 @@ export default class Deque {
 	toArray() {
 		const res = [];
 
-		for (let i = this.frontIndex; i < this.backIndex; i++) {
+		for (let i = this.frontIndex; i <= this.backIndex; i++) {
 			res.push(this.peekIndex(i));
 		}
 
@@ -88,16 +101,16 @@ export default class Deque {
 	}
 }
 
-// const deque = new Deque();
+// const deque = new Deque(5);
 
-// deque.addFront(1);
-// deque.addFront(2);
-// deque.addBack(3);
-// deque.addBack(4);
-// deque.addFront(5);
-// deque.addFront(6);
-// deque.addBack(7);
-// deque.addBack(8);
+// deque.addFront(1); // 1
+// deque.addFront(2); // 2 1
+// deque.addBack(3); // 2 1 3
+// deque.addBack(4); // 2 1 3 4
+// deque.addFront(5); // 5 2 1 3 4
+// deque.addFront(6); // 6 5 2 1 3
+// deque.addBack(7); // 5 2 1 3 7
+// deque.addBack(8); // 2 1 3 7 8
 
 // console.log(deque);
 // console.log(deque.toArray());
