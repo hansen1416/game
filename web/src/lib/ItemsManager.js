@@ -1,6 +1,6 @@
 import * as THREE from "three";
 import * as CANNON from "cannon-es";
-import { GROUND_LEVEL } from "../utils/constants";
+import { GROUND_LEVEL, GROUND_WIDTH, GROUND_HEIGHT } from "../utils/constants";
 import ThreeScene from "./ThreeScene";
 import CannonWorld from "./CannonWorld";
 import { poissonDiskSampling } from "../utils/poissonSampling";
@@ -53,11 +53,12 @@ export default class ItemsManager {
 	}
 
 	spreadItems() {
-		const points = poissonDiskSampling(100, 100, 20, 30);
+		const points = poissonDiskSampling(GROUND_WIDTH/10, GROUND_HEIGHT/10, 20, 30);
 
 		const y = GROUND_LEVEL + 0.9;
 
 		for (let p of points) {
+			// todo this approach isn't effective, must reuse the items
 			this.addItem(
 				{ x: p.x - 50, y: y, z: p.y - 50 },
 				{ color: 0xff0099 }

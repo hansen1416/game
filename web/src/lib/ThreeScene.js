@@ -57,15 +57,14 @@ export default class ThreeScene {
 
 		this.camera.updateProjectionMatrix(); // update the camera's projection matrix
 
-		{
-			// mimic the sun light
-			const dlight = new THREE.SpotLight(0xffffff, 0.7);
-			dlight.position.set(0, 30, 0);
-			dlight.castShadow = true;
-			this.scene.add(dlight);
-			// env light
-			this.scene.add(new THREE.AmbientLight(0xffffff, 0.3));
-		}
+		// env light
+		this.scene.add(new THREE.AmbientLight(0xffffff, 0.8));
+
+		// mimic the sun light. maybe update light position later
+		this.light = new THREE.PointLight(0xffffff, 0.2);
+		this.light.position.set(0, 30, 0);
+		this.light.castShadow = true;
+		this.scene.add(this.light);
 
 		this.renderer = new THREE.WebGLRenderer({
 			canvas: canvas,
