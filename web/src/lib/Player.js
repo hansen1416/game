@@ -67,6 +67,10 @@ export default class Player {
 		return this.#speed;
 	}
 
+	get speed_scalar() {
+		return this.#speed_scalar;
+	}
+
 	/**
 	 *
 	 * @param {THREE.Vector3} vec
@@ -101,21 +105,21 @@ export default class Player {
 		}
 	}
 
-	/**
-	 *
-	 * @param {number} rad
-	 */
-	changeSpeedDirection(rad) {
-		if (rad < 0.1) {
-			return;
-		}
+	// /**
+	//  *
+	//  * @param {number} rad
+	//  */
+	// changeSpeedDirection(rad) {
+	// 	if (rad < 0.1) {
+	// 		return;
+	// 	}
 
-		const cos_val = Math.cos(rad);
-		const sin_val = Math.sin(rad);
+	// 	const cos_val = Math.cos(rad);
+	// 	const sin_val = Math.sin(rad);
 
-		this.#speed.x = this.#speed.x * cos_val + this.#speed.z * sin_val;
-		this.#speed.z = -this.#speed.x * sin_val + this.#speed.z * cos_val;
-	}
+	// 	this.#speed.x = this.#speed.x * cos_val + this.#speed.z * sin_val;
+	// 	this.#speed.z = -this.#speed.x * sin_val + this.#speed.z * cos_val;
+	// }
 
 	move() {
 		this.mesh.position.add(

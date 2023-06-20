@@ -22,8 +22,8 @@ export default class PlayerController {
 	 */
 	main_player;
 
-	//
-	lateral = 20;
+	// [0, 1] how sensitive the camera respond to player's rotation, higher is more sensitive
+	camera_sensitivity = 0.1
 
 	/**
 	 *
@@ -108,8 +108,8 @@ export default class PlayerController {
 	}
 
 	/**
-	 *	this function is called in the onPoseCallback,
-	 *  so it's a bit slower than requestAnimationFrame
+	 *	this function is called in the `onPoseCallback`,
+	 *  so it's a bit (a few ms) slower than `requestAnimationFrame`
 	 *
 	 * @param {object} pose3D
 	 * @param {object} pose2D
@@ -125,10 +125,7 @@ export default class PlayerController {
 		// const shoulder_rotation =
 		this.main_player.pose2totation.applyPoseToBone(pose3D, lower_body);
 
-		// there will be a initial speed, which will be modified by user torse orientation
-		// the user's character movement
-		// this.main_player.move();
-
+		// the shoulder pose rotation control the rotation of mesh
 		const shoulder_vector = new THREE.Vector3(
 			pose3D[BlazePoseKeypointsValues["RIGHT_SHOULDER"]].x -
 				pose3D[BlazePoseKeypointsValues["LEFT_SHOULDER"]].x,
@@ -138,34 +135,14 @@ export default class PlayerController {
 				pose3D[BlazePoseKeypointsValues["LEFT_SHOULDER"]].z
 		).normalize();
 
-		const angle = shoulder_vector.angleTo(new THREE.Vector3(-1, 0, 0));
+		this.main_player.rotate(shoulder_vector);
 
-		const sign = shoulder_vector.z > 0 ? 1 : -1;
-
-		// console.log(angle, sign);
-
-		if (angle > 0.1) {
-			this.main_player.mesh.applyQuaternion(
-				new THREE.Quaternion().setFromAxisAngle(
-					new THREE.Vector3(0, 1, 0),
-					(sign * angle) / 10
-				)
-			);
-		}
-
-		// keep a track of shoulder movement, used to calculate speed direction and camera position
-		// this.main_player.updateShoulderTrack();
-
-		const shoulder_vec = this.main_player.currentShoulderVector();
-
-		this.main_player.updateSpeed({
-			x: shoulder_vec.z,
-			z: -shoulder_vec.x,
-		});
+		// the shoulder mesh rotation control the camera direction and speed direction
+		this.main_player.updateShoulderVectorMesh();
 
 		this.main_player.move();
 
-		this._cameraFollow(shoulder_vec);
+		this.cameraFollow();
 	}
 
 	/**
@@ -182,30 +159,29 @@ export default class PlayerController {
 		and add to the players position
 		we should have the camera position, which is always at the back of player
 
-		slerp by 0.1 each step, so the camera is smooth
+		slerp by `camera_sensitivity` each step, so the camera is smooth
 	 */
-	_cameraFollow(shoulder_vector) {
-		const camera_dir = new THREE.Vector3(
-			-shoulder_vector.z,
-			0,
-			shoulder_vector.x
-		)
-			.normalize()
+	cameraFollow() {
+		const camera_dir = this.main_player
+			.getCameraDirection()
 			.multiplyScalar(SceneProperties.camera_far_z);
 
-		// camera_dir.multiplyScalar(SceneProperties.camera_far_z)
-
+		// the height of camera is constant
+		// its direction is controlled by mesh shoulder
 		const camera_target_pos = new THREE.Vector3(
 			this.main_player.mesh.position.x + camera_dir.x,
 			this.renderer.camera.position.y,
 			this.main_player.mesh.position.z + camera_dir.z
 		);
 
-		this.renderer.camera.position.lerp(camera_target_pos, 0.1);
+		this.renderer.camera.position.lerp(camera_target_pos, this.camera_sensitivity);
 		this.renderer.camera.lookAt(this.main_player.mesh.position);
 	}
 
-	// call this in each animaiton frame
+	/**
+	 * call this in each animaiton frame
+	 * it controls the other players movement
+	 */
 	onFrameUpdate() {
 		for (let i = 0; i < this.players.length; i++) {
 			if (this.players[i].speed) {

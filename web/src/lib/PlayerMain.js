@@ -13,6 +13,14 @@ export default class PlayerMain extends Player {
 	#shoulder_track = new Deque(10);
 
 	/**
+	 * @type {THREE.Vector3}
+	 */
+	shoulder_vector_mesh;
+
+	// [0, 1] how sensitive the mesh's rotation react to player's rotation, higher is more sensitive
+	rotation_sensitivity = 0.1;
+
+	/**
 	 *
 	 * @param {THREE.Object3D} model
 	 * @param {{x: number, y: number, z: number}} position
@@ -34,24 +42,35 @@ export default class PlayerMain extends Player {
 	}
 
 	/**
-	 * record motion history of the past 20 frames
+	 * the `shoulder_vec_pose` is from data captured by mediapipe pose landmark
+	 * when there is a left/right angle,
+	 * and the `angle` is gt a threshold
+	 * keep turning the speed direction
+	 *
+	 * @param {THREE.Vector3} shoulder_vec_pose
 	 */
-	updateShoulderTrack() {
-		const left_shoulder_pos = new THREE.Vector3();
-		const right_shoulder_pos = new THREE.Vector3();
+	rotate(shoulder_vec_pose) {
+		const angle = shoulder_vec_pose.angleTo(new THREE.Vector3(-1, 0, 0));
 
-		this.bones.LeftShoulder.getWorldPosition(left_shoulder_pos);
-		this.bones.RightShoulder.getWorldPosition(right_shoulder_pos);
+		const sign = shoulder_vec_pose.z > 0 ? 1 : -1;
 
-		this.#shoulder_track.addBack(
-			new THREE.Vector3().subVectors(
-				right_shoulder_pos,
-				left_shoulder_pos
-			)
-		);
+		const angle_threshold = 0.1;
+
+		if (angle > angle_threshold) {
+			this.mesh.applyQuaternion(
+				new THREE.Quaternion().setFromAxisAngle(
+					new THREE.Vector3(0, 1, 0),
+					sign * angle * this.rotation_sensitivity
+				)
+			);
+		}
 	}
 
-	currentShoulderVector() {
+	/**
+	 * shoulder mesh rotation control the camera direction and speed direction
+	 * update it on each frame
+	 */
+	updateShoulderVectorMesh() {
 		// return this.#shoulder_track.peekBack();
 		const left_shoulder_pos = new THREE.Vector3();
 		const right_shoulder_pos = new THREE.Vector3();
@@ -59,81 +78,36 @@ export default class PlayerMain extends Player {
 		this.bones.LeftShoulder.getWorldPosition(left_shoulder_pos);
 		this.bones.RightShoulder.getWorldPosition(right_shoulder_pos);
 
-		return new THREE.Vector3().subVectors(
+		this.shoulder_vector_mesh = new THREE.Vector3().subVectors(
 			right_shoulder_pos,
 			left_shoulder_pos
 		);
 	}
 
-	// calculateSpeedDirection() {
-	// 	const start_vec = this.#shoulder_track.peekFront();
-	// 	const end_vec = this.#shoulder_track.peekBack();
+	/**
+	 * movement direction is always same as the direction the mesh facing
+	 * the velocity is controlled by `speed_scalar`
+	 */
+	move() {
+		this.updateSpeed({
+			x: this.shoulder_vector_mesh.z,
+			z: -this.shoulder_vector_mesh.x,
+		});
 
-	// 	if (!start_vec || !end_vec) {
-	// 		return;
-	// 	}
+		this.mesh.position.add(
+			this.speed.normalize().multiplyScalar(this.speed_scalar)
+		);
+	}
 
-	// 	// there is always very small changes in the shoulder position
-	// 	// set a threshold so that if the change is smaller than it
-	// 	// we won't change speed direction
-	// 	const change_direction_threshold = 0.1;
-
-	// 	const velo = new THREE.Vector3().subVectors(
-	// 		end_vec.clone().normalize(),
-	// 		start_vec.clone().normalize()
-	// 	);
-
-	// 	// `velo.z` and `end_vec.z` both lt 0, it means the torse towards right and rotate to right
-	// 	// `velo.z` and `end_vec.z` both gt 0, it means the torse towards left and rotate to left
-	// 	// so `velo.z` and `end_vec.z` have the same sign, we do rotation
-
-	// 	const shoulder_vec = new THREE.Vector3().subVectors(
-	// 		this.bones.RightShoulder.position,
-	// 		this.bones.LeftShoulder.position
-	// 	);
-
-	// 	const angle = shoulder_vec.angleTo(new THREE.Vector3(-1, 0, 0));
-
-	// 	console.log(angle);
-
-	// 	// if (velo.length() > change_direction_threshold && velo.z * end_vec.z > 0) {
-	// 	if (angle > change_direction_threshold) {
-	// 		if (end_vec.z > 0) {
-	// 			// this.rotateHorizontalSpeed(q)
-	// 			// this.mesh.applyQuaternion;
-	// 			// console.log(new_speed)
-	// 			// todo we also need to rotate the model
-	// 		} else if (end_vec.z < 0) {
-	// 			// this.rotateHorizontalSpeed(angle);
-	// 		}
-
-	// 		const q = new THREE.Quaternion().setFromAxisAngle(
-	// 			new THREE.Vector3(0, 1, 0),
-	// 			((end_vec.z > 0 ? 1 : -1) * angle) / 10
-	// 		);
-	// 		// console.log(q);
-	// 		// this.mesh.applyQuaternion(q);
-
-	// 		return;
-
-	// 		// we also need to know if torse is turing to left/right or restore from left/right
-	// 		const speed_dir = new THREE.Vector3(end_vec.z, 0, -end_vec.x)
-	// 			.normalize()
-	// 			.multiplyScalar(INIT_SPEED_SCALAR);
-
-	// 		return speed_dir;
-	// 	} else {
-	// 		return;
-	// 	}
-	// }
-
-	// updateSpeed() {
-	// 	const end_vec = this.currentShoulderVector();
-
-	// 	const speed_dir = new THREE.Vector3(
-	// 		end_vec.z,
-	// 		0,
-	// 		-end_vec.x
-	// 	).normalize();
-	// }
+	/**
+	 * the camera direction
+	 * @returns {THREE.Vector3}
+	 */
+	getCameraDirection() {
+		return new THREE.Vector3(
+			-this.shoulder_vector_mesh.z,
+			0,
+			this.shoulder_vector_mesh.x
+		).normalize();
+	}
 }
