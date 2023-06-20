@@ -5,18 +5,16 @@ import PoseToRotation from "./PoseToRotation";
 
 let instance;
 
-// const INIT_SPEED_SCALAR = 0.1;
-
 export default class PlayerMain extends Player {
 	#hands_track = new Deque(10);
-
-	#shoulder_track = new Deque(10);
 
 	/**
 	 * @type {THREE.Vector3}
 	 */
 	shoulder_vector_mesh;
 
+	// the angle threshold, to start rotation
+	rotation_threshold = 0.1;
 	// [0, 1] how sensitive the mesh's rotation react to player's rotation, higher is more sensitive
 	rotation_sensitivity = 0.1;
 
@@ -54,13 +52,11 @@ export default class PlayerMain extends Player {
 
 		const sign = shoulder_vec_pose.z > 0 ? 1 : -1;
 
-		const angle_threshold = 0.1;
-
-		if (angle > angle_threshold) {
+		if (angle > this.rotation_threshold) {
 			this.mesh.applyQuaternion(
 				new THREE.Quaternion().setFromAxisAngle(
 					new THREE.Vector3(0, 1, 0),
-					sign * angle * this.rotation_sensitivity
+					sign * angle * this.rotation_sensitivity // todo maybe convert it to a curve making the rotaion more smooth
 				)
 			);
 		}

@@ -411,7 +411,7 @@
 			>
 		</div>
 		<div>
-			<button
+			<!-- <button
 				on:click={() => {
 					const mesh = ballMesh();
 					// @ts-ignore
@@ -424,7 +424,7 @@
 
 					// cannonWorld.project(mesh, direction.multiplyScalar(speed));
 				}}>throw</button
-			>
+			> -->
 
 			{#if runAnimation}
 				<button
