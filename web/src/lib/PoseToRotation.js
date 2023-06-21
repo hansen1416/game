@@ -1,11 +1,14 @@
 import * as THREE from "three";
 import { clamp, BlazePoseKeypointsValues, MDMJoints } from "../utils/ropes";
 
-function quaternionFromBasis(xaxis0, yaxis0, zaxis0, xaxis1, yaxis1, zaxis1) {
+function quaternionFromBasis(xaxis0, yaxis0, zaxis0, xaxis1, yaxis1, zaxis1, quat) {
 	/**
 	 * transfer object from basis0 to basis1
 	 */
 	const m0 = new THREE.Matrix4().makeBasis(xaxis0, yaxis0, zaxis0);
+
+	m0.makeRotationFromQuaternion(quat)
+
 	const m1 = new THREE.Matrix4().makeBasis(xaxis1, yaxis1, zaxis1);
 
 	const m = m1.multiply(m0.invert());
@@ -13,7 +16,7 @@ function quaternionFromBasis(xaxis0, yaxis0, zaxis0, xaxis1, yaxis1, zaxis1) {
 	return new THREE.Quaternion().setFromRotationMatrix(m);
 }
 
-function torsoRotation(left_shoulder2, right_shoulder2, left_hip2, right_hip2) {
+function torsoRotation(left_shoulder2, right_shoulder2, left_hip2, right_hip2, quat) {
 	/**
 		Now you want matrix B that maps from 1st set of coords to 2nd set:
 		A2 = B * A1
@@ -74,7 +77,8 @@ function torsoRotation(left_shoulder2, right_shoulder2, left_hip2, right_hip2) {
 		zaxis0,
 		xaxis1,
 		yaxis1,
-		zaxis1
+		zaxis1,
+		quat
 	);
 
 	// origin basis of abdominal
@@ -107,7 +111,8 @@ function torsoRotation(left_shoulder2, right_shoulder2, left_hip2, right_hip2) {
 		zaxis2,
 		xaxis3,
 		yaxis3,
-		zaxis3
+		zaxis3,
+		quat
 	);
 
 	return [abs_q, chest_q];
@@ -194,7 +199,7 @@ export default class PoseToRotation {
 	 * @param {Array} pose3D
 	 * @param {boolean} lower_body
 	 */
-	applyPoseToBone(pose3D, lower_body = false) {
+	applyPoseToBone(pose3D, lower_body = false, quat = new THREE.Quaternion()) {
 		this.pose3D = pose3D;
 
 		const swap_left_right = false;
@@ -211,7 +216,8 @@ export default class PoseToRotation {
 				: this.pose3D[this.joints_map["LEFT_HIP"]],
 			swap_left_right
 				? this.pose3D[this.joints_map["LEFT_HIP"]]
-				: this.pose3D[this.joints_map["RIGHT_HIP"]]
+				: this.pose3D[this.joints_map["RIGHT_HIP"]],
+			quat
 		);
 
 		this.bones.Hips.rotation.setFromQuaternion(abs_q);

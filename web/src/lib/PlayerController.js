@@ -23,7 +23,7 @@ export default class PlayerController {
 	main_player;
 
 	// [0, 1] how sensitive the camera respond to player's rotation, higher is more sensitive
-	camera_sensitivity = 0.1
+	camera_sensitivity = 0.1;
 
 	/**
 	 *
@@ -111,8 +111,8 @@ export default class PlayerController {
 	 *	this function is called in the `onPoseCallback`,
 	 *  so it's a bit (a few ms) slower than `requestAnimationFrame`
 	 *
-	 * @param {object} pose3D
-	 * @param {object} pose2D
+	 * @param {{x:number, y:number, z:number}[]} pose3D
+	 * @param {{x:number, y:number, z:number}[]} pose2D
 	 * @param {boolean} lower_body
 	 * @returns
 	 */
@@ -121,9 +121,15 @@ export default class PlayerController {
 			return;
 		}
 
-		// we also need the direction that the user is facing, to caluclate the speed on the x axis
-		// const shoulder_rotation =
-		this.main_player.pose2totation.applyPoseToBone(pose3D, lower_body);
+		const width_ratio = 30;
+		const height_ratio = (width_ratio * 480) / 640;
+
+		// multiply x,y by width/height factor
+		for (let i = 0; i < pose3D.length; i++) {
+			pose3D[i].x *= width_ratio;
+			pose3D[i].y *= -height_ratio;
+			pose3D[i].z *= -width_ratio;
+		}
 
 		// the shoulder pose rotation control the rotation of mesh
 		const shoulder_vector = new THREE.Vector3(
@@ -135,7 +141,11 @@ export default class PlayerController {
 				pose3D[BlazePoseKeypointsValues["LEFT_SHOULDER"]].z
 		).normalize();
 
+		// this must happend before apply pose to bones, cause we need to apply rotation to the captured pose position
 		this.main_player.rotate(shoulder_vector);
+
+		// this.main_player.pose2totation.applyPoseToBone(pose3Dvec, lower_body);
+		this.main_player.applyPoseToBone(pose3D, lower_body);
 
 		// the shoulder mesh rotation control the camera direction and speed direction
 		this.main_player.updateShoulderVectorMesh();
@@ -174,7 +184,10 @@ export default class PlayerController {
 			this.main_player.mesh.position.z + camera_dir.z
 		);
 
-		this.renderer.camera.position.lerp(camera_target_pos, this.camera_sensitivity);
+		this.renderer.camera.position.lerp(
+			camera_target_pos,
+			this.camera_sensitivity
+		);
 		this.renderer.camera.lookAt(this.main_player.mesh.position);
 	}
 

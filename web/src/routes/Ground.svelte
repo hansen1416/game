@@ -297,15 +297,15 @@
 		// 	big_obj.push(data_recorder.toArray());
 		// }
 
-		const width_ratio = 30;
-		const height_ratio = (width_ratio * 480) / 640;
+		// const width_ratio = 30;
+		// const height_ratio = (width_ratio * 480) / 640;
 
-		// multiply x,y by differnt factor
-		for (let v of pose3D) {
-			v["x"] *= width_ratio;
-			v["y"] *= -height_ratio;
-			v["z"] *= -width_ratio;
-		}
+		// // multiply x,y by differnt factor
+		// for (let v of pose3D) {
+		// 	v["x"] *= width_ratio;
+		// 	v["y"] *= -height_ratio;
+		// 	v["z"] *= -width_ratio;
+		// }
 
 		// todo set speed
 		// change player state based on the pose
