@@ -2,7 +2,7 @@ import * as THREE from "three";
 import Deque from "../utils/Deque";
 import Player from "./Player";
 import PoseToRotation from "./PoseToRotation";
-import { clamp, BlazePoseKeypointsValues } from "../utils/ropes";
+import { BlazePoseKeypointsValues } from "../utils/ropes";
 
 let instance;
 
@@ -23,7 +23,7 @@ export default class PlayerMain extends Player {
 	 * @type {THREE.Vector3[]}
 	 */
 	pose3d_mediapipe = Array.from({ length: 33 }, () => new THREE.Vector3());
-
+	// mediapipe 33 joints mapping to index
 	joints_map = BlazePoseKeypointsValues;
 
 	/**
@@ -331,11 +331,6 @@ export default class PlayerMain extends Player {
 	 * @returns {THREE.Quaternion}
 	 */
 	getChestQuaternion(left_shoulder, right_shoulder, core) {
-		// origin basis of chest
-		// const xaxis0 = new THREE.Vector3(1, 0, 0);
-		// const yaxis0 = new THREE.Vector3(0, -1, 0);
-		// const zaxis0 = new THREE.Vector3(0, 0, 1);
-
 		// new basis of chest from pose data
 		const xaxis = new THREE.Vector3()
 			.subVectors(left_shoulder, right_shoulder)
@@ -353,9 +348,7 @@ export default class PlayerMain extends Player {
 			.crossVectors(xaxis, zaxis)
 			.normalize();
 
-		/**
-		 * transfer object from basis0 to basis1
-		 */
+		// transfer origin basis of chest to target basis
 		const m0 = new THREE.Matrix4().makeBasis(
 			new THREE.Vector3(1, 0, 0),
 			new THREE.Vector3(0, -1, 0),
@@ -396,9 +389,7 @@ export default class PlayerMain extends Player {
 			.crossVectors(zaxis, xaxis)
 			.normalize();
 
-		/**
-		 * transfer origin basis of abdominal to target basis
-		 */
+		// transfer origin basis of abdominal to target basis
 		const m0 = new THREE.Matrix4().makeBasis(
 			new THREE.Vector3(1, 0, 0),
 			new THREE.Vector3(0, 1, 0),

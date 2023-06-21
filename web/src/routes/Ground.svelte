@@ -69,12 +69,6 @@
 
 	let video, canvas;
 
-	let player1,
-		player1Bones = {};
-
-	let player2,
-		player2Bones = {};
-
 	let cameraReady = false,
 		mannequinReady = false,
 		modelReady = false;
@@ -85,21 +79,10 @@
 		showVideo = false,
 		animationPointer;
 
-	let handsWaitingThreshold = 1 * 60, // wait 1 second to reload weapon
-		speed_threshold = 2;
-
-	let handsEmptyCounterLeft = 0,
-		handsWaitingLeft = false,
-		handsAvailableLeft = false,
-		handBallMeshLeft;
-	let handsEmptyCounterRight = 0,
-		handsWaitingRight = false,
-		handsAvailableRight = false,
-		handBallMeshRight;
-
-	let poseToRotation;
-
-	let toss = new Toss();
+	let handsWaitingLeft = false,
+		handsAvailableLeft = false;
+	let handsWaitingRight = false,
+		handsAvailableRight = false;
 
 	const sceneWidth = document.documentElement.clientWidth;
 	const sceneHeight = document.documentElement.clientHeight;
