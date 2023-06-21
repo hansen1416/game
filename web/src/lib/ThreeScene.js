@@ -120,4 +120,8 @@ export default class ThreeScene {
 	removePlayerObj(player_obj) {
 		console.info("todo remove", player_obj);
 	}
+
+	resetControl() {
+		this.controls.reset();
+	}
 }

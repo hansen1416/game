@@ -402,29 +402,25 @@
 
 	<div class="controls">
 		<div>
-			<div class="threshold"><span>Threshold</span></div>
-			<label
-				>Speed: <input
-					bind:value={speed_threshold}
-					placeholder=""
-				/></label
-			>
-		</div>
-		<div>
-			<!-- <button
+			<button
 				on:click={() => {
-					const mesh = ballMesh();
-					// @ts-ignore
-					mesh.position.set(0, GROUND_LEVEL + 2, PLAYER_Z);
+					threeScene.resetControl();
+				}}>Reset Control</button
+			>
 
-					threeScene.scene.add(mesh);
-
-					const direction = new THREE.Vector3(0, 0.1, 2).normalize();
-					const speed = 36;
-
-					// cannonWorld.project(mesh, direction.multiplyScalar(speed));
-				}}>throw</button
-			> -->
+			{#if showVideo}
+				<button
+					on:click={() => {
+						showVideo = !showVideo;
+					}}>hide video</button
+				>
+			{:else}
+				<button
+					on:click={() => {
+						showVideo = !showVideo;
+					}}>show video</button
+				>
+			{/if}
 
 			{#if runAnimation}
 				<button
@@ -439,20 +435,6 @@
 					on:click={() => {
 						runAnimation = !runAnimation;
 					}}>Run</button
-				>
-			{/if}
-
-			{#if showVideo}
-				<button
-					on:click={() => {
-						showVideo = !showVideo;
-					}}>hide video</button
-				>
-			{:else}
-				<button
-					on:click={() => {
-						showVideo = !showVideo;
-					}}>show video</button
 				>
 			{/if}
 		</div>
@@ -470,19 +452,9 @@
 		right: 10px;
 	}
 
-	.controls .threshold,
-	.controls label {
-		color: #fff;
-	}
-
-	.controls input {
-		width: 30px;
-		height: 20px;
-	}
-
 	.controls button {
-		padding: 10px;
-		font-size: 20px;
+		padding: 2px 4px;
+		font-size: 18px;
 		text-transform: capitalize;
 	}
 </style>
