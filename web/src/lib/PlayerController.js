@@ -224,6 +224,8 @@ export default class PlayerController {
 
 		this.main_player.move();
 
+		this.pitcher.trackHandsPos();
+
 		// update hands track, for pitching
 		this.pitcher.onPoseApplied(this.project, this.updateProjectilePos);
 

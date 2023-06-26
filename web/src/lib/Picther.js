@@ -68,8 +68,11 @@ export default class Pitcher {
 		}
 	}
 
-	/** */
-	#trackHandsPos() {
+	/** 
+	 * record a series of hand positions
+	 * later calculate the velocity when projection
+	*/
+	trackHandsPos() {
 		const left_hand = new THREE.Vector3();
 
 		this.bones.LeftHand.getWorldPosition(left_hand);
@@ -213,8 +216,6 @@ export default class Pitcher {
 	 * @param {function} updatePosFn
 	 */
 	onPoseApplied(projectionFn, updatePosFn) {
-		this.#trackHandsPos();
-
 		if (this.handsWaitingLeft === false) {
 			const velocity = this.#calculateAngularVelocity(true);
 			// console.log("velocity", velocity);
