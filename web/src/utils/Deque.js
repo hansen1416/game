@@ -99,6 +99,12 @@ export default class Deque {
 
 		return res;
 	}
+
+	clear() {
+		this.items = {};
+		this.frontIndex = 0;
+		this.backIndex = -1;
+	}
 }
 
 // const deque = new Deque(5);

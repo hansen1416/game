@@ -1,9 +1,11 @@
 import * as THREE from "three";
-import Player from "./Player";
-import PlayerMain from "./PlayerMain";
+import * as CANNON from "cannon-es";
+import { BlazePoseKeypointsValues } from "../utils/ropes";
 import ThreeScene, { SceneProperties } from "./ThreeScene";
 import CannonWorld from "./CannonWorld";
-import { BlazePoseKeypointsValues } from "../utils/ropes";
+import Player from "./Player";
+import PlayerMain from "./PlayerMain";
+import Pitcher from "./Picther";
 
 let instance;
 
@@ -22,8 +24,22 @@ export default class PlayerController {
 	 */
 	main_player;
 
+	/**
+	 * @type {Pitcher}
+	 */
+	pitcher;
+
 	// [0, 1] how sensitive the camera respond to player's rotation, higher is more sensitive
 	camera_sensitivity = 0.1;
+
+	/**
+	 * @type {THREE.Mesh}
+	 */
+	left_projectile;
+	/**
+	 * @type {THREE.Mesh}
+	 */
+	right_projectile;
 
 	/**
 	 *
@@ -65,6 +81,8 @@ export default class PlayerController {
 		if (is_main) {
 			player = new PlayerMain(model, position, rotation);
 			this.main_player = player;
+
+			this.pitcher = new Pitcher(player);
 		} else {
 			player = new Player(model, position, rotation);
 
@@ -108,6 +126,60 @@ export default class PlayerController {
 	}
 
 	/**
+	 * call this in each animaiton frame
+	 * it controls the other players movement
+	 */
+	onFrameUpdate() {
+		for (let i = 0; i < this.players.length; i++) {
+			if (this.players[i].speed) {
+				this.players[i].mesh.position.add(this.players[i].speed);
+			}
+		}
+
+		this.pitcher.onFrameUpdate(this.addMeshToHand);
+	}
+
+	/**
+	 *
+	 * @param {boolean} left
+	 * @returns {THREE.Mesh}
+	 */
+	getProjectile(left = false) {
+		return left ? this.left_projectile : this.right_projectile;
+	}
+	/**
+	 *
+	 * @param {THREE.Mesh} mesh
+	 * @param {boolean} left
+	 */
+	setProjectile(mesh, left = false) {
+		if (left) {
+			this.left_projectile = mesh;
+		} else {
+			this.right_projectile = mesh;
+		}
+	}
+
+	/**
+	 *
+	 * @param {THREE.Vector3} position
+	 * @param {boolean} left
+	 */
+	addMeshToHand(position, left = false) {
+		const mesh = new THREE.Mesh(
+			new THREE.SphereGeometry(0.1), // @ts-ignore
+			new THREE.MeshNormalMaterial()
+		);
+		mesh.castShadow = true;
+
+		mesh.position.copy(position);
+
+		this.setProjectile(mesh, left);
+
+		this.renderer.scene.add(mesh);
+	}
+
+	/**
 	 *	this function is called in the `onPoseCallback`,
 	 *  so it's a bit (a few ms) slower than `requestAnimationFrame`
 	 *
@@ -116,7 +188,7 @@ export default class PlayerController {
 	 * @param {boolean} lower_body
 	 * @returns
 	 */
-	playerMainPose2Bone(pose3D, pose2D, lower_body = false) {
+	applyPose2MainPlayer(pose3D, pose2D, lower_body = false) {
 		if (!this.main_player) {
 			return;
 		}
@@ -151,6 +223,9 @@ export default class PlayerController {
 		this.main_player.updateShoulderVectorMesh();
 
 		this.main_player.move();
+
+		// update hands track, for pitching
+		this.pitcher.onPoseApplied(this.project, this.updateProjectilePos);
 
 		this.cameraFollow();
 	}
@@ -192,14 +267,45 @@ export default class PlayerController {
 	}
 
 	/**
-	 * call this in each animaiton frame
-	 * it controls the other players movement
+	 *
+	 * @param {THREE.Vector3} position
+	 * @param {boolean} left
 	 */
-	onFrameUpdate() {
-		for (let i = 0; i < this.players.length; i++) {
-			if (this.players[i].speed) {
-				this.players[i].mesh.position.add(this.players[i].speed);
-			}
-		}
+	updateProjectilePos(position, left = false) {
+		this.getProjectile(left).position.copy(position);
+	}
+
+	/**
+	 * 	The value of linearDamping can be set to any non-negative number, 
+		with higher values resulting in faster loss of velocity. 
+		A value of 0 means there is no damping effect, 
+		and the body will continue moving at a constant velocity forever.
+
+	 * @param {THREE.Vector3} velocity
+	 * @param {boolean} left
+	 */
+	project(velocity, left = false) {
+		const projectile = this.getProjectile(left);
+
+		const projectileBody = new CANNON.Body({
+			mass: 5, // kg
+			// @ts-ignore
+			shape: new CANNON.Sphere(projectile.geometry.parameters.radius),
+		});
+		projectileBody.position.set(
+			projectile.position.x,
+			projectile.position.y,
+			projectile.position.z
+		); // m
+
+		projectileBody.velocity.set(velocity.x, velocity.y, velocity.z);
+
+		const dimping = 0.3;
+
+		projectileBody.linearDamping = dimping;
+
+		this.physics.world.addBody(projectileBody);
+
+		this.physics.addItemBody(projectileBody, projectile);
 	}
 }

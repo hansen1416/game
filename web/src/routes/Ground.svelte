@@ -14,7 +14,7 @@
 	import StageBuilder from "../lib/StageBuilder";
 	import ItemsManager from "../lib/ItemsManager";
 	import PlayerController from "../lib/PlayerController";
-	import Toss from "../lib/Toss";
+	// import Toss from "../lib/Toss";
 
 	import CannonDebugger from "cannon-es-debugger";
 
@@ -195,7 +195,7 @@
 		threeScene.onFrameUpdate();
 
 		cannonWorld.onFrameUpdate();
-
+		// update other players except main player
 		playerController.onFrameUpdate();
 
 		if (debug) {
@@ -297,7 +297,7 @@
 		// and how to send the toss to items manager? probably through gamemedia
 		// maybe also need callback on the items when collide
 
-		playerController.playerMainPose2Bone(pose3D, pose2D, false);
+		playerController.applyPose2MainPlayer(pose3D, pose2D, false);
 
 		/**
 			poseToRotation.applyPoseToBone(pose3D, true);

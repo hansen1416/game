@@ -31,7 +31,7 @@ export default class Player {
 	 */
 	#speed = new THREE.Vector3();
 
-	#speed_scalar = 0.0;
+	#speed_scalar = 0.1;
 
 	/**
 	 *
