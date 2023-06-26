@@ -83,6 +83,8 @@ export default class PlayerController {
 			this.main_player = player;
 
 			this.pitcher = new Pitcher(player);
+
+			this.pitcher.subscribe(this);
 		} else {
 			player = new Player(model, position, rotation);
 
@@ -136,7 +138,7 @@ export default class PlayerController {
 			}
 		}
 
-		this.pitcher.onFrameUpdate(this.addMeshToHand);
+		this.pitcher.onFrameUpdate();
 	}
 
 	/**
@@ -166,6 +168,8 @@ export default class PlayerController {
 	 * @param {boolean} left
 	 */
 	addMeshToHand(position, left = false) {
+		console.log(position, this);
+
 		const mesh = new THREE.Mesh(
 			new THREE.SphereGeometry(0.1), // @ts-ignore
 			new THREE.MeshNormalMaterial()
@@ -227,7 +231,7 @@ export default class PlayerController {
 		this.pitcher.trackHandsPos();
 
 		// update hands track, for pitching
-		this.pitcher.onPoseApplied(this.project, this.updateProjectilePos);
+		// this.pitcher.onPoseApplied(this.project, this.updateProjectilePos);
 
 		this.cameraFollow();
 	}

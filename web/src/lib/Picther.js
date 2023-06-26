@@ -20,13 +20,22 @@ export default class Pitcher {
 		this.handsEmptyCounterLeft = 0;
 		this.handsEmptyCounterRight = 0;
 		this.handsWaitingThreshold = 60;
+
+		this.observers = [];
+	}
+
+	notify(fn, data) {
+		this.observers.forEach((handler) => handler[fn](data));
+	}
+	subscribe(handler) {
+		this.observers.push(handler);
 	}
 
 	/**
 	 *
-	 * @param {function} addMesh2HandFn
+
 	 */
-	onFrameUpdate(addMesh2HandFn) {
+	onFrameUpdate() {
 		if (this.handsWaitingLeft) {
 			if (this.handsEmptyCounterLeft < this.handsWaitingThreshold) {
 				this.handsEmptyCounterLeft += 1;
@@ -45,12 +54,14 @@ export default class Pitcher {
 			}
 		}
 
+		this.notify("addMeshToHand", new THREE.Vector3(1.1, 1.1, 1.1));
+
 		if (this.handsAvailableLeft) {
 			const pos = new THREE.Vector3();
 
 			this.bones.LeftHand.getWorldPosition(pos);
 
-			addMesh2HandFn(pos);
+			// addMesh2HandFn(pos);
 
 			this.handsAvailableLeft = false;
 			this.handsWaitingLeft = false;
@@ -61,17 +72,17 @@ export default class Pitcher {
 
 			this.bones.RightHand.getWorldPosition(pos);
 
-			addMesh2HandFn(pos);
+			// addMesh2HandFn(pos);
 
 			this.handsAvailableRight = false;
 			this.handsWaitingRight = false;
 		}
 	}
 
-	/** 
+	/**
 	 * record a series of hand positions
 	 * later calculate the velocity when projection
-	*/
+	 */
 	trackHandsPos() {
 		const left_hand = new THREE.Vector3();
 
