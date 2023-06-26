@@ -299,6 +299,8 @@
 
 		playerController.applyPose2MainPlayer(pose3D, pose2D, false);
 
+		// todo, need to apply running animation on legs
+
 		/**
 			poseToRotation.applyPoseToBone(pose3D, true);
 
