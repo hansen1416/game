@@ -17,12 +17,12 @@ export default class RapierWorld {
 			instance = this;
 		}
 
-        const gravity = { x: 0.0, y: -9.81, z: 0.0 };
-        /** @type {World} */
-        this.world = new RAPIER.World(gravity);
+		const gravity = { x: 0.0, y: -9.81, z: 0.0 };
+		/** @type {World} */
+		this.world = new RAPIER.World(gravity);
 	}
 
-    onFrameUpdate() {
+	onFrameUpdate() {
 		this.world.step();
 
 		// for (let i in this.rigid) {

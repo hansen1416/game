@@ -11,6 +11,7 @@
 	import ThreeScene from "../lib/ThreeScene";
 	import CannonWorld from "../lib/CannonWorld";
 	import RapierWorld from "../lib/RapierWorld";
+	import TerrainBuilder from "../lib/TerrainBuilder";
 	import StageBuilder from "../lib/StageBuilder";
 	import ItemsManager from "../lib/ItemsManager";
 	import PlayerController from "../lib/PlayerController";
@@ -81,10 +82,10 @@
 		showVideo = false,
 		animationPointer;
 
-	let handsWaitingLeft = false,
-		handsAvailableLeft = false;
-	let handsWaitingRight = false,
-		handsAvailableRight = false;
+	// let handsWaitingLeft = false,
+	// 	handsAvailableLeft = false;
+	// let handsWaitingRight = false,
+	// 	handsAvailableRight = false;
 
 	const sceneWidth = document.documentElement.clientWidth;
 	const sceneHeight = document.documentElement.clientHeight;
@@ -92,11 +93,11 @@
 	onMount(() => {
 		threeScene = new ThreeScene(canvas, sceneWidth, sceneHeight);
 
-		import('@dimforge/rapier3d').then(RAPIER => {
+		import("@dimforge/rapier3d").then((RAPIER) => {
+			physicsWorld = new RapierWorld(RAPIER);
 
-			physicsWorld = new RapierWorld(RAPIER)
-			
-		})
+			new TerrainBuilder(threeScene, physicsWorld).terrain();
+		});
 
 		cannonWorld = new CannonWorld();
 
@@ -164,10 +165,10 @@
 			mannequinReady = true;
 			modelReady = true;
 			// hand is ready for ball mesh
-			handsWaitingLeft = true;
-			handsAvailableLeft = true;
-			handsWaitingRight = true;
-			handsAvailableRight = true;
+			// handsWaitingLeft = true;
+			// handsAvailableLeft = true;
+			// handsWaitingRight = true;
+			// handsAvailableRight = true;
 		});
 	});
 

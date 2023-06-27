@@ -19,4 +19,8 @@ export default class TerrainBuilder {
 		this.renderer = renderer;
 		this.physics = physics;
 	}
+
+	terrain() {
+		return this;
+	}
 }
