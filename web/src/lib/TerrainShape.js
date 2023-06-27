@@ -1,16 +1,4 @@
-import type { World } from "@dimforge/rapier3d";
-import {
-	BufferGeometry,
-	Color,
-	Float32BufferAttribute,
-	Mesh,
-	MeshStandardMaterial,
-	Object3D,
-	Vector3,
-} from "three";
-import { noise3 } from "../lib";
-import { Rapier } from "../physics/rapier";
-
+import * as THREE from "three";
 import ThreeScene from "./ThreeScene";
 import RapierWorld from "./RapierWorld";
 
@@ -19,15 +7,21 @@ const TERRAIN_STRIDE = TERRAIN_SIZE + 1;
 
 export class TerrainShape {
 	heightMap = new Float32Array(TERRAIN_STRIDE ** 2);
-	positionBuffer = new Float32BufferAttribute(TERRAIN_STRIDE ** 2 * 18, 3);
-	geometry = new BufferGeometry();
-	material = new MeshStandardMaterial({ color: new Color(0x448833) });
-	mesh = new Mesh(this.geometry, this.material);
+	positionBuffer = new THREE.Float32BufferAttribute(
+		TERRAIN_STRIDE ** 2 * 18,
+		3
+	);
+	geometry = new THREE.BufferGeometry();
+	material = new THREE.MeshStandardMaterial({
+		color: new THREE.Color(0x448833),
+	});
+	mesh = new THREE.Mesh(this.geometry, this.material);
 
 	/**
 	 *
 	 * @param {ThreeScene} renderer
 	 * @param {RapierWorld} physics
+	 * @param {THREE.Vector3} origin
 	 */
 	constructor(renderer, physics, origin) {
 		this.renderer = renderer;
@@ -68,6 +62,7 @@ export class TerrainShape {
 		}
 
 		this.genMesh();
+		this.addPhysics();
 	}
 
 	dispose() {
@@ -76,9 +71,9 @@ export class TerrainShape {
 		this.mesh.parent?.remove(this.mesh);
 	}
 
-	addToScene(parent) {
-		parent.add(this.mesh);
-	}
+	// addToScene(parent) {
+	// 	parent.add(this.mesh);
+	// }
 
 	genMesh() {
 		const position = [];
@@ -109,23 +104,50 @@ export class TerrainShape {
 		this.geometry.setAttribute("position", this.positionBuffer);
 		this.geometry.setIndex(indices);
 		this.geometry.computeVertexNormals();
+
+		this.renderer.scene.add(this.mesh);
 	}
 
-	addPhysics(world: World, rapier: Rapier) {
-		const rbDesc = rapier.RigidBodyDesc.fixed().setTranslation(
-			this.origin.x + TERRAIN_SIZE * 0.5,
-			this.origin.y,
-			this.origin.z + TERRAIN_SIZE * 0.5
-		);
-		const terrainBody = this.physics.world.createRigidBody(rbDesc);
-		const clDesc = rapier.ColliderDesc.heightfield(
-			TERRAIN_SIZE,
-			TERRAIN_SIZE,
-			this.heightMap,
-			new Vector3(TERRAIN_SIZE, 1, TERRAIN_SIZE)
-		);
-		this.physics.world.createCollider(clDesc, terrainBody);
+	addPhysics() {
+		this.physics.createTerrain(this.origin, TERRAIN_SIZE, this.heightMap);
 	}
 }
 
+/**
+ *
+ * @param {number} x
+ * @param {number} y
+ * @returns {number}
+ */
 const hmIndex = (x, y) => x * TERRAIN_STRIDE + y;
+
+/**
+ *
+ * @param {number} x
+ * @param {number} y
+ * @param {number} z
+ * @returns {number}
+ */
+function noise3(x, y, z) {
+	return permute3(x, y, z) / 289.0;
+}
+
+/**
+ *
+ * @param {number} x
+ * @returns {number}
+ */
+function permute(x) {
+	return THREE.MathUtils.euclideanModulo((34.0 * x + 1.0) * x, 289.0);
+}
+
+/**
+ *
+ * @param {number} x
+ * @param {number} y
+ * @param {number} z
+ * @returns {number}
+ */
+function permute3(x, y, z) {
+	return permute(x + permute(y + permute(z)));
+}

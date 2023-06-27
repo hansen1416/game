@@ -1,6 +1,7 @@
 import * as THREE from "three";
 import ThreeScene from "./ThreeScene";
 import RapierWorld from "./RapierWorld";
+import { TerrainShape } from "./TerrainShape";
 
 let instance;
 
@@ -33,6 +34,11 @@ export default class TerrainBuilder {
 				// terrain.addToScene(this.scene);
 				// this.terrain.push(terrain);
 				// this.pool.add(terrain);
+				const terrain = new TerrainShape(
+					this.renderer,
+					this.physics,
+					new THREE.Vector3(x, 0, y)
+				);
 			}
 		}
 
