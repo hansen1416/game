@@ -231,7 +231,7 @@ export default class PlayerController {
 		this.pitcher.trackHandsPos();
 
 		// update hands track, for pitching
-		// this.pitcher.onPoseApplied(this.project, this.updateProjectilePos);
+		this.pitcher.onPoseApplied();
 
 		this.cameraFollow();
 	}
@@ -290,7 +290,7 @@ export default class PlayerController {
 	 * @param {THREE.Vector3} velocity
 	 * @param {boolean} left
 	 */
-	project(velocity, left = false) {
+	shoot(velocity, left = false) {
 		const projectile = this.getProjectile(left);
 
 		const projectileBody = new CANNON.Body({

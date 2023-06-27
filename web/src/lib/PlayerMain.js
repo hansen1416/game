@@ -12,7 +12,7 @@ export default class PlayerMain extends Player {
 	/**
 	 * @type {THREE.Vector3}
 	 */
-	shoulder_vector_mesh;
+	shoulder_vector_mesh = new THREE.Vector3(-1, 0, 0);
 
 	// the angle threshold, to start rotation
 	rotation_threshold = 0.1;
@@ -82,9 +82,11 @@ export default class PlayerMain extends Player {
 		this.bones.LeftShoulder.getWorldPosition(left_shoulder_pos);
 		this.bones.RightShoulder.getWorldPosition(right_shoulder_pos);
 
-		this.shoulder_vector_mesh = new THREE.Vector3().subVectors(
-			right_shoulder_pos,
-			left_shoulder_pos
+		this.shoulder_vector_mesh.copy(
+			new THREE.Vector3().subVectors(
+				right_shoulder_pos,
+				left_shoulder_pos
+			)
 		);
 	}
 

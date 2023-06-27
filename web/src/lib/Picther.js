@@ -4,10 +4,11 @@ import Deque from "../utils/Deque";
 export default class Pitcher {
 	/**
 	 *
-	 * @param {{bones: {[key: string]: THREE.Bone}}} player_instance
+	 * @param {{bones: {[key: string]: THREE.Bone}, shoulder_vector_mesh: THREE.Vector3}} player_instance
 	 */
 	constructor(player_instance) {
 		this.bones = player_instance.bones;
+		this.shoulder_vector = player_instance.shoulder_vector_mesh;
 
 		this.left_hand_track = new Deque(10);
 		this.right_hand_track = new Deque(10);
@@ -20,20 +21,29 @@ export default class Pitcher {
 		this.handsEmptyCounterLeft = 0;
 		this.handsEmptyCounterRight = 0;
 		this.handsWaitingThreshold = 60;
-
+		/** @type {object[]} */
 		this.observers = [];
-	}
-
-	notify(fn, data) {
-		this.observers.forEach((handler) => handler[fn](data));
-	}
-	subscribe(handler) {
-		this.observers.push(handler);
 	}
 
 	/**
 	 *
+	 * @param {string} fn
+	 * @param {array} args
+	 */
+	fire(fn, args) {
+		this.observers.forEach((observer) => observer[fn](...args));
+	}
 
+	/**
+	 *
+	 * @param {object} observer
+	 */
+	subscribe(observer) {
+		this.observers.push(observer);
+	}
+
+	/**
+	 * when hands empty, add a projectile to it
 	 */
 	onFrameUpdate() {
 		if (this.handsWaitingLeft) {
@@ -54,14 +64,12 @@ export default class Pitcher {
 			}
 		}
 
-		this.notify("addMeshToHand", new THREE.Vector3(1.1, 1.1, 1.1));
-
 		if (this.handsAvailableLeft) {
 			const pos = new THREE.Vector3();
 
 			this.bones.LeftHand.getWorldPosition(pos);
 
-			// addMesh2HandFn(pos);
+			this.fire("addMeshToHand", [pos, true]);
 
 			this.handsAvailableLeft = false;
 			this.handsWaitingLeft = false;
@@ -72,7 +80,7 @@ export default class Pitcher {
 
 			this.bones.RightHand.getWorldPosition(pos);
 
-			// addMesh2HandFn(pos);
+			this.fire("addMeshToHand", [pos, false]);
 
 			this.handsAvailableRight = false;
 			this.handsWaitingRight = false;
@@ -134,18 +142,11 @@ export default class Pitcher {
 			.subVectors(handpos, shoulderpos)
 			.normalize();
 
-		// if arm vector within 10degree from 0,0,1, we have a direction
-		// and the arm is straight enough, more than 80 percent total length
+		// when is fore arm is roughly pointing forward, trigger the shoot
+		if (Math.abs(direction.x) < 0.6 && Math.abs(direction.y) < 0.3) {
 
-		if (
-			Math.abs(direction.x) < 0.6 &&
-			Math.abs(direction.y) < 0.3
-			// handpos.distanceTo(shoulderpos) >= arm_length * 0.7
-		) {
-			// direction.y = 0;
-			// direction.normalize();
-
-			return new THREE.Vector3(0, 0, 1);
+			// the direction mapping to x,z plane is orthogonal to the shoulder vector "(z, -x)"
+			return new THREE.Vector3(this.shoulder_vector.z, 0, -this.shoulder_vector.x);
 		}
 
 		return;
@@ -192,14 +193,14 @@ export default class Pitcher {
 
 		// todo, decide what really is a toss
 		if (speed > speed_threshold && direction) {
-			console.log(
-				"direction",
-				direction,
-				"speed",
-				speed,
-				"angle difference",
-				direction.angleTo(new THREE.Vector3(0, 0, 1))
-			);
+			// console.log(
+			// 	"direction",
+			// 	direction,
+			// 	"speed",
+			// 	speed,
+			// 	"angle difference",
+			// 	direction.angleTo(new THREE.Vector3(0, 0, 1))
+			// );
 
 			this.#clearTrack(left);
 
@@ -223,16 +224,15 @@ export default class Pitcher {
 
 	/**
 	 *
-	 * @param {function} projectionFn
-	 * @param {function} updatePosFn
 	 */
-	onPoseApplied(projectionFn, updatePosFn) {
+	onPoseApplied() {
 		if (this.handsWaitingLeft === false) {
 			const velocity = this.#calculateAngularVelocity(true);
 			// console.log("velocity", velocity);
 			if (velocity) {
 				// making ball move
-				projectionFn(velocity, true);
+
+				this.fire("shoot", [velocity, true]);
 
 				// mark hand empty, waiting for new object to load
 				this.handsWaitingLeft = true;
@@ -243,7 +243,7 @@ export default class Pitcher {
 
 				this.bones.LeftHand.getWorldPosition(pos);
 
-				updatePosFn(pos, true);
+				this.fire("updateProjectilePos", [pos, true]);
 			}
 		}
 
@@ -253,7 +253,7 @@ export default class Pitcher {
 			if (velocity) {
 				// making ball move
 
-				projectionFn(velocity, false);
+				this.fire("shoot", [velocity, false]);
 
 				this.handsWaitingRight = true;
 			} else {
@@ -263,7 +263,7 @@ export default class Pitcher {
 
 				this.bones.RightHand.getWorldPosition(pos);
 
-				updatePosFn(pos, false);
+				this.fire("updateProjectilePos", [pos, false]);
 			}
 		}
 	}
