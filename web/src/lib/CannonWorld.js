@@ -29,7 +29,6 @@ export default class CannonWorld {
 		// 		contactEquationStiffness: 1e6,
 		// 	}
 		// );
-
 		// this.world.addContactMaterial(planeContactMaterial);
 
 		this.rigid = [];

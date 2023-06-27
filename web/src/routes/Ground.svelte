@@ -2,15 +2,15 @@
 	import { onDestroy, onMount } from "svelte";
 	import * as THREE from "three"; // @ts-ignore
 	import { cloneDeep } from "lodash";
-	import { GROUND_LEVEL, FLOOR_WIDTH, PLAYER_Z } from "../utils/constants";
+	import { GROUND_LEVEL, PLAYER_Z } from "../utils/constants";
 	import {
-		ballMesh,
 		createPoseLandmarker,
 		loadGLTF,
 		invokeCamera,
 	} from "../utils/ropes";
 	import ThreeScene from "../lib/ThreeScene";
 	import CannonWorld from "../lib/CannonWorld";
+	import RapierWorld from "../lib/RapierWorld";
 	import StageBuilder from "../lib/StageBuilder";
 	import ItemsManager from "../lib/ItemsManager";
 	import PlayerController from "../lib/PlayerController";
@@ -62,6 +62,8 @@
 	let threeScene;
 	/** @type {CannonWorld} */
 	let cannonWorld;
+	/** @type {RapierWorld} */
+	let physicsWorld;
 	/** @type {ItemsManager} */
 	let itemsManager;
 	/** @type {PlayerController} */
@@ -89,6 +91,12 @@
 
 	onMount(() => {
 		threeScene = new ThreeScene(canvas, sceneWidth, sceneHeight);
+
+		import('@dimforge/rapier3d').then(RAPIER => {
+
+			physicsWorld = new RapierWorld(RAPIER)
+			
+		})
 
 		cannonWorld = new CannonWorld();
 
