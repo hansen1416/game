@@ -168,7 +168,7 @@ export default class PlayerController {
 	 * @param {boolean} left
 	 */
 	addMeshToHand(position, left = false) {
-		console.log(position, this);
+		// console.log(position, this);
 
 		const mesh = new THREE.Mesh(
 			new THREE.SphereGeometry(0.1), // @ts-ignore

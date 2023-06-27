@@ -43,6 +43,28 @@ export default class Pitcher {
 	}
 
 	/**
+	 *
+	 * @param {boolean} left
+	 * @returns
+	 */
+	getHandsWaitingFlag(left = false) {
+		return left ? this.handsWaitingLeft : this.handsWaitingRight;
+	}
+
+	/**
+	 *
+	 * @param {boolean} flag
+	 * @param {boolean} left
+	 */
+	setHandsWaitingFlag(flag, left = false) {
+		if (left) {
+			this.handsWaitingLeft = flag;
+		} else {
+			this.handsWaitingRight = flag;
+		}
+	}
+
+	/**
 	 * when hands empty, add a projectile to it
 	 */
 	onFrameUpdate() {
@@ -144,9 +166,12 @@ export default class Pitcher {
 
 		// when is fore arm is roughly pointing forward, trigger the shoot
 		if (Math.abs(direction.x) < 0.6 && Math.abs(direction.y) < 0.3) {
-
 			// the direction mapping to x,z plane is orthogonal to the shoulder vector "(z, -x)"
-			return new THREE.Vector3(this.shoulder_vector.z, 0, -this.shoulder_vector.x);
+			return new THREE.Vector3(
+				this.shoulder_vector.z,
+				0,
+				-this.shoulder_vector.x
+			);
 		}
 
 		return;
@@ -191,17 +216,7 @@ export default class Pitcher {
 		const speed =
 			(velocity.length() * 1000) / (end_point.t - start_point.t);
 
-		// todo, decide what really is a toss
 		if (speed > speed_threshold && direction) {
-			// console.log(
-			// 	"direction",
-			// 	direction,
-			// 	"speed",
-			// 	speed,
-			// 	"angle difference",
-			// 	direction.angleTo(new THREE.Vector3(0, 0, 1))
-			// );
-
 			this.#clearTrack(left);
 
 			return direction.multiplyScalar(speed * 20);
@@ -223,47 +238,30 @@ export default class Pitcher {
 	}
 
 	/**
-	 *
+	 * on each frame the model moved with the captured pose
+	 * if we got a speed, lauch the projectile
+	 * otherwise the projectiles move with the hands
 	 */
 	onPoseApplied() {
-		if (this.handsWaitingLeft === false) {
-			const velocity = this.#calculateAngularVelocity(true);
+		for (let f of [true, false]) {
+			if (this.getHandsWaitingFlag(f)) {
+				continue;
+			}
+			const velocity = this.#calculateAngularVelocity(f);
+
 			// console.log("velocity", velocity);
 			if (velocity) {
-				// making ball move
-
-				this.fire("shoot", [velocity, true]);
+				this.fire("shoot", [velocity, f]);
 
 				// mark hand empty, waiting for new object to load
-				this.handsWaitingLeft = true;
+				this.setHandsWaitingFlag(true, f);
 			} else {
 				// let the ball move with hand
-
 				const pos = new THREE.Vector3();
 
-				this.bones.LeftHand.getWorldPosition(pos);
+				this.bones[f ? "LeftHand" : "RightHand"].getWorldPosition(pos);
 
-				this.fire("updateProjectilePos", [pos, true]);
-			}
-		}
-
-		if (this.handsWaitingRight === false) {
-			const velocity = this.#calculateAngularVelocity(false);
-			// console.log("velocity", velocity);
-			if (velocity) {
-				// making ball move
-
-				this.fire("shoot", [velocity, false]);
-
-				this.handsWaitingRight = true;
-			} else {
-				// let the ball move with hand
-
-				const pos = new THREE.Vector3();
-
-				this.bones.RightHand.getWorldPosition(pos);
-
-				this.fire("updateProjectilePos", [pos, false]);
+				this.fire("updateProjectilePos", [pos, f]);
 			}
 		}
 	}
