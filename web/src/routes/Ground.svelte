@@ -1,6 +1,6 @@
 <script>
 	import { onDestroy, onMount } from "svelte";
-	import * as THREE from "three"; // @ts-ignore
+	// @ts-ignore
 	import { cloneDeep } from "lodash";
 	import { GROUND_LEVEL, PLAYER_Z } from "../utils/constants";
 	import {
@@ -12,12 +12,9 @@
 	import CannonWorld from "../lib/CannonWorld";
 	import RapierWorld from "../lib/RapierWorld";
 	import TerrainBuilder from "../lib/TerrainBuilder";
-	import StageBuilder from "../lib/StageBuilder";
 	import ItemsManager from "../lib/ItemsManager";
 	import PlayerController from "../lib/PlayerController";
 	// import Toss from "../lib/Toss";
-
-	import CannonDebugger from "cannon-es-debugger";
 
 	/**
 	 * what do I need?
@@ -56,8 +53,6 @@
 	 *
 	 * use Observer for Architect
 	 */
-
-	let debug;
 
 	/** @type {ThreeScene} */
 	let threeScene;
@@ -101,17 +96,12 @@
 
 		cannonWorld = new CannonWorld();
 
-		new StageBuilder(threeScene, cannonWorld).addGround().build();
 
 		itemsManager = new ItemsManager(threeScene, cannonWorld);
 
 		itemsManager.spreadItems();
 
 		playerController = new PlayerController(threeScene, cannonWorld);
-
-		if (import.meta.env.DEV) {
-			debug = CannonDebugger(threeScene.scene, cannonWorld.world);
-		}
 
 		if (true) {
 			invokeCamera(video, () => {
@@ -207,9 +197,6 @@
 		// update other players except main player
 		playerController.onFrameUpdate();
 
-		if (debug) {
-			debug.update();
-		}
 		/**
 		if (handsWaitingLeft) {
 			if (handsEmptyCounterLeft < handsWaitingThreshold) {
