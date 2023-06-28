@@ -14,7 +14,6 @@
 	import TerrainBuilder from "../lib/TerrainBuilder";
 	import ItemsManager from "../lib/ItemsManager";
 	import PlayerController from "../lib/PlayerController";
-	// import Toss from "../lib/Toss";
 
 	/**
 	 * what do I need?
@@ -308,59 +307,7 @@
 			if (to_pos) {
 				player1.position.set(to_pos.x, GROUND_LEVEL, PLAYER_Z);
 			}
-
-			toss.getHandsPos(player1Bones);
-
-			if (handsWaitingLeft === false && handBallMeshLeft) {
-				const velocity = toss.calculateAngularVelocity(
-					player1Bones,
-					true,
-					speed_threshold
-				);
-				// console.log("velocity", velocity);
-				if (velocity) {
-					// making ball move
-
-					// cannonWorld.project(handBallMeshLeft, velocity);
-
-					handsWaitingLeft = true;
-					handBallMeshLeft = null;
-				} else {
-					// let the ball move with hand
-
-					const tmpvec = new THREE.Vector3();
-
-					player1Bones.LeftHand.getWorldPosition(tmpvec);
-
-					handBallMeshLeft.position.copy(tmpvec);
-				}
-			}
-
-			if (handsWaitingRight === false && handBallMeshRight) {
-				const velocity = toss.calculateAngularVelocity(
-					player1Bones,
-					false,
-					speed_threshold
-				);
-				// console.log("velocity", velocity);
-				if (velocity) {
-					// making ball move
-
-					// cannonWorld.project(handBallMeshRight, velocity);
-
-					handsWaitingRight = true;
-					handBallMeshRight = null;
-				} else {
-					// let the ball move with hand
-
-					const tmpvec = new THREE.Vector3();
-
-					player1Bones.RightHand.getWorldPosition(tmpvec);
-
-					handBallMeshRight.position.copy(tmpvec);
-				}
-			}
-*/
+		*/
 
 		poseDetectorAvailable = true;
 	}

@@ -5,7 +5,7 @@ import ThreeScene, { SceneProperties } from "./ThreeScene";
 import CannonWorld from "./CannonWorld";
 import Player from "./Player";
 import PlayerMain from "./PlayerMain";
-import Pitcher from "./Picther";
+import Pitcher from "./Pitcher";
 
 let instance;
 
