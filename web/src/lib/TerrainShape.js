@@ -119,7 +119,9 @@ export class TerrainShape {
  * @param {number} y
  * @returns {number}
  */
-const hmIndex = (x, y) => x * TERRAIN_STRIDE + y;
+function hmIndex(x, y) {
+	return x * TERRAIN_STRIDE + y;
+}
 
 /**
  *
