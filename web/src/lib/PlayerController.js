@@ -94,9 +94,9 @@ export default class PlayerController {
 
 		this.renderer.addPlayerObj(player.mesh);
 
-		if (player.body) {
-			this.physics.addPlayerBody(player.body, player.mesh);
-		}
+		// if (player.body) {
+		// 	this.physics.addPlayerBody(player.body, player.mesh);
+		// }
 	}
 
 	/**
@@ -108,9 +108,9 @@ export default class PlayerController {
 
 		this.renderer.removePlayerObj(player.mesh);
 
-		if (player.body) {
-			this.physics.removePlayerBody(player.body);
-		}
+		// if (player.body) {
+		// 	this.physics.removePlayerBody(player.body);
+		// }
 
 		// how to effctively remove the player from array
 		const idx = this.players_mapping[uuid];
