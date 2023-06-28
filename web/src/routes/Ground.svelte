@@ -72,7 +72,7 @@
 
 	let poseDetector, poseDetectorAvailable;
 
-	let runAnimation = true,
+	let runAnimation = false,
 		showVideo = false,
 		animationPointer;
 
@@ -91,16 +91,17 @@
 			physicsWorld = new RapierWorld(RAPIER);
 
 			new TerrainBuilder(threeScene, physicsWorld).terrain();
+
+			playerController = new PlayerController(threeScene, physicsWorld);
+
+			playerController.addBall();
 		});
 
 		cannonWorld = new CannonWorld();
 
-
 		itemsManager = new ItemsManager(threeScene, cannonWorld);
 
 		itemsManager.spreadItems();
-
-		playerController = new PlayerController(threeScene, cannonWorld);
 
 		if (true) {
 			invokeCamera(video, () => {
@@ -192,7 +193,7 @@
 
 		threeScene.onFrameUpdate();
 
-		cannonWorld.onFrameUpdate();
+		physicsWorld.onFrameUpdate();
 		// update other players except main player
 		playerController.onFrameUpdate();
 

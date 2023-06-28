@@ -2,7 +2,7 @@ import * as THREE from "three";
 import * as CANNON from "cannon-es";
 import { BlazePoseKeypointsValues } from "../utils/ropes";
 import ThreeScene, { SceneProperties } from "./ThreeScene";
-import CannonWorld from "./CannonWorld";
+import RapierWorld from "./RapierWorld";
 import Player from "./Player";
 import PlayerMain from "./PlayerMain";
 import Pitcher from "./Pitcher";
@@ -44,7 +44,7 @@ export default class PlayerController {
 	/**
 	 *
 	 * @param {ThreeScene} renderer
-	 * @param {CannonWorld} physics
+	 * @param {RapierWorld} physics
 	 */
 	constructor(renderer, physics) {
 		if (instance) {
@@ -310,8 +310,24 @@ export default class PlayerController {
 
 		projectileBody.linearDamping = dimping;
 
-		this.physics.world.addBody(projectileBody);
+		// this.physics.world.addBody(projectileBody);
 
-		this.physics.addItemBody(projectileBody, projectile);
+		// this.physics.addItemBody(projectileBody, projectile);
+	}
+
+	addBall() {
+		const mesh = new THREE.Mesh(
+			new THREE.SphereGeometry(0.1), // @ts-ignore
+			new THREE.MeshNormalMaterial()
+		);
+		mesh.castShadow = true;
+
+		const position = new THREE.Vector3(0, 2, 0);
+
+		mesh.position.copy(position);
+
+		this.renderer.scene.add(mesh);
+
+		this.physics.createRigidBodyDynamic(position, mesh);
 	}
 }

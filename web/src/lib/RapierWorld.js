@@ -5,12 +5,23 @@ let instance;
 /**
  * @typedef {import('../../node_modules/@dimforge/rapier3d/pipeline/world').World} World
  * @typedef {import('../../node_modules/@dimforge/rapier3d/geometry/collider').ColliderDesc} ColliderDesc
+ * @typedef {import('../../node_modules/@dimforge/rapier3d/dynamics/rigid_body').RigidBody} RigidBody
  * @typedef {import('../../node_modules/@dimforge/rapier3d/dynamics/rigid_body').RigidBodyDesc} RigidBodyDesc
  * @typedef {import('../../node_modules/@dimforge/rapier3d/dynamics/coefficient_combine_rule').CoefficientCombineRule} CoefficientCombineRule
- * 
+ *
  */
 
 export default class RapierWorld {
+	/**
+	 * @type {RigidBody[]}
+	 */
+	rigid = [];
+
+	/**
+	 * @type {THREE.Mesh[]}
+	 */
+	mesh = [];
+
 	/**
 	 *
 	 * @param {module} RAPIER
@@ -31,43 +42,46 @@ export default class RapierWorld {
 		/** @type {RigidBodyDesc} */
 		this.RigidBodyDesc = RAPIER.RigidBodyDesc;
 		/** @type {CoefficientCombineRule} */
-		this.CoefficientCombineRule = RAPIER.CoefficientCombineRule
+		this.CoefficientCombineRule = RAPIER.CoefficientCombineRule;
 	}
 
 	onFrameUpdate() {
 		this.world.step();
 
-		// for (let i in this.rigid) {
-		// 	this.mesh[i].position.copy(this.rigid[i].position);
-		// 	this.mesh[i].quaternion.copy(this.rigid[i].quaternion);
-		// }
+		for (let i in this.rigid) {
+			const t = this.rigid[i].translation();
+			this.mesh[i].position.set(t.x, t.y, t.z);
+
+			// this.mesh[i].quaternion.copy(this.rigid[i].quaternion);
+		}
 	}
 
 	/**
 	 *
-	 * @param {number} x
-	 * @param {number} y
-	 * @param {number} z
+	 * @param {THREE.Vector3} position
+	 * @param {THREE.Mesh} mesh
 	 */
-	createRigidBodyFixed(x, y, z) {
+	createRigidBodyDynamic(position, mesh) {
 		// @ts-ignore
 		const rbDesc = this.RigidBodyDesc.dynamic()
-		.setTranslation(6, 4, 0)
-		.setLinearDamping(0.1)
-		// .restrictRotations(false, true, false) // Y-axis only
-		.setCcdEnabled(true);
-	  this.sphereBody = this.world.createRigidBody(rbDesc);
-  
-	  // @ts-ignore
-	  const clDesc = this.ColliderDesc.ball(1)
-		.setFriction(0.1)// @ts-ignore
-		.setFrictionCombineRule(this.CoefficientCombineRule.Max)
-		// .setTranslation(0, 0, 0)
-		.setRestitution(0.6)// @ts-ignore
-		.setRestitutionCombineRule(this.CoefficientCombineRule.Max);
-	  // .setCollisionGroups(CollisionMask.ActorMask | CollisionMask.TouchActor);
-	  this.world.createCollider(clDesc, this.sphereBody);
-  
+			.setTranslation(position.x, position.y, position.z)
+			.setLinearDamping(0.5)
+			// .restrictRotations(false, true, false) // Y-axis only
+			.setCcdEnabled(true);
+		const sphereBody = this.world.createRigidBody(rbDesc);
+
+		// @ts-ignore
+		const clDesc = this.ColliderDesc.ball(0.1)
+			.setFriction(0.1) // @ts-ignore
+			.setFrictionCombineRule(this.CoefficientCombineRule.Max)
+			// .setTranslation(0, 0, 0)
+			.setRestitution(0.6) // @ts-ignore
+			.setRestitutionCombineRule(this.CoefficientCombineRule.Max);
+		// .setCollisionGroups(CollisionMask.ActorMask | CollisionMask.TouchActor);
+		this.world.createCollider(clDesc, sphereBody);
+
+		this.rigid.push(sphereBody);
+		this.mesh.push(mesh);
 	}
 
 	/**
