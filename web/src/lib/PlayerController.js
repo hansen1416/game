@@ -1,5 +1,4 @@
 import * as THREE from "three";
-import * as CANNON from "cannon-es";
 import { BlazePoseKeypointsValues } from "../utils/ropes";
 import ThreeScene, { SceneProperties } from "./ThreeScene";
 import RapierWorld from "./RapierWorld";

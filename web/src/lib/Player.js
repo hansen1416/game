@@ -1,5 +1,4 @@
 import * as THREE from "three";
-import * as CANNON from "cannon-es";
 
 export const STATE_ENUM = {
 	0: "idle",
@@ -19,7 +18,7 @@ export default class Player {
 	 */
 	bones = {};
 	/**
-	 * @type {CANNON.Body}
+	 * @type {any}
 	 */
 	body;
 
