@@ -1,7 +1,6 @@
-import * as THREE from "three";
-
 /**
  * @typedef {import('../../node_modules/@dimforge/rapier3d/pipeline/world').World} World
+ * @typedef {import('../../node_modules/@dimforge/rapier3d/geometry/collider').Collider} Collider
  * @typedef {import('../../node_modules/@dimforge/rapier3d/geometry/collider').ColliderDesc} ColliderDesc
  * @typedef {import('../../node_modules/@dimforge/rapier3d/dynamics/rigid_body').RigidBody} RigidBody
  * @typedef {import('../../node_modules/@dimforge/rapier3d/dynamics/rigid_body').RigidBodyDesc} RigidBodyDesc
@@ -9,6 +8,8 @@ import * as THREE from "three";
  * @typedef {import('../../node_modules/@dimforge/rapier3d/control/character_controller').KinematicCharacterController} KinematicCharacterController
  * @typedef {{x: number, y: number, z: number}} vec3
  */
+
+import * as THREE from "three";
 
 let instance;
 
@@ -49,7 +50,12 @@ export default class RapierWorld {
 	/**
 	 * @type {KinematicCharacterController}
 	 */
-	controller
+	character_controller;
+
+	/**
+	 * @type {Collider}
+	 */
+	character_collider;
 
 	/**
 	 *
@@ -168,22 +174,37 @@ export default class RapierWorld {
 		this.mesh.push(mesh);
 	}
 
-	#getController() {
-		if (!this.controller) {
-			this.controller = this.world.createCharacterController(0.01);
-		}
+	/**
+	 *
+	 * @returns {Collider}
+	 */
+	createCharacter() {
+		this.character_controller = this.world.createCharacterController(0.01);
 
-		return this.controller
+		this.character_controller.setUp({ x: 0, y: 1, z: 0 });
+
+		// @ts-ignore
+		const clDesc = this.ColliderDesc.ball(0.5)
+			.setFriction(this.friction) // @ts-ignore
+			.setFrictionCombineRule(this.CoefficientCombineRule.Max)
+			// .setTranslation(0, 0, 0)
+			.setRestitution(this.restitution) // @ts-ignore
+			.setRestitutionCombineRule(this.CoefficientCombineRule.Max);
+
+		this.character_collider = this.world.createCollider(clDesc);
+		return this.character_collider;
 	}
 
-	calculateCharacterVelocity() {
-		// this.controller.computeColliderMovement(
-		// 	collider,           // The collider we would like to move.
-		// 	desiredTranslation, // The movement we would like to apply if there wasn’t any obstacle.
-		// );
+	calculateCharacterVelocity(nominal_velocity) {
+		this.character_controller.computeColliderMovement(
+			this.character_collider, // The collider we would like to move.
+			nominal_velocity // The movement we would like to apply if there wasn’t any obstacle.
+		);
+
+		return this.character_controller.computedMovement();
 	}
 
 	destructor() {
-		this.world.removeCharacterController(this.controller);
+		this.world.removeCharacterController(this.character_controller);
 	}
 }

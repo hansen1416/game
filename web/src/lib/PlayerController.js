@@ -81,6 +81,8 @@ export default class PlayerController {
 			player = new PlayerMain(model, position, rotation);
 			this.main_player = player;
 
+			this.physics.createCharacter();
+
 			this.pitcher = new Pitcher(player);
 
 			this.pitcher.subscribe(this);
