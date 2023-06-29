@@ -91,7 +91,7 @@ export default class Pitcher {
 
 			this.bones.LeftHand.getWorldPosition(pos);
 
-			this.fire("addMeshToHand", [pos, true]);
+			this.fire("addProjectileToHand", [pos, true]);
 
 			this.handsAvailableLeft = false;
 			this.handsWaitingLeft = false;
@@ -102,7 +102,7 @@ export default class Pitcher {
 
 			this.bones.RightHand.getWorldPosition(pos);
 
-			this.fire("addMeshToHand", [pos, false]);
+			this.fire("addProjectileToHand", [pos, false]);
 
 			this.handsAvailableRight = false;
 			this.handsWaitingRight = false;

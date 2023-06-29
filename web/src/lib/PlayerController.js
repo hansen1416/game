@@ -167,7 +167,7 @@ export default class PlayerController {
 	 * @param {THREE.Vector3} position
 	 * @param {boolean} left
 	 */
-	addMeshToHand(position, left = false) {
+	addProjectileToHand(position, left = false) {
 		// console.log(position, this);
 
 		const mesh = new THREE.Mesh(
@@ -181,6 +181,15 @@ export default class PlayerController {
 		this.setProjectile(mesh, left);
 
 		this.renderer.scene.add(mesh);
+	}
+
+	/**
+	 *
+	 * @param {THREE.Vector3} position
+	 * @param {boolean} left
+	 */
+	updateProjectilePos(position, left = false) {
+		this.getProjectile(left).position.copy(position);
 	}
 
 	/**
@@ -273,15 +282,6 @@ export default class PlayerController {
 	}
 
 	/**
-	 *
-	 * @param {THREE.Vector3} position
-	 * @param {boolean} left
-	 */
-	updateProjectilePos(position, left = false) {
-		this.getProjectile(left).position.copy(position);
-	}
-
-	/**
 	 * 	The value of linearDamping can be set to any non-negative number, 
 		with higher values resulting in faster loss of velocity. 
 		A value of 0 means there is no damping effect, 
@@ -293,41 +293,43 @@ export default class PlayerController {
 	shoot(velocity, left = false) {
 		const projectile = this.getProjectile(left);
 
-		const projectileBody = new CANNON.Body({
-			mass: 5, // kg
-			// @ts-ignore
-			shape: new CANNON.Sphere(projectile.geometry.parameters.radius),
-		});
-		projectileBody.position.set(
-			projectile.position.x,
-			projectile.position.y,
-			projectile.position.z
-		); // m
+		this.physics.createRigidBodyDynamic(projectile, projectile.position, velocity);
 
-		projectileBody.velocity.set(velocity.x, velocity.y, velocity.z);
+		// const projectileBody = new CANNON.Body({
+		// 	mass: 5, // kg
+		// 	// @ts-ignore
+		// 	shape: new CANNON.Sphere(projectile.geometry.parameters.radius),
+		// });
+		// projectileBody.position.set(
+		// 	projectile.position.x,
+		// 	projectile.position.y,
+		// 	projectile.position.z
+		// ); // m
 
-		const dimping = 0.3;
+		// projectileBody.velocity.set(velocity.x, velocity.y, velocity.z);
 
-		projectileBody.linearDamping = dimping;
+		// const dimping = 0.3;
+
+		// projectileBody.linearDamping = dimping;
 
 		// this.physics.world.addBody(projectileBody);
 
 		// this.physics.addItemBody(projectileBody, projectile);
 	}
 
-	addBall() {
-		const mesh = new THREE.Mesh(
-			new THREE.SphereGeometry(0.1), // @ts-ignore
-			new THREE.MeshNormalMaterial()
-		);
-		mesh.castShadow = true;
+	// addBall() {
+	// 	const mesh = new THREE.Mesh(
+	// 		new THREE.SphereGeometry(0.1), // @ts-ignore
+	// 		new THREE.MeshNormalMaterial()
+	// 	);
+	// 	mesh.castShadow = true;
 
-		const position = new THREE.Vector3(0, 2, 0);
+	// 	const position = new THREE.Vector3(0, 2, 0);
 
-		mesh.position.copy(position);
+	// 	mesh.position.copy(position);
 
-		this.renderer.scene.add(mesh);
+	// 	this.renderer.scene.add(mesh);
 
-		this.physics.createRigidBodyDynamic(position, mesh);
-	}
+	// 	this.physics.createRigidBodyDynamic(position, mesh);
+	// }
 }

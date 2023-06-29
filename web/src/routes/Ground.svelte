@@ -93,8 +93,6 @@
 			new TerrainBuilder(threeScene, physicsWorld).terrain();
 
 			playerController = new PlayerController(threeScene, physicsWorld);
-
-			playerController.addBall();
 		});
 
 		cannonWorld = new CannonWorld();

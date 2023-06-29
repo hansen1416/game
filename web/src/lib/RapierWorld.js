@@ -58,13 +58,15 @@ export default class RapierWorld {
 
 	/**
 	 *
-	 * @param {THREE.Vector3} position
 	 * @param {THREE.Mesh} mesh
+	 * @param {THREE.Vector3} position
+	 * @param {THREE.Vector3} velocity
 	 */
-	createRigidBodyDynamic(position, mesh) {
+	createRigidBodyDynamic(mesh, position, velocity) {
 		// @ts-ignore
 		const rbDesc = this.RigidBodyDesc.dynamic()
 			.setTranslation(position.x, position.y, position.z)
+			.setLinvel(velocity.x, velocity.y, velocity.z)
 			.setLinearDamping(0.5)
 			// .restrictRotations(false, true, false) // Y-axis only
 			.setCcdEnabled(true);
