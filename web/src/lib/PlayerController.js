@@ -293,28 +293,7 @@ export default class PlayerController {
 	shoot(velocity, left = false) {
 		const projectile = this.getProjectile(left);
 
-		this.physics.createRigidBodyDynamic(projectile, projectile.position, velocity);
-
-		// const projectileBody = new CANNON.Body({
-		// 	mass: 5, // kg
-		// 	// @ts-ignore
-		// 	shape: new CANNON.Sphere(projectile.geometry.parameters.radius),
-		// });
-		// projectileBody.position.set(
-		// 	projectile.position.x,
-		// 	projectile.position.y,
-		// 	projectile.position.z
-		// ); // m
-
-		// projectileBody.velocity.set(velocity.x, velocity.y, velocity.z);
-
-		// const dimping = 0.3;
-
-		// projectileBody.linearDamping = dimping;
-
-		// this.physics.world.addBody(projectileBody);
-
-		// this.physics.addItemBody(projectileBody, projectile);
+		this.physics.createProjectile(projectile, projectile.position, velocity);
 	}
 
 	// addBall() {

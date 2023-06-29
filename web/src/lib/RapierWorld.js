@@ -1,15 +1,15 @@
 import * as THREE from "three";
 
-let instance;
-
 /**
  * @typedef {import('../../node_modules/@dimforge/rapier3d/pipeline/world').World} World
  * @typedef {import('../../node_modules/@dimforge/rapier3d/geometry/collider').ColliderDesc} ColliderDesc
  * @typedef {import('../../node_modules/@dimforge/rapier3d/dynamics/rigid_body').RigidBody} RigidBody
  * @typedef {import('../../node_modules/@dimforge/rapier3d/dynamics/rigid_body').RigidBodyDesc} RigidBodyDesc
  * @typedef {import('../../node_modules/@dimforge/rapier3d/dynamics/coefficient_combine_rule').CoefficientCombineRule} CoefficientCombineRule
- *
+ * @typedef {{x: number, y: number, z: number}} vec3
  */
+
+let instance;
 
 export default class RapierWorld {
 	/**
@@ -21,6 +21,29 @@ export default class RapierWorld {
 	 * @type {THREE.Mesh[]}
 	 */
 	mesh = [];
+
+	/**
+	 *  Larger values of the damping coefficients lead to a stronger slow-downs. Their default values are 0.0 (no damping at all).
+	 */
+	liner_damping = 0.5;
+
+	/**
+	 * A friction coefficient of 0 implies no friction at all (completely sliding contact)
+	 * and a coefficient greater or equal to 1 implies a very strong friction. Values greater than 1 are allowed.
+	 */
+	friction = 0.5;
+
+	/**
+	 * A restitution coefficient set to 1 (fully elastic contact) implies that
+	 * the exit velocity at a contact has the same magnitude as the entry velocity along the contact normal:
+	 * it is as if you drop a bouncing ball and it gets back to the same height after the bounce.
+	 *
+	 * A restitution coefficient set ot 0 implies that
+	 * the exit velocity at a contact will be zero along the contact normal:
+	 * it's as if you drop a ball but it doesn't bounce at all.
+	 */
+
+	restitution = 0.3;
 
 	/**
 	 *
@@ -45,6 +68,9 @@ export default class RapierWorld {
 		this.CoefficientCombineRule = RAPIER.CoefficientCombineRule;
 	}
 
+	/**
+	 * called in each `requestAnimationFrame`
+	 */
 	onFrameUpdate() {
 		this.world.step();
 
@@ -57,38 +83,8 @@ export default class RapierWorld {
 	}
 
 	/**
-	 *
-	 * @param {THREE.Mesh} mesh
-	 * @param {THREE.Vector3} position
-	 * @param {THREE.Vector3} velocity
-	 */
-	createRigidBodyDynamic(mesh, position, velocity) {
-		// @ts-ignore
-		const rbDesc = this.RigidBodyDesc.dynamic()
-			.setTranslation(position.x, position.y, position.z)
-			.setLinvel(velocity.x, velocity.y, velocity.z)
-			.setLinearDamping(0.5)
-			// .restrictRotations(false, true, false) // Y-axis only
-			.setCcdEnabled(true);
-		const sphereBody = this.world.createRigidBody(rbDesc);
-
-		// @ts-ignore
-		const clDesc = this.ColliderDesc.ball(0.1)
-			.setFriction(0.1) // @ts-ignore
-			.setFrictionCombineRule(this.CoefficientCombineRule.Max)
-			// .setTranslation(0, 0, 0)
-			.setRestitution(0.6) // @ts-ignore
-			.setRestitutionCombineRule(this.CoefficientCombineRule.Max);
-		// .setCollisionGroups(CollisionMask.ActorMask | CollisionMask.TouchActor);
-		this.world.createCollider(clDesc, sphereBody);
-
-		this.rigid.push(sphereBody);
-		this.mesh.push(mesh);
-	}
-
-	/**
 	 * Creates a new collider descriptor with a heightfield shape.
-	 * @param {THREE.Vector3} origin
+	 * @param {vec3} origin
 	 * @param {number} terrain_size
 	 * @param {Float32Array} heights - The heights of the heightfield along its local `y` axis,
 	 *                  provided as a matrix stored in column-major order.
@@ -110,5 +106,59 @@ export default class RapierWorld {
 			new THREE.Vector3(terrain_size, 1, terrain_size)
 		);
 		this.world.createCollider(clDesc, terrainBody);
+	}
+
+	/**
+	 *
+	 * @param {THREE.Mesh} mesh
+	 * @param {vec3} position
+	 * @param {vec3} velocity
+	 */
+	createProjectile(mesh, position, velocity) {
+		// @ts-ignore
+		const rbDesc = this.RigidBodyDesc.dynamic()
+			.setTranslation(position.x, position.y, position.z)
+			.setLinvel(velocity.x, velocity.y, velocity.z)
+			.setLinearDamping(this.liner_damping)
+			// .restrictRotations(false, true, false) // Y-axis only
+			.setCcdEnabled(true);
+		const sphereBody = this.world.createRigidBody(rbDesc);
+
+		// @ts-ignore
+		const clDesc = this.ColliderDesc.ball(0.1)
+			.setFriction(this.friction) // @ts-ignore
+			.setFrictionCombineRule(this.CoefficientCombineRule.Max)
+			// .setTranslation(0, 0, 0)
+			.setRestitution(this.restitution) // @ts-ignore
+			.setRestitutionCombineRule(this.CoefficientCombineRule.Max);
+		// .setCollisionGroups(CollisionMask.ActorMask | CollisionMask.TouchActor);
+		this.world.createCollider(clDesc, sphereBody);
+
+		this.rigid.push(sphereBody);
+		this.mesh.push(mesh);
+	}
+
+	/**
+	 *
+	 * @param {THREE.Mesh} mesh
+	 * @param {vec3} position
+	 */
+	createRandomSample(mesh, position) {
+		// @ts-ignore
+		const rbDesc = this.RigidBodyDesc.dynamic()
+			.setTranslation(position.x, position.y, position.z)
+			.setLinearDamping(this.liner_damping)
+			.setCcdEnabled(true);
+		const rigid = this.world.createRigidBody(rbDesc);
+
+		// @ts-ignore
+		const clDesc = this.ColliderDesc.cuboid(0.5, 0.4, 0.3)
+			.setFriction(this.friction)
+			.setRestitution(this.restitution);
+
+		this.world.createCollider(clDesc, rigid);
+
+		this.rigid.push(rigid);
+		this.mesh.push(mesh);
 	}
 }

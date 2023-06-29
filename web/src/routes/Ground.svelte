@@ -9,7 +9,6 @@
 		invokeCamera,
 	} from "../utils/ropes";
 	import ThreeScene from "../lib/ThreeScene";
-	import CannonWorld from "../lib/CannonWorld";
 	import RapierWorld from "../lib/RapierWorld";
 	import TerrainBuilder from "../lib/TerrainBuilder";
 	import ItemsManager from "../lib/ItemsManager";
@@ -19,7 +18,7 @@
 	 * what do I need?
 	 *
 	 * class to build the scene, add objects
-	 * 		this class will need ThreeScene and CannonWorld
+	 * 		this class will need ThreeScene and PhysicsWorld
 	 * 		how does it handle moving object?
 	 *
 	 * class to map the joints to character rotations, only uppder body
@@ -55,8 +54,6 @@
 
 	/** @type {ThreeScene} */
 	let threeScene;
-	/** @type {CannonWorld} */
-	let cannonWorld;
 	/** @type {RapierWorld} */
 	let physicsWorld;
 	/** @type {ItemsManager} */
@@ -80,22 +77,6 @@
 	const sceneHeight = document.documentElement.clientHeight;
 
 	onMount(() => {
-		threeScene = new ThreeScene(canvas, sceneWidth, sceneHeight);
-
-		import("@dimforge/rapier3d").then((RAPIER) => {
-			physicsWorld = new RapierWorld(RAPIER);
-
-			new TerrainBuilder(threeScene, physicsWorld).terrain();
-
-			playerController = new PlayerController(threeScene, physicsWorld);
-		});
-
-		cannonWorld = new CannonWorld();
-
-		itemsManager = new ItemsManager(threeScene, cannonWorld);
-
-		itemsManager.spreadItems();
-
 		if (true) {
 			invokeCamera(video, () => {
 				cameraReady = true;
@@ -107,6 +88,20 @@
 				poseDetectorAvailable = true;
 			});
 		}
+
+		threeScene = new ThreeScene(canvas, sceneWidth, sceneHeight);
+
+		import("@dimforge/rapier3d").then((RAPIER) => {
+			physicsWorld = new RapierWorld(RAPIER);
+
+			new TerrainBuilder(threeScene, physicsWorld).terrain();
+
+			playerController = new PlayerController(threeScene, physicsWorld);
+
+			itemsManager = new ItemsManager(threeScene, physicsWorld);
+
+			itemsManager.spreadItems();
+		});
 
 		Promise.all([
 			loadGLTF("/glb/dors.glb"),
