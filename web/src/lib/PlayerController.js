@@ -292,22 +292,10 @@ export default class PlayerController {
 	shoot(velocity, left = false) {
 		const projectile = this.getProjectile(left);
 
-		this.physics.createProjectile(projectile, projectile.position, velocity);
+		this.physics.createProjectile(
+			projectile,
+			projectile.position,
+			velocity
+		);
 	}
-
-	// addBall() {
-	// 	const mesh = new THREE.Mesh(
-	// 		new THREE.SphereGeometry(0.1), // @ts-ignore
-	// 		new THREE.MeshNormalMaterial()
-	// 	);
-	// 	mesh.castShadow = true;
-
-	// 	const position = new THREE.Vector3(0, 2, 0);
-
-	// 	mesh.position.copy(position);
-
-	// 	this.renderer.scene.add(mesh);
-
-	// 	this.physics.createRigidBodyDynamic(position, mesh);
-	// }
 }

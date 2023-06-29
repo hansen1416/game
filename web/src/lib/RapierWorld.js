@@ -6,6 +6,7 @@ import * as THREE from "three";
  * @typedef {import('../../node_modules/@dimforge/rapier3d/dynamics/rigid_body').RigidBody} RigidBody
  * @typedef {import('../../node_modules/@dimforge/rapier3d/dynamics/rigid_body').RigidBodyDesc} RigidBodyDesc
  * @typedef {import('../../node_modules/@dimforge/rapier3d/dynamics/coefficient_combine_rule').CoefficientCombineRule} CoefficientCombineRule
+ * @typedef {import('../../node_modules/@dimforge/rapier3d/control/character_controller').KinematicCharacterController} KinematicCharacterController
  * @typedef {{x: number, y: number, z: number}} vec3
  */
 
@@ -44,6 +45,11 @@ export default class RapierWorld {
 	 */
 
 	restitution = 0.3;
+
+	/**
+	 * @type {KinematicCharacterController}
+	 */
+	controller
 
 	/**
 	 *
@@ -160,5 +166,24 @@ export default class RapierWorld {
 
 		this.rigid.push(rigid);
 		this.mesh.push(mesh);
+	}
+
+	#getController() {
+		if (!this.controller) {
+			this.controller = this.world.createCharacterController(0.01);
+		}
+
+		return this.controller
+	}
+
+	calculateCharacterVelocity() {
+		// this.controller.computeColliderMovement(
+		// 	collider,           // The collider we would like to move.
+		// 	desiredTranslation, // The movement we would like to apply if there wasn’t any obstacle.
+		// );
+	}
+
+	destructor() {
+		this.world.removeCharacterController(this.controller);
 	}
 }
