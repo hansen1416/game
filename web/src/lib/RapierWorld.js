@@ -195,13 +195,22 @@ export default class RapierWorld {
 		return this.character_collider;
 	}
 
+	/**
+	 *
+	 * @param {vec3} nominal_velocity
+	 * @returns
+	 */
 	calculateCharacterVelocity(nominal_velocity) {
 		this.character_controller.computeColliderMovement(
 			this.character_collider, // The collider we would like to move.
 			nominal_velocity // The movement we would like to apply if there wasn’t any obstacle.
 		);
 
-		return this.character_controller.computedMovement();
+		const correctedMovement = this.character_controller.computedMovement();
+
+		this.character_collider.setTranslation(correctedMovement);
+
+		return correctedMovement;
 	}
 
 	destructor() {

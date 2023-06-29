@@ -140,6 +140,14 @@ export default class PlayerController {
 		}
 
 		this.pitcher.onFrameUpdate();
+
+		const vel = this.physics.calculateCharacterVelocity({
+			x: 0,
+			y: 0,
+			z: 0.1,
+		});
+
+		// console.log(vel, this.physics.character_collider.translation());
 	}
 
 	/**
