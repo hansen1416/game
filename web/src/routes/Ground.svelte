@@ -76,11 +76,6 @@
 		showVideo = false,
 		animationPointer;
 
-	// let handsWaitingLeft = false,
-	// 	handsAvailableLeft = false;
-	// let handsWaitingRight = false,
-	// 	handsAvailableRight = false;
-
 	const sceneWidth = document.documentElement.clientWidth;
 	const sceneHeight = document.documentElement.clientHeight;
 
@@ -152,11 +147,6 @@
 			cameraReady = true;
 			mannequinReady = true;
 			modelReady = true;
-			// hand is ready for ball mesh
-			// handsWaitingLeft = true;
-			// handsAvailableLeft = true;
-			// handsWaitingRight = true;
-			// handsAvailableRight = true;
 		});
 	});
 
@@ -195,63 +185,6 @@
 		// update other players except main player
 		playerController.onFrameUpdate();
 
-		/**
-		if (handsWaitingLeft) {
-			if (handsEmptyCounterLeft < handsWaitingThreshold) {
-				handsEmptyCounterLeft += 1;
-			} else {
-				handsAvailableLeft = true;
-				handsEmptyCounterLeft = 0;
-			}
-		}
-
-		if (handsWaitingRight) {
-			if (handsEmptyCounterRight < handsWaitingThreshold) {
-				handsEmptyCounterRight += 1;
-			} else {
-				handsAvailableRight = true;
-				handsEmptyCounterRight = 0;
-			}
-		}
-
-		if (handsAvailableLeft) {
-			// todo add ball to hand
-
-			handBallMeshLeft = ballMesh();
-
-			// console.log("add ball", handBallMeshLeft, player1Bones);
-
-			const tmpvec = new THREE.Vector3();
-
-			player1Bones.LeftHand.getWorldPosition(tmpvec);
-
-			// @ts-ignore
-			handBallMeshLeft.position.copy(tmpvec);
-
-			threeScene.scene.add(handBallMeshLeft);
-
-			handsAvailableLeft = false;
-			handsWaitingLeft = false;
-		}
-
-		if (handsAvailableRight) {
-			// todo add ball to hand
-
-			handBallMeshRight = ballMesh();
-
-			const tmpvec = new THREE.Vector3();
-
-			player1Bones.RightHand.getWorldPosition(tmpvec);
-
-			// @ts-ignore
-			handBallMeshRight.position.copy(tmpvec);
-
-			threeScene.scene.add(handBallMeshRight);
-
-			handsAvailableRight = false;
-			handsWaitingRight = false;
-		}
-*/
 		animationPointer = requestAnimationFrame(animate);
 	}
 
@@ -263,33 +196,6 @@
 
 		const pose3D = cloneDeep(result.worldLandmarks[0]);
 		const pose2D = cloneDeep(result.landmarks[0]);
-
-		// data_recorder.addBack({ data: pose3D, t: performance.now() });
-
-		// if (data_recorder.size() > 30) {
-		// 	data_recorder.removeFront();
-		// }
-
-		// if (data_recorder.size() === 30) {
-		// 	big_obj.push(data_recorder.toArray());
-		// }
-
-		// const width_ratio = 30;
-		// const height_ratio = (width_ratio * 480) / 640;
-
-		// // multiply x,y by differnt factor
-		// for (let v of pose3D) {
-		// 	v["x"] *= width_ratio;
-		// 	v["y"] *= -height_ratio;
-		// 	v["z"] *= -width_ratio;
-		// }
-
-		// todo set speed
-		// change player state based on the pose
-		// do toss based on the player's pose
-		// where to store the mainplayer's pose cache?
-		// and how to send the toss to items manager? probably through gamemedia
-		// maybe also need callback on the items when collide
 
 		playerController.applyPose2MainPlayer(pose3D, pose2D, false);
 
