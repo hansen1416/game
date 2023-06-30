@@ -1,5 +1,16 @@
 import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
+import Stats from "three/examples/jsm/libs/stats.module.js";
+
+let stats;
+
+if (import.meta.env.DEV) {
+	stats = new Stats();
+
+	stats.showPanel(1);
+
+	document.body.appendChild(stats.dom);
+}
 
 export const SceneProperties = {
 	camera_height: 1,
@@ -58,10 +69,10 @@ export default class ThreeScene {
 		this.camera.updateProjectionMatrix(); // update the camera's projection matrix
 
 		// env light
-		this.scene.add(new THREE.AmbientLight(0xffffff, 0.8));
+		this.scene.add(new THREE.AmbientLight(0xffffff, 0.5));
 
 		// mimic the sun light. maybe update light position later
-		this.light = new THREE.PointLight(0xffffff, 0.2);
+		this.light = new THREE.PointLight(0xffffff, 0.5);
 		this.light.position.set(0, 30, 0);
 		this.light.castShadow = true;
 		this.scene.add(this.light);
@@ -85,6 +96,10 @@ export default class ThreeScene {
 		// this.controls.update();
 
 		this.renderer.render(this.scene, this.camera);
+
+		if (stats) {
+			stats.update();
+		}
 	}
 
 	/**

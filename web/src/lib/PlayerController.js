@@ -40,7 +40,7 @@ export default class PlayerController {
 	 */
 	right_projectile;
 
-		/**
+	/**
 	 * @type {THREE.Mesh}
 	 */
 	tmp_char;
@@ -92,9 +92,9 @@ export default class PlayerController {
 				new THREE.MeshNormalMaterial()
 			);
 			this.tmp_char.castShadow = true;
-			this.tmp_char.position.set(0,-0.6,0)
+			this.tmp_char.position.set(0, -0.6, 0);
 
-			this.renderer.scene.add(this.tmp_char)
+			this.renderer.scene.add(this.tmp_char);
 
 			this.physics.createCharacter(this.tmp_char);
 
@@ -156,16 +156,36 @@ export default class PlayerController {
 
 		this.pitcher.onFrameUpdate();
 
-		const desiredTranslation = new THREE.Vector3()
+		const desiredTranslation = new THREE.Vector3();
 
-		this.tmp_char.getWorldPosition(desiredTranslation)
+		this.tmp_char.getWorldPosition(desiredTranslation);
 
-		desiredTranslation.z += 0.01
+		desiredTranslation.z += 0.01;
 		// desiredTranslation.y -= 0.005
 
-		this.physics.moveCharacter(desiredTranslation);
+		// this.physics.moveCharacter(desiredTranslation);
 
-		// console.log(vel, this.physics.character_collider.translation());
+		if (import.meta.env.DEV) {
+			if (!this.lines) {
+				let material = new THREE.LineBasicMaterial({
+					color: 0xffffff, // @ts-ignore
+					vertexColors: THREE.VertexColors,
+				});
+				let geometry = new THREE.BufferGeometry();
+				this.lines = new THREE.LineSegments(geometry, material);
+				this.renderer.scene.add(this.lines);
+			}
+
+			let buffers = this.physics.world.debugRender();
+			this.lines.geometry.setAttribute(
+				"position",
+				new THREE.BufferAttribute(buffers.vertices, 3)
+			);
+			this.lines.geometry.setAttribute(
+				"color",
+				new THREE.BufferAttribute(buffers.colors, 4)
+			);
+		}
 	}
 
 	/**

@@ -193,7 +193,7 @@ export default class RapierWorld {
 
 		this.character_controller.setUp({ x: 0, y: 1, z: 0 });
 		this.character_controller.enableSnapToGround(0.8);
-		this.character_controller.enableAutostep(0.1, 0.1, false)
+		this.character_controller.enableAutostep(0.1, 0.1, false);
 
 		// rigidbody
 		// @ts-ignore
@@ -209,7 +209,7 @@ export default class RapierWorld {
 		const clDesc = this.ColliderDesc.ball(0.4)
 			.setFriction(this.friction)
 			.setRestitution(this.restitution)
-			.setMass(10)
+			.setMass(10);
 
 		this.character_collider = this.world.createCollider(
 			clDesc,
@@ -234,9 +234,6 @@ export default class RapierWorld {
 		const correctedMovement = this.character_controller.computedMovement();
 
 		this.character_rigid.setNextKinematicTranslation(correctedMovement);
-
-		console.log(correctedMovement);
-		console.log(this.character_collider.translation());
 	}
 
 	destructor() {
