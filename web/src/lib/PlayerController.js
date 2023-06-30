@@ -40,6 +40,11 @@ export default class PlayerController {
 	 */
 	right_projectile;
 
+		/**
+	 * @type {THREE.Mesh}
+	 */
+	tmp_char;
+
 	/**
 	 *
 	 * @param {ThreeScene} renderer
@@ -81,7 +86,17 @@ export default class PlayerController {
 			player = new PlayerMain(model, position, rotation);
 			this.main_player = player;
 
-			this.physics.createCharacter();
+			// a tmp sphere to test character controller
+			this.tmp_char = new THREE.Mesh(
+				new THREE.SphereGeometry(0.4), // @ts-ignore
+				new THREE.MeshNormalMaterial()
+			);
+			this.tmp_char.castShadow = true;
+			this.tmp_char.position.set(0,-0.6,0)
+
+			this.renderer.scene.add(this.tmp_char)
+
+			this.physics.createCharacter(this.tmp_char);
 
 			this.pitcher = new Pitcher(player);
 
@@ -141,11 +156,14 @@ export default class PlayerController {
 
 		this.pitcher.onFrameUpdate();
 
-		const vel = this.physics.calculateCharacterVelocity({
-			x: 0,
-			y: 0,
-			z: 0.1,
-		});
+		const desiredTranslation = new THREE.Vector3()
+
+		this.tmp_char.getWorldPosition(desiredTranslation)
+
+		desiredTranslation.z += 0.01
+		// desiredTranslation.y -= 0.005
+
+		this.physics.moveCharacter(desiredTranslation);
 
 		// console.log(vel, this.physics.character_collider.translation());
 	}

@@ -53,6 +53,11 @@ export default class RapierWorld {
 	character_controller;
 
 	/**
+	 * @type {RigidBody}
+	 */
+	character_rigid;
+
+	/**
 	 * @type {Collider}
 	 */
 	character_collider;
@@ -90,7 +95,10 @@ export default class RapierWorld {
 			const t = this.rigid[i].translation();
 			this.mesh[i].position.set(t.x, t.y, t.z);
 
-			// this.mesh[i].quaternion.copy(this.rigid[i].quaternion);
+			const r = this.rigid[i].rotation();
+			this.mesh[i].setRotationFromQuaternion(
+				new THREE.Quaternion(r.x, r.y, r.z, r.w)
+			);
 		}
 	}
 
@@ -116,7 +124,9 @@ export default class RapierWorld {
 			terrain_size,
 			heights,
 			new THREE.Vector3(terrain_size, 1, terrain_size)
-		);
+		)
+			.setFriction(this.friction)
+			.setRestitution(0);
 		this.world.createCollider(clDesc, terrainBody);
 	}
 
@@ -175,42 +185,58 @@ export default class RapierWorld {
 	}
 
 	/**
-	 *
-	 * @returns {Collider}
+	 * @param {THREE.Mesh} mesh
 	 */
-	createCharacter() {
+	createCharacter(mesh) {
+		// controller
 		this.character_controller = this.world.createCharacterController(0.01);
 
 		this.character_controller.setUp({ x: 0, y: 1, z: 0 });
+		this.character_controller.enableSnapToGround(0.8);
+		this.character_controller.enableAutostep(0.1, 0.1, false)
 
+		// rigidbody
 		// @ts-ignore
-		const clDesc = this.ColliderDesc.ball(0.5)
-			.setFriction(this.friction) // @ts-ignore
-			.setFrictionCombineRule(this.CoefficientCombineRule.Max)
-			// .setTranslation(0, 0, 0)
-			.setRestitution(this.restitution) // @ts-ignore
-			.setRestitutionCombineRule(this.CoefficientCombineRule.Max);
+		const rbDesc = this.RigidBodyDesc.kinematicPositionBased()
+			.setTranslation(0, -0.6, 0)
+			.enabledRotations(true, true, true)
+			.setLinearDamping(0);
 
-		this.character_collider = this.world.createCollider(clDesc);
-		return this.character_collider;
+		this.character_rigid = this.world.createRigidBody(rbDesc);
+
+		// collider
+		// @ts-ignore
+		const clDesc = this.ColliderDesc.ball(0.4)
+			.setFriction(this.friction)
+			.setRestitution(this.restitution)
+			.setMass(10)
+
+		this.character_collider = this.world.createCollider(
+			clDesc,
+			this.character_rigid
+		);
+
+		this.rigid.push(this.character_rigid);
+		this.mesh.push(mesh);
 	}
 
 	/**
 	 *
-	 * @param {vec3} nominal_velocity
+	 * @param {vec3} target_translation
 	 * @returns
 	 */
-	calculateCharacterVelocity(nominal_velocity) {
+	moveCharacter(target_translation) {
 		this.character_controller.computeColliderMovement(
 			this.character_collider, // The collider we would like to move.
-			nominal_velocity // The movement we would like to apply if there wasn’t any obstacle.
+			target_translation // The movement we would like to apply if there wasn’t any obstacle.
 		);
 
 		const correctedMovement = this.character_controller.computedMovement();
 
-		this.character_collider.setTranslation(correctedMovement);
+		this.character_rigid.setNextKinematicTranslation(correctedMovement);
 
-		return correctedMovement;
+		console.log(correctedMovement);
+		console.log(this.character_collider.translation());
 	}
 
 	destructor() {

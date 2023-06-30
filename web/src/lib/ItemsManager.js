@@ -58,6 +58,6 @@ export default class ItemsManager {
 		// 	);
 		// }
 
-		this.addItem({ x: 2, y: 2, z: 2 }, { color: 0xff0099 });
+		this.addItem({ x: 0, y: 0, z: 6 }, { color: 0xff0099 });
 	}
 }
