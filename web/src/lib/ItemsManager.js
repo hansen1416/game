@@ -1,12 +1,9 @@
-import * as THREE from "three";
-import { GROUND_LEVEL, GROUND_WIDTH, GROUND_HEIGHT } from "../utils/constants";
-import ThreeScene from "./ThreeScene";
-import RapierWorld from "./RapierWorld";
-import { poissonDiskSampling } from "../utils/poissonSampling";
-
 /**
  * @typedef {{x: number, y: number, z: number}} vec3
  */
+
+import ThreeScene from "./ThreeScene";
+import RapierWorld from "./RapierWorld";
 
 let instance;
 
@@ -30,17 +27,9 @@ export default class ItemsManager {
 	/**
 	 *
 	 * @param {vec3} pos
-	 * @param {{color: number}} prop
 	 */
-	addItem(pos, prop) {
-		const mesh = new THREE.Mesh(
-			new THREE.BoxGeometry(1, 0.8, 0.5),
-			new THREE.MeshBasicMaterial({ color: prop.color })
-		);
-
-		mesh.position.set(pos.x, pos.y, pos.z);
-
-		this.renderer.addItemMesh(mesh);
+	addItem(pos) {
+		const mesh = this.renderer.createRandomSample(pos);
 
 		this.physics.createRandomSample(mesh, pos);
 	}
@@ -58,6 +47,6 @@ export default class ItemsManager {
 		// 	);
 		// }
 
-		this.addItem({ x: 0, y: 0, z: 6 }, { color: 0xff0099 });
+		this.addItem({ x: 0, y: -0.2, z: 8 });
 	}
 }

@@ -174,7 +174,7 @@ export default class RapierWorld {
 		const rigid = this.world.createRigidBody(rbDesc);
 
 		// @ts-ignore
-		const clDesc = this.ColliderDesc.cuboid(0.5, 0.4, 0.3)
+		const clDesc = this.ColliderDesc.cuboid(0.4, 0.8, 0.3)
 			.setFriction(this.friction)
 			.setRestitution(this.restitution);
 

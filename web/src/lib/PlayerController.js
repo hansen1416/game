@@ -108,7 +108,7 @@ export default class PlayerController {
 			this.players_mapping[player.uuid] = this.players.length - 1;
 		}
 
-		this.renderer.addPlayerObj(player.mesh);
+		this.renderer.scene.add(player.mesh);
 
 		// if (player.body) {
 		// 	this.physics.addPlayerBody(player.body, player.mesh);
@@ -217,17 +217,11 @@ export default class PlayerController {
 	addProjectileToHand(position, left = false) {
 		// console.log(position, this);
 
-		const mesh = new THREE.Mesh(
-			new THREE.SphereGeometry(0.1), // @ts-ignore
-			new THREE.MeshNormalMaterial()
-		);
-		mesh.castShadow = true;
+		const mesh = this.renderer.createProjectile();
 
 		mesh.position.copy(position);
 
 		this.setProjectile(mesh, left);
-
-		this.renderer.scene.add(mesh);
 	}
 
 	/**

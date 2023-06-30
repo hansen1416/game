@@ -29,8 +29,10 @@ export default class TerrainBuilder {
 	}
 
 	terrain() {
-		for (let y = -32; y < 32; y += 16) {
-			for (let x = -32; x < 32; x += 16) {
+		const terrain_range = 64;
+
+		for (let y = -terrain_range; y < terrain_range; y += 16) {
+			for (let x = -terrain_range; x < terrain_range; x += 16) {
 				// const terrain = new TerrainShape(new Vector3(x, 0, y));
 				// terrain.addToScene(this.scene);
 				// this.terrain.push(terrain);
@@ -46,7 +48,6 @@ export default class TerrainBuilder {
 		return this;
 	}
 }
-
 
 // import { ParametricGeometry } from "three/addons/geometries/ParametricGeometry.js";
 

@@ -1,3 +1,7 @@
+/**
+ * @typedef {{x: number, y: number, z: number}} vec3
+ */
+
 import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 import Stats from "three/examples/jsm/libs/stats.module.js";
@@ -104,30 +108,39 @@ export default class ThreeScene {
 
 	/**
 	 *
-	 * @param {THREE.Mesh} mesh
+	 * @returns {THREE.Mesh}
 	 */
-	addStaticMesh(mesh) {
-		mesh.receiveShadow = true;
-
-		this.scene.add(mesh);
-	}
-
-	/**
-	 *
-	 * @param {THREE.Mesh} mesh
-	 */
-	addItemMesh(mesh) {
+	createProjectile() {
+		const mesh = new THREE.Mesh(
+			new THREE.SphereGeometry(0.1), // @ts-ignore
+			new THREE.MeshNormalMaterial()
+		);
 		mesh.castShadow = true;
 
 		this.scene.add(mesh);
+
+		return mesh;
 	}
+
 	/**
 	 *
-	 * @param {THREE.Object3D} player_obj
+	 * @param {vec3} pos
 	 */
-	addPlayerObj(player_obj) {
-		this.scene.add(player_obj);
+	createRandomSample(pos) {
+		const mesh = new THREE.Mesh(
+			new THREE.BoxGeometry(0.8, 1.6, 0.6),
+			new THREE.MeshBasicMaterial({ color: 0xff0099 })
+		);
+
+		mesh.position.set(pos.x, pos.y, pos.z);
+
+		mesh.castShadow = true;
+
+		this.scene.add(mesh);
+
+		return mesh;
 	}
+
 	/**
 	 *
 	 * @param {THREE.Object3D} player_obj
