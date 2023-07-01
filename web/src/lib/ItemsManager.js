@@ -47,6 +47,6 @@ export default class ItemsManager {
 		// 	);
 		// }
 
-		this.addItem({ x: 0, y: -0.2, z: 8 });
+		this.addItem({ x: 0, y: 0.8, z: 8 });
 	}
 }

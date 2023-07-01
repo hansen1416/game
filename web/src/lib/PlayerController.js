@@ -184,7 +184,7 @@ export default class PlayerController {
 
 		this.main_player.mesh.getWorldPosition(t);
 
-		// t.z += 0.02;
+		// t.z += 0.04;
 
 		return t;
 	}
