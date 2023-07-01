@@ -143,6 +143,22 @@ export default class PlayerController {
 		delete this.players_mapping[uuid];
 	}
 
+	cameraFollowObject(mesh) {
+		// the height of camera is constant
+		// its direction is controlled by mesh shoulder
+		const camera_target_pos = new THREE.Vector3(
+			mesh.position.x + 4,
+			mesh.position.y + 4,
+			mesh.position.z - 2
+		);
+
+		this.renderer.camera.position.lerp(
+			camera_target_pos,
+			this.camera_sensitivity
+		);
+		this.renderer.camera.lookAt(mesh.position);
+	}
+
 	/**
 	 * call this in each animaiton frame
 	 * it controls the other players movement
@@ -160,10 +176,12 @@ export default class PlayerController {
 
 		this.tmp_char.getWorldPosition(desiredTranslation);
 
-		desiredTranslation.z += 0.01;
+		desiredTranslation.z += 0.03;
 		// desiredTranslation.y -= 0.005
 
-		// this.physics.moveCharacter(desiredTranslation);
+		this.physics.moveCharacter(desiredTranslation);
+
+		this.cameraFollowObject(this.tmp_char);
 
 		if (import.meta.env.DEV) {
 			if (!this.lines) {
