@@ -34,7 +34,7 @@ export default class Player {
 
 	/**
 	 *
-	 * @param {THREE.Object3D} model
+	 * @param {THREE.Mesh} model
 	 * @param {{x: number, y: number, z: number}} position
 	 * @param {{x: number, y: number, z: number}} rotation
 	 */

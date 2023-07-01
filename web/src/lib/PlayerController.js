@@ -69,7 +69,7 @@ export default class PlayerController {
 
 	/**
 	 *
-	 * @param {THREE.Object3D} model
+	 * @param {THREE.Mesh} model
 	 * @param {{x: number, y: number, z: number}} position
 	 * @param {{x: number, y: number, z: number}} rotation
 	 * @param {boolean} is_main
@@ -86,17 +86,8 @@ export default class PlayerController {
 			player = new PlayerMain(model, position, rotation);
 			this.main_player = player;
 
-			// a tmp sphere to test character controller
-			this.tmp_char = new THREE.Mesh(
-				new THREE.SphereGeometry(0.4), // @ts-ignore
-				new THREE.MeshNormalMaterial()
-			);
-			this.tmp_char.castShadow = true;
-			this.tmp_char.position.set(0, -0.6, 0);
-
-			this.renderer.scene.add(this.tmp_char);
-
-			this.physics.createCharacter(this.tmp_char);
+			// prepare the controller and collider
+			this.physics.createCharacter(model);
 
 			this.pitcher = new Pitcher(player);
 
@@ -143,22 +134,6 @@ export default class PlayerController {
 		delete this.players_mapping[uuid];
 	}
 
-	cameraFollowObject(mesh) {
-		// the height of camera is constant
-		// its direction is controlled by mesh shoulder
-		const camera_target_pos = new THREE.Vector3(
-			mesh.position.x + 4,
-			mesh.position.y + 4,
-			mesh.position.z - 2
-		);
-
-		this.renderer.camera.position.lerp(
-			camera_target_pos,
-			this.camera_sensitivity
-		);
-		this.renderer.camera.lookAt(mesh.position);
-	}
-
 	/**
 	 * call this in each animaiton frame
 	 * it controls the other players movement
@@ -172,16 +147,10 @@ export default class PlayerController {
 
 		this.pitcher.onFrameUpdate();
 
-		const desiredTranslation = new THREE.Vector3();
-
-		this.tmp_char.getWorldPosition(desiredTranslation);
-
-		desiredTranslation.z += 0.03;
-		// desiredTranslation.y -= 0.005
+		// move character
+		const desiredTranslation = this.calculateMainPlayerTranslation();
 
 		this.physics.moveCharacter(desiredTranslation);
-
-		this.cameraFollowObject(this.tmp_char);
 
 		if (import.meta.env.DEV) {
 			if (!this.lines) {
@@ -204,6 +173,20 @@ export default class PlayerController {
 				new THREE.BufferAttribute(buffers.colors, 4)
 			);
 		}
+	}
+
+	/**
+	 * todo, consider terrain height
+	 * @returns {THREE.Vector3}
+	 */
+	calculateMainPlayerTranslation() {
+		const t = new THREE.Vector3();
+
+		this.main_player.mesh.getWorldPosition(t);
+
+		// t.z += 0.02;
+
+		return t;
 	}
 
 	/**
