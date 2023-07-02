@@ -65,6 +65,10 @@ export default class PlayerMain extends Player {
 				)
 			);
 		}
+
+		const q = new THREE.Quaternion();
+
+		return this.mesh.getWorldQuaternion(q);
 	}
 
 	/**
@@ -91,15 +95,18 @@ export default class PlayerMain extends Player {
 	 * movement direction is always same as the direction the mesh facing
 	 * the velocity is controlled by `speed_scalar`
 	 */
-	move() {
+	calculateSpeed() {
 		this.updateSpeed({
 			x: this.shoulder_vector_mesh.z,
 			z: -this.shoulder_vector_mesh.x,
 		});
 
-		this.mesh.position.add(
-			this.speed.normalize().multiplyScalar(this.speed_scalar)
-		);
+		// todo, consider terrain height, update y axis
+		this.updateSpeed({
+			y: 0,
+		});
+
+		this.scaleSpeed();
 	}
 
 	/**
@@ -119,7 +126,7 @@ export default class PlayerMain extends Player {
 	 * @param {{x:number, y:number, z:number}[]} pose3D
 	 * @param {boolean} lower_body
 	 */
-	applyPoseToBone(pose3D, lower_body = false) {
+	applyPose2Bone(pose3D, lower_body = false) {
 		// multiply x,y by width/height factor
 		for (let i = 0; i < pose3D.length; i++) {
 			this.pose3d_mediapipe[i].x = pose3D[i].x;
@@ -527,5 +534,18 @@ export default class PlayerMain extends Player {
 		return {
 			x: object_x,
 		};
+	}
+
+	/**
+	 *
+	 * @param {Array} data
+	 * @param {number} idx
+	 * @returns
+	 */
+	applyAnimation2Bone(data, idx) {
+		// check if player has speed
+		if (this.speed.length() < this.speed_scalar * 0.9) {
+			return;
+		}
 	}
 }

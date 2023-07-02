@@ -15,16 +15,6 @@ let instance;
 
 export default class RapierWorld {
 	/**
-	 * @type {RigidBody[]}
-	 */
-	rigid = [];
-
-	/**
-	 * @type {THREE.Mesh[]}
-	 */
-	mesh = [];
-
-	/**
 	 *  Larger values of the damping coefficients lead to a stronger slow-downs. Their default values are 0.0 (no damping at all).
 	 */
 	liner_damping = 0.5;
@@ -80,16 +70,6 @@ export default class RapierWorld {
 	 */
 	onFrameUpdate() {
 		this.world.step();
-
-		for (let i in this.rigid) {
-			const t = this.rigid[i].translation();
-			this.mesh[i].position.set(t.x, t.y, t.z);
-
-			const r = this.rigid[i].rotation();
-			this.mesh[i].setRotationFromQuaternion(
-				new THREE.Quaternion(r.x, r.y, r.z, r.w)
-			);
-		}
 	}
 
 	/**
@@ -147,9 +127,6 @@ export default class RapierWorld {
 			.setMass(1);
 
 		this.world.createCollider(clDesc, this.character_rigid);
-
-		this.rigid.push(this.character_rigid);
-		this.mesh.push(mesh);
 	}
 
 	removeCharacter() {
@@ -159,11 +136,10 @@ export default class RapierWorld {
 
 	/**
 	 *
-	 * @param {THREE.Mesh} mesh
 	 * @param {vec3} position
 	 * @param {vec3} velocity
 	 */
-	createProjectile(mesh, position, velocity) {
+	createProjectile(position, velocity) {
 		// @ts-ignore
 		const rbDesc = this.RigidBodyDesc.dynamic()
 			.setTranslation(position.x, position.y, position.z)
@@ -171,7 +147,7 @@ export default class RapierWorld {
 			.setLinearDamping(this.liner_damping)
 			// .restrictRotations(false, true, false) // Y-axis only
 			.setCcdEnabled(true);
-		const sphereBody = this.world.createRigidBody(rbDesc);
+		const rigid = this.world.createRigidBody(rbDesc);
 
 		// @ts-ignore
 		const clDesc = this.ColliderDesc.ball(0.1)
@@ -181,10 +157,9 @@ export default class RapierWorld {
 			.setRestitution(this.restitution) // @ts-ignore
 			.setRestitutionCombineRule(this.CoefficientCombineRule.Max);
 		// .setCollisionGroups(CollisionMask.ActorMask | CollisionMask.TouchActor);
-		this.world.createCollider(clDesc, sphereBody);
+		this.world.createCollider(clDesc, rigid);
 
-		this.rigid.push(sphereBody);
-		this.mesh.push(mesh);
+		return rigid;
 	}
 
 	removeProjectile() {
@@ -212,21 +187,37 @@ export default class RapierWorld {
 
 		this.world.createCollider(clDesc, rigid);
 
-		this.rigid.push(rigid);
-		this.mesh.push(mesh);
+		return rigid;
 	}
 
 	removeRandomSample() {
 		// todo
 		// this.world.removeRigidBody
 	}
+
 	/**
 	 *
-	 * @param {vec3} target_translation
+	 * @param {THREE.Quaternion} quaternion
+	 */
+	rotateCharacter(quaternion) {
+		this.character_rigid.setRotation(quaternion, true);
+	}
+
+	/**
+	 *
+	 * @param {vec3} speed
 	 * @returns
 	 */
-	moveCharacter(target_translation) {
-		this.character_rigid.setTranslation(target_translation, true);
+	moveCharacter(speed) {
+		const t = this.character_rigid.translation();
+
+		t.x += speed.x;
+		t.y += speed.y;
+		t.z += speed.z;
+
+		this.character_rigid.setTranslation(t, true);
+
+		return t;
 	}
 
 	destructor() {

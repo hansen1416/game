@@ -1,13 +1,20 @@
-/**
- * @typedef {{x: number, y: number, z: number}} vec3
- */
-
+import * as THREE from "three";
 import ThreeScene from "./ThreeScene";
 import RapierWorld from "./RapierWorld";
 
 let instance;
 
 export default class ItemsManager {
+	/**
+	 * @type {THREE.Mesh[]}
+	 */
+	item_meshes = [];
+
+	/**
+	 * @type {import("./RapierWorld").RigidBody[]}
+	 */
+	item_rigid = [];
+
 	/**
 	 *
 	 * @param {ThreeScene} renderer
@@ -24,14 +31,29 @@ export default class ItemsManager {
 		this.physics = physics;
 	}
 
+	onFrameUpdate() {
+		for (let i in this.item_rigid) {
+			const t = this.item_rigid[i].translation();
+			this.item_meshes[i].position.set(t.x, t.y, t.z);
+
+			const r = this.item_rigid[i].rotation();
+			this.item_meshes[i].setRotationFromQuaternion(
+				new THREE.Quaternion(r.x, r.y, r.z, r.w)
+			);
+		}
+	}
+
 	/**
 	 *
-	 * @param {vec3} pos
+	 * @param {import("./RapierWorld").vec3} pos
 	 */
 	addItem(pos) {
 		const mesh = this.renderer.createRandomSample(pos);
 
-		this.physics.createRandomSample(mesh, pos);
+		const rigid = this.physics.createRandomSample(mesh, pos);
+
+		this.item_rigid.push(rigid);
+		this.item_meshes.push(mesh);
 	}
 
 	spreadItems() {
@@ -47,6 +69,6 @@ export default class ItemsManager {
 		// 	);
 		// }
 
-		this.addItem({ x: 0, y: 0.8, z: 8 });
+		this.addItem({ x: 2, y: 0.8, z: 8 });
 	}
 }

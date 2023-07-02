@@ -41,9 +41,23 @@ export default class PlayerController {
 	right_projectile;
 
 	/**
-	 * @type {THREE.Mesh}
+	 * @type {THREE.Mesh[]}
 	 */
-	tmp_char;
+	projectile_meshes = [];
+
+	/**
+	 * @type {import("./RapierWorld").RigidBody[]}
+	 */
+	projectile_rigid = [];
+
+	/**
+	 * @type {Array}
+	 */
+	animation_data;
+	/**
+	 * @type {number}
+	 */
+	animation_data_idx = 0;
 
 	/**
 	 *
@@ -141,12 +155,23 @@ export default class PlayerController {
 			}
 		}
 
+		// captured pose only control upper body
+		// we need to apply animation to lower body of player depends on player's `speed`
+		this.applyLowerBodyAnimation2MainPlayer();
+
 		this.pitcher.onFrameUpdate();
 
-		// move character
-		const desiredTranslation = this.calculateMainPlayerTranslation();
+		// todo, update other players rigid and mesh
 
-		this.physics.moveCharacter(desiredTranslation);
+		for (let i in this.projectile_rigid) {
+			const t = this.projectile_rigid[i].translation();
+			this.projectile_meshes[i].position.set(t.x, t.y, t.z);
+
+			const r = this.projectile_rigid[i].rotation();
+			this.projectile_meshes[i].setRotationFromQuaternion(
+				new THREE.Quaternion(r.x, r.y, r.z, r.w)
+			);
+		}
 
 		if (import.meta.env.DEV) {
 			if (!this.lines) {
@@ -171,18 +196,22 @@ export default class PlayerController {
 		}
 	}
 
-	/**
-	 * todo, consider terrain height
-	 * @returns {THREE.Vector3}
-	 */
-	calculateMainPlayerTranslation() {
-		const t = new THREE.Vector3();
+	applyLowerBodyAnimation2MainPlayer() {
+		if (!this.animation_data) {
+			return;
+		}
 
-		this.main_player.mesh.getWorldPosition(t);
+		//how to do?
+		this.main_player.applyAnimation2Bone(
+			this.animation_data,
+			this.animation_data_idx
+		);
 
-		// t.z += 0.04;
+		this.animation_data_idx++;
 
-		return t;
+		if (this.animation_data_idx >= this.animation_data.length) {
+			this.animation_data_idx = 0;
+		}
 	}
 
 	/**
@@ -231,6 +260,22 @@ export default class PlayerController {
 	}
 
 	/**
+	 *
+	 * @param {THREE.Vector3} shoulder_vector
+	 */
+	rotateMainPlayer(shoulder_vector) {
+		const quaternion = this.main_player.rotate(shoulder_vector);
+
+		this.physics.rotateCharacter(quaternion);
+	}
+
+	moveMainPlayer() {
+		const translation = this.physics.moveCharacter(this.main_player.speed);
+
+		this.main_player.move(translation);
+	}
+
+	/**
 	 *	this function is called in the `onPoseCallback`,
 	 *  so it's a bit (a few ms) slower than `requestAnimationFrame`
 	 *
@@ -264,16 +309,22 @@ export default class PlayerController {
 				pose3D[BlazePoseKeypointsValues["LEFT_SHOULDER"]].z
 		).normalize();
 
-		// this must happend before apply pose to bones, cause we need to apply rotation to the captured pose position
-		this.main_player.rotate(shoulder_vector);
+		// this must happend before apply pose to bones,
+		// cause we need to apply rotation to the captured pose position
+		// rotate main player's mesh and rigid
+		this.rotateMainPlayer(shoulder_vector);
 
-		// this.main_player.pose2totation.applyPoseToBone(pose3Dvec, lower_body);
-		this.main_player.applyPoseToBone(pose3D, lower_body);
+		// this.main_player.pose2totation.applyPose2Bone(pose3Dvec, lower_body);
+		this.main_player.applyPose2Bone(pose3D, lower_body);
 
 		// the shoulder mesh rotation control the camera direction and speed direction
 		this.main_player.updateShoulderVectorMesh();
 
-		this.main_player.move();
+		// `speed` is just a vector that add to player `position` in each frame
+		this.main_player.calculateSpeed();
+
+		// move main player's mesh and rigid
+		this.moveMainPlayer();
 
 		this.pitcher.trackHandsPos();
 
@@ -329,12 +380,11 @@ export default class PlayerController {
 	 * @param {boolean} left
 	 */
 	shoot(velocity, left = false) {
-		const projectile = this.getProjectile(left);
+		const mesh = this.getProjectile(left);
 
-		this.physics.createProjectile(
-			projectile,
-			projectile.position,
-			velocity
-		);
+		const body = this.physics.createProjectile(mesh.position, velocity);
+
+		this.projectile_meshes.push(mesh);
+		this.projectile_rigid.push(body);
 	}
 }

@@ -93,7 +93,7 @@ export default class Player {
 
 	/**
 	 *
-	 * @param {{x?: number, z?: number}} obj
+	 * @param {{x?: number, y?:number, z?: number}} obj
 	 */
 	updateSpeed(obj) {
 		if (obj.x !== undefined) {
@@ -104,25 +104,15 @@ export default class Player {
 		}
 	}
 
-	// /**
-	//  *
-	//  * @param {number} rad
-	//  */
-	// changeSpeedDirection(rad) {
-	// 	if (rad < 0.1) {
-	// 		return;
-	// 	}
+	scaleSpeed() {
+		this.#speed.normalize().multiplyScalar(this.#speed_scalar);
+	}
 
-	// 	const cos_val = Math.cos(rad);
-	// 	const sin_val = Math.sin(rad);
-
-	// 	this.#speed.x = this.#speed.x * cos_val + this.#speed.z * sin_val;
-	// 	this.#speed.z = -this.#speed.x * sin_val + this.#speed.z * cos_val;
-	// }
-
-	move() {
-		this.mesh.position.add(
-			this.#speed.normalize().multiplyScalar(this.#speed_scalar)
-		);
+	/**
+	 *
+	 * @param {import("./RapierWorld").vec3} translation
+	 */
+	move(translation) {
+		this.mesh.position.set(translation.x, translation.y, translation.z);
 	}
 }

@@ -1,7 +1,3 @@
-/**
- * @typedef {{x: number, y: number, z: number}} vec3
- */
-
 import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 import Stats from "three/examples/jsm/libs/stats.module.js";
@@ -127,7 +123,7 @@ export default class ThreeScene {
 
 	/**
 	 *
-	 * @param {vec3} pos
+	 * @param {import("./RapierWorld").vec3} pos
 	 */
 	createRandomSample(pos) {
 		const mesh = new THREE.Mesh(

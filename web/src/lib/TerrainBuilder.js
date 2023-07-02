@@ -35,7 +35,7 @@ export default class TerrainBuilder {
 		// Define the vertices and faces of the surface
 		const worldWidth = 256;
 		const worldDepth = 256;
-		const data = generateHeight(worldWidth, worldDepth);
+		// const data = generateHeight(worldWidth, worldDepth);
 
 		// const geometry = new THREE.PlaneGeometry(
 		// 	500,
@@ -81,7 +81,17 @@ export default class TerrainBuilder {
 		// this.renderer.camera.position.set(100, 800, -800);
 		// this.renderer.camera.lookAt(-100, 810, -800);
 
-		mesh.position.set(0, 0, 0);
+		const origin = new THREE.Vector3(0, 0, 0);
+
+		mesh.position.copy(origin);
+
+		const heightMap = new Float32Array(17 ** 2);
+
+		for (let i = 0; i < heightMap.length; i++) {
+			heightMap[i] = 0;
+		}
+
+		this.physics.createTerrain(origin, 16, heightMap);
 
 		this.renderer.scene.add(mesh);
 	}

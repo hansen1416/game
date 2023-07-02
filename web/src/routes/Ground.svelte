@@ -174,11 +174,14 @@
 			);
 		}
 
-		threeScene.onFrameUpdate();
-
-		physicsWorld.onFrameUpdate();
 		// update other players except main player
 		playerController.onFrameUpdate();
+
+		itemsManager.onFrameUpdate();
+
+		// update physics world and threejs renderer
+		physicsWorld.onFrameUpdate();
+		threeScene.onFrameUpdate();
 
 		animationPointer = requestAnimationFrame(animate);
 	}
@@ -197,7 +200,6 @@
 		// todo, need to apply running animation on legs
 
 		/**
-			poseToRotation.applyPoseToBone(pose3D, true);
 
 			// move the position of model
 			const pose2D = cloneDeep(result.landmarks[0]);
