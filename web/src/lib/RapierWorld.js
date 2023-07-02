@@ -120,6 +120,11 @@ export default class RapierWorld {
 		this.world.createCollider(clDesc, terrainBody);
 	}
 
+	removeTerrain() {
+		// todo
+		// this.world.removeRigidBody
+	}
+
 	/**
 	 * @param {THREE.Mesh} mesh
 	 */
@@ -145,6 +150,11 @@ export default class RapierWorld {
 
 		this.rigid.push(this.character_rigid);
 		this.mesh.push(mesh);
+	}
+
+	removeCharacter() {
+		// todo
+		// this.world.removeRigidBody
 	}
 
 	/**
@@ -177,6 +187,11 @@ export default class RapierWorld {
 		this.mesh.push(mesh);
 	}
 
+	removeProjectile() {
+		// todo
+		// this.world.removeRigidBody
+	}
+
 	/**
 	 *
 	 * @param {THREE.Mesh} mesh
@@ -201,6 +216,10 @@ export default class RapierWorld {
 		this.mesh.push(mesh);
 	}
 
+	removeRandomSample() {
+		// todo
+		// this.world.removeRigidBody
+	}
 	/**
 	 *
 	 * @param {vec3} target_translation
@@ -211,6 +230,6 @@ export default class RapierWorld {
 	}
 
 	destructor() {
-		// this.world.removeCharacterController(this.character_controller);
+		this.world.free();
 	}
 }

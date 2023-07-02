@@ -10,7 +10,7 @@ export const POSE_ENUM = {
 
 export default class Player {
 	/**
-	 * @type {THREE.Object3D}
+	 * @type {THREE.Mesh}
 	 */
 	mesh;
 	/**

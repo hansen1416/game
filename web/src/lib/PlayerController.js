@@ -100,10 +100,6 @@ export default class PlayerController {
 		}
 
 		this.renderer.scene.add(player.mesh);
-
-		// if (player.body) {
-		// 	this.physics.addPlayerBody(player.body, player.mesh);
-		// }
 	}
 
 	/**

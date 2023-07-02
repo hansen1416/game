@@ -146,7 +146,7 @@ export default class ThreeScene {
 
 	/**
 	 *
-	 * @param {THREE.Object3D} player_obj
+	 * @param {THREE.Mesh} player_obj
 	 */
 	removePlayerObj(player_obj) {
 		console.info("todo remove", player_obj);
