@@ -70,6 +70,7 @@ export function getUserMedia(constraints, successCallback, errorCallback) {
 			.getUserMedia(constraints)
 			.then(successCallback, errorCallback);
 	} else {
+		// @ts-ignore
 		navigator.getUserMedia(constraints, successCallback, errorCallback);
 	}
 }
@@ -100,8 +101,10 @@ export function startCamera(videoElement) {
 }
 
 export function invokeCamera(videoElement, callback) {
+	/** @param {object} e */
 	const errorCallback = (e) => {
-		alert("camera error!!", e);
+		alert("camera error!!");
+		constraints.log(e);
 	};
 
 	const constraints = {
@@ -130,7 +133,7 @@ export function invokeCamera(videoElement, callback) {
 			callback();
 		}
 	};
-
+	// @ts-ignore
 	navigator.getUserMedia =
 		navigator.getUserMedia ||
 		navigator.webkitGetUserMedia ||
@@ -1419,11 +1422,11 @@ export function ballMesh() {
 }
 
 /**
- * download file from 
+ * download file from
  * https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision/wasm/
  * https://storage.googleapis.com/mediapipe-models/pose_landmarker/pose_landmarker_lite/float16/1/pose_landmarker_lite.task
- * 
- * @returns 
+ *
+ * @returns
  */
 export async function createPoseLandmarker() {
 	const vision = await FilesetResolver.forVisionTasks("/tasks-vision/wasm");
@@ -1442,13 +1445,60 @@ export async function createPoseLandmarker() {
 }
 
 export function pointsDiff(v1, v2) {
-    return Math.sqrt(Math.pow(v1[0] - v2[0], 2) + Math.pow(v1[1] - v2[1], 2) + Math.pow(v1[2] - v2[2], 2));
+	return Math.sqrt(
+		Math.pow(v1[0] - v2[0], 2) +
+			Math.pow(v1[1] - v2[1], 2) +
+			Math.pow(v1[2] - v2[2], 2)
+	);
 }
 
 export function dtwMetric(a, b) {
-    return pointsDiff(a[0], b[0]) + pointsDiff(a[1], b[1]) + pointsDiff(a[2], b[2]) + pointsDiff(a[3], b[3]);
+	return (
+		pointsDiff(a[0], b[0]) +
+		pointsDiff(a[1], b[1]) +
+		pointsDiff(a[2], b[2]) +
+		pointsDiff(a[3], b[3])
+	);
 }
 
+/**
+ *
+ * @param {ArrayBuffer} buffer
+ * @returns {Array[]}
+ */
+export function readBuffer(buffer) {
+	const arr = new Float32Array(buffer);
+
+	const shape_arr = [];
+
+	for (let i = 0; i < arr.length; i += 66) {
+		const tmp = [];
+
+		for (let j = 0; j < 66; j += 1) {
+			tmp.push(arr[i + j]);
+		}
+
+		const tmp2 = [];
+
+		for (let j = 0; j < 66; j += 3) {
+			tmp2.push({ x: tmp[j], y: tmp[j + 1], z: tmp[j + 2] });
+		}
+
+		// console.log(tmp);
+		shape_arr.push(tmp2);
+
+		// for (let j = 0; j < 66; j += 3) {
+		// 	shape_arr.push({
+		// 		x: tmp[i],
+		// 		y: tmp[i + 1],
+		// 		z: tmp[i + 2],
+		// 	});
+		// }
+	}
+
+	// console.log(shape_arr);
+	return shape_arr;
+}
 
 /**
  * calf_l

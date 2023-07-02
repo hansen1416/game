@@ -83,6 +83,35 @@ export default class PlayerController {
 
 	/**
 	 *
+	 * @param {boolean} left
+	 * @returns {THREE.Mesh}
+	 */
+	getProjectile(left = false) {
+		return left ? this.left_projectile : this.right_projectile;
+	}
+	/**
+	 *
+	 * @param {THREE.Mesh} mesh
+	 * @param {boolean} left
+	 */
+	setProjectile(mesh, left = false) {
+		if (left) {
+			this.left_projectile = mesh;
+		} else {
+			this.right_projectile = mesh;
+		}
+	}
+
+	/**
+	 *
+	 * @param {Array[]} data
+	 */
+	setAnimationData(data) {
+		this.animation_data = data;
+	}
+
+	/**
+	 *
 	 * @param {THREE.Mesh} model
 	 * @param {{x: number, y: number, z: number}} position
 	 * @param {{x: number, y: number, z: number}} rotation
@@ -201,6 +230,8 @@ export default class PlayerController {
 			return;
 		}
 
+		// console.log(this.animation_data);
+
 		//how to do?
 		this.main_player.applyAnimation2Bone(
 			this.animation_data,
@@ -211,27 +242,6 @@ export default class PlayerController {
 
 		if (this.animation_data_idx >= this.animation_data.length) {
 			this.animation_data_idx = 0;
-		}
-	}
-
-	/**
-	 *
-	 * @param {boolean} left
-	 * @returns {THREE.Mesh}
-	 */
-	getProjectile(left = false) {
-		return left ? this.left_projectile : this.right_projectile;
-	}
-	/**
-	 *
-	 * @param {THREE.Mesh} mesh
-	 * @param {boolean} left
-	 */
-	setProjectile(mesh, left = false) {
-		if (left) {
-			this.left_projectile = mesh;
-		} else {
-			this.right_projectile = mesh;
 		}
 	}
 

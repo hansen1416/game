@@ -7,6 +7,7 @@
 		createPoseLandmarker,
 		loadGLTF,
 		invokeCamera,
+		readBuffer,
 	} from "../utils/ropes";
 	import ThreeScene from "../lib/ThreeScene";
 	import RapierWorld from "../lib/RapierWorld";
@@ -91,7 +92,12 @@
 
 		threeScene = new ThreeScene(canvas, sceneWidth, sceneHeight);
 
-		import("@dimforge/rapier3d").then((RAPIER) => {
+		Promise.all([
+			import("@dimforge/rapier3d"),
+			loadGLTF("/glb/dors.glb"),
+			loadGLTF("/glb/daneel.glb"),
+			fetch("/motion/motion3-1.bin"),
+		]).then(([RAPIER, dors, daneel, motion_data]) => {
 			physicsWorld = new RapierWorld(RAPIER);
 
 			new TerrainBuilder(threeScene, physicsWorld).terrain();
@@ -101,13 +107,7 @@
 			itemsManager = new ItemsManager(threeScene, physicsWorld);
 
 			itemsManager.spreadItems();
-		});
 
-		Promise.all([
-			loadGLTF("/glb/dors.glb"),
-			loadGLTF("/glb/daneel.glb"),
-			// loadGLTF(process.env.PUBLIC_URL + "/glb/monster.glb"),
-		]).then(([dors, daneel]) => {
 			// player1
 			playerController.addPlayer(
 				dors.scene.children[0],
@@ -135,8 +135,10 @@
 				}
 			);
 
-			// assign speed to another player
-			// playerController.players[0].speed = new THREE.Vector3(0.01, 0, -0.1)
+			// running animation
+			motion_data.arrayBuffer().then((buffer) => {
+				playerController.setAnimationData(readBuffer(buffer));
+			});
 
 			// all models ready
 			cameraReady = true;
