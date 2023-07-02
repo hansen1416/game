@@ -5,6 +5,7 @@ import { TerrainShape } from "./TerrainShape";
 import { GROUND_LEVEL } from "../utils/constants";
 import { ParametricGeometry } from "three/addons/geometries/ParametricGeometry.js";
 import THREETerrain from "./THREE.Terrain";
+import { ImprovedNoise } from "three/addons/math/ImprovedNoise.js";
 
 let instance;
 
@@ -31,6 +32,61 @@ export default class TerrainBuilder {
 	}
 
 	terrain() {
+		// Define the vertices and faces of the surface
+		const worldWidth = 256;
+		const worldDepth = 256;
+		const data = generateHeight(worldWidth, worldDepth);
+
+		// const geometry = new THREE.PlaneGeometry(
+		// 	500,
+		// 	500,
+		// 	worldWidth - 1,
+		// 	worldDepth - 1
+		// );
+		// geometry.rotateX(-Math.PI / 2);
+
+		// const vertices = geometry.attributes.position.array;
+
+		// for (let i = 0, j = 0, l = vertices.length; i < l; i++, j += 3) {
+		// 	vertices[j + 1] = data[i];
+		// }
+
+		const geometry = new THREE.PlaneGeometry(
+			500,
+			500,
+			worldWidth - 1,
+			worldDepth - 1
+		);
+		geometry.rotateX(-Math.PI / 2);
+
+		// const position = geometry.attributes.position;
+		// // position.usage = THREE.DynamicDrawUsage;
+
+		// for (let i = 0; i < position.count; i++) {
+		// 	const y = 2 * Math.sin(i / 2);
+		// 	position.setY(i, y);
+		// }
+
+		const mesh = new THREE.Mesh(
+			geometry,
+			new THREE.MeshStandardMaterial({
+				color: 0x0b549d,
+				side: THREE.DoubleSide,
+			})
+		);
+
+		mesh.receiveShadow = true;
+		mesh.castShadow = true;
+
+		// this.renderer.camera.position.set(100, 800, -800);
+		// this.renderer.camera.lookAt(-100, 810, -800);
+
+		mesh.position.set(0, 0, 0);
+
+		this.renderer.scene.add(mesh);
+	}
+
+	terrain_3() {
 		const terrain_range = 64;
 
 		for (let y = -terrain_range; y < terrain_range; y += 16) {
@@ -91,6 +147,35 @@ export default class TerrainBuilder {
 		// Assuming you already have your global scene, add the terrain to it
 		this.renderer.scene.add(terrainScene);
 	}
+}
+
+function generateHeight(width, height) {
+	let seed = Math.PI / 4;
+	window.Math.random = function () {
+		const x = Math.sin(seed++) * 10000;
+		return x - Math.floor(x);
+	};
+
+	const size = width * height,
+		data = new Uint8Array(size);
+	const perlin = new ImprovedNoise(),
+		z = Math.random() * 100;
+
+	let quality = 1;
+
+	for (let j = 0; j < 4; j++) {
+		for (let i = 0; i < size; i++) {
+			const x = i % width,
+				y = ~~(i / width);
+			data[i] += Math.abs(
+				perlin.noise(x / quality, y / quality, z) * quality * 1.75
+			);
+		}
+
+		quality *= 5;
+	}
+
+	return data;
 }
 
 function rampFunction(u, v, pos) {

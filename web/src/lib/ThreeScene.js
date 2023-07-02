@@ -62,7 +62,7 @@ export default class ThreeScene {
 			75,
 			width / height,
 			0.01,
-			100
+			2000
 		);
 
 		this.camera.position.set(
@@ -78,8 +78,10 @@ export default class ThreeScene {
 
 		// mimic the sun light. maybe update light position later
 		this.light = new THREE.PointLight(0xffffff, 0.5);
-		this.light.position.set(0, GROUND_LEVEL + 10, 0);
+		this.light.position.set(0, GROUND_LEVEL + 10, -5);
 		this.light.castShadow = true;
+		// this.light.shadow.mapSize.width = 2048;
+		// this.light.shadow.mapSize.height = 2048;
 		this.scene.add(this.light);
 
 		this.renderer = new THREE.WebGLRenderer({
