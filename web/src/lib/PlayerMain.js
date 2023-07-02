@@ -1,7 +1,7 @@
 import * as THREE from "three";
 import Deque from "../utils/Deque";
 import Player from "./Player";
-import { BlazePoseKeypointsValues } from "../utils/ropes";
+import { BlazePoseKeypointsValues, MDMJoints } from "../utils/ropes";
 
 let instance;
 
@@ -537,15 +537,148 @@ export default class PlayerMain extends Player {
 	}
 
 	/**
+	 * @param {import("./RapierWorld").vec3[]} data
+	 * @param {string} bone_name
+	 * @param {string} parent_bone_name
+	 * @param {string} start_joint_name
+	 * @param {string} end_joint_name
+	 * @param {THREE.Euler} init_euler
+	 * @param {THREE.Vector3} up_vector
+	 */
+	rotateLimbMDM(
+		data,
+		bone_name,
+		parent_bone_name,
+		start_joint_name,
+		end_joint_name,
+		init_euler,
+		up_vector
+	) {
+		const start_joint = data[MDMJoints[start_joint_name]];
+		const end_joint = data[MDMJoints[end_joint_name]];
+
+		const world_target_vector = new THREE.Vector3(
+			end_joint.x - start_joint.x,
+			end_joint.y - start_joint.y,
+			end_joint.z - start_joint.z
+		).normalize();
+
+		const world_quaternion = new THREE.Quaternion();
+
+		this.bones[parent_bone_name].getWorldQuaternion(world_quaternion);
+
+		// after apply the parent quaternion,
+		// `world_target_vector` actually became the local target vector
+		world_target_vector.applyQuaternion(world_quaternion.conjugate());
+
+		// store the local vectors for all bones, used for gesture classification
+		// this.local_vectors[bone_name] = world_target_vector.clone();
+
+		// all the bones rest pose in the model is (0,1,0)
+		// first place the limb to the human body nature position
+		const init_quaternion = new THREE.Quaternion().setFromEuler(init_euler);
+
+		// this is the real human body rotation,
+		let local_quaternion_bio = new THREE.Quaternion().setFromUnitVectors(
+			up_vector,
+			world_target_vector
+		);
+
+		/*
+			Notice that rotating by `a` and then by `b` is equivalent to 
+			performing a single rotation by the quaternion product `ba`. 
+			This is a key observation.
+			*/
+		const local_quaternion_bone =
+			new THREE.Quaternion().multiplyQuaternions(
+				local_quaternion_bio,
+				init_quaternion
+			);
+
+		this.bones[bone_name].rotation.setFromQuaternion(
+			local_quaternion_bone.normalize()
+		);
+	}
+
+	/**
 	 *
-	 * @param {Array} data
-	 * @param {number} idx
+	 * @param {import("./RapierWorld").vec3[]} raw_data
 	 * @returns
 	 */
-	applyAnimation2Bone(data, idx) {
+	applyAnimation2Bone(raw_data) {
 		// check if player has speed
 		if (this.speed.length() < this.speed_scalar * 0.9) {
 			return;
 		}
+
+		const data = Array.from({ length: 22 }, () => new THREE.Vector3());
+
+		for (let i = 0; i < raw_data.length; i++) {
+			data[i].x = raw_data[i].x;
+			data[i].y = raw_data[i].y;
+			data[i].z = raw_data[i].z;
+
+			data[i].applyQuaternion(this.mesh.quaternion);
+		}
+
+		this.rotateLimbMDM(
+			data,
+			"LeftUpLeg",
+			"Hips",
+			"LEFT_HIP",
+			"LEFT_KNEE",
+			new THREE.Euler(0, 0, -3.14),
+			new THREE.Vector3(0, -1, 0)
+		);
+
+		this.rotateLimbMDM(
+			data,
+			"LeftLeg",
+			"LeftUpLeg",
+			"LEFT_HIP",
+			"LEFT_ANKLE",
+			new THREE.Euler(0, 0, 0),
+			new THREE.Vector3(0, 1, 0)
+		);
+
+		this.rotateLimbMDM(
+			data,
+			"LeftFoot",
+			"LeftLeg",
+			"LEFT_ANKLE",
+			"LEFT_FOOT_INDEX",
+			new THREE.Euler(1.035, 0, 0),
+			new THREE.Vector3(0, 0, 1)
+		);
+
+		this.rotateLimbMDM(
+			data,
+			"RightUpLeg",
+			"Hips",
+			"RIGHT_HIP",
+			"RIGHT_KNEE",
+			new THREE.Euler(0, 0, 3.14),
+			new THREE.Vector3(0, -1, 0)
+		);
+
+		this.rotateLimbMDM(
+			data,
+			"RightLeg",
+			"RightUpLeg",
+			"RIGHT_KNEE",
+			"RIGHT_ANKLE",
+			new THREE.Euler(0, 0, 0),
+			new THREE.Vector3(0, 1, 0)
+		);
+
+		this.rotateLimbMDM(
+			data,
+			"RightFoot",
+			"RightLeg",
+			"RIGHT_ANKLE",
+			"RIGHT_FOOT_INDEX",
+			new THREE.Euler(1.035, 0, 0),
+			new THREE.Vector3(0, 0, 1)
+		);
 	}
 }

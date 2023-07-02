@@ -234,8 +234,7 @@ export default class PlayerController {
 
 		//how to do?
 		this.main_player.applyAnimation2Bone(
-			this.animation_data,
-			this.animation_data_idx
+			this.animation_data[this.animation_data_idx]
 		);
 
 		this.animation_data_idx++;
