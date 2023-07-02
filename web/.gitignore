@@ -34,3 +34,5 @@ tmp*
 .env
 
 dist
+
+THREE.Terrain.js

@@ -1,6 +1,7 @@
 import * as THREE from "three";
 import ThreeScene from "./ThreeScene";
 import RapierWorld from "./RapierWorld";
+// import * as BufferGeometryUtils from "three/addons/utils/BufferGeometryUtils.js";
 
 const TERRAIN_SIZE = 16;
 const TERRAIN_STRIDE = TERRAIN_SIZE + 1;
@@ -103,6 +104,9 @@ export class TerrainShape {
 		this.positionBuffer.needsUpdate = true;
 		this.geometry.setAttribute("position", this.positionBuffer);
 		this.geometry.setIndex(indices);
+
+		// this.geometry = BufferGeometryUtils.mergeVertices(this.geometry);
+
 		this.geometry.computeVertexNormals();
 
 		this.renderer.scene.add(this.mesh);
