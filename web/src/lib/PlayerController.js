@@ -206,7 +206,7 @@ export default class PlayerController {
 			if (!this.lines) {
 				let material = new THREE.LineBasicMaterial({
 					color: 0xffffff, // @ts-ignore
-					vertexColors: THREE.VertexColors,
+					// vertexColors: THREE.VertexColors,
 				});
 				let geometry = new THREE.BufferGeometry();
 				this.lines = new THREE.LineSegments(geometry, material);

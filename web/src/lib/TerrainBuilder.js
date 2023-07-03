@@ -4,7 +4,7 @@ import RapierWorld from "./RapierWorld";
 import { TerrainShape } from "./TerrainShape";
 import { GROUND_LEVEL } from "../utils/constants";
 import { ParametricGeometry } from "three/addons/geometries/ParametricGeometry.js";
-import THREETerrain from "./THREE.Terrain";
+// import THREETerrain from "./THREE.Terrain";
 import { ImprovedNoise } from "three/addons/math/ImprovedNoise.js";
 
 let instance;
@@ -137,25 +137,25 @@ export default class TerrainBuilder {
 	}
 
 	terrain_1() {
-		console.log(THREETerrain);
+		// console.log(THREETerrain);
 
-		var xS = 63,
-			yS = 63;
-		const terrainScene = THREETerrain({
-			easing: THREETerrain.EaseOut,
-			frequency: 2.5,
-			heightmap: THREETerrain.DiamondSquare,
-			material: new THREE.MeshBasicMaterial({ color: 0x5566aa }),
-			maxHeight: 100,
-			minHeight: -100,
-			steps: 1,
-			xSegments: xS,
-			xSize: 1024,
-			ySegments: yS,
-			ySize: 1024,
-		});
-		// Assuming you already have your global scene, add the terrain to it
-		this.renderer.scene.add(terrainScene);
+		// var xS = 63,
+		// 	yS = 63;
+		// const terrainScene = THREETerrain({
+		// 	easing: THREETerrain.EaseOut,
+		// 	frequency: 2.5,
+		// 	heightmap: THREETerrain.DiamondSquare,
+		// 	material: new THREE.MeshBasicMaterial({ color: 0x5566aa }),
+		// 	maxHeight: 100,
+		// 	minHeight: -100,
+		// 	steps: 1,
+		// 	xSegments: xS,
+		// 	xSize: 1024,
+		// 	ySegments: yS,
+		// 	ySize: 1024,
+		// });
+		// // Assuming you already have your global scene, add the terrain to it
+		// this.renderer.scene.add(terrainScene);
 	}
 }
 
