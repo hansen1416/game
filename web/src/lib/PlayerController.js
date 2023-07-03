@@ -202,27 +202,6 @@ export default class PlayerController {
 			);
 		}
 
-		if (import.meta.env.DEV) {
-			if (!this.lines) {
-				let material = new THREE.LineBasicMaterial({
-					color: 0xffffff, // @ts-ignore
-					// vertexColors: THREE.VertexColors,
-				});
-				let geometry = new THREE.BufferGeometry();
-				this.lines = new THREE.LineSegments(geometry, material);
-				this.renderer.scene.add(this.lines);
-			}
-
-			let buffers = this.physics.world.debugRender();
-			this.lines.geometry.setAttribute(
-				"position",
-				new THREE.BufferAttribute(buffers.vertices, 3)
-			);
-			this.lines.geometry.setAttribute(
-				"color",
-				new THREE.BufferAttribute(buffers.colors, 4)
-			);
-		}
 	}
 
 	applyLowerBodyAnimation2MainPlayer() {
