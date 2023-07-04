@@ -106,9 +106,9 @@ export default class RapierWorld {
 	}
 
 	/**
-	 * @param {THREE.Mesh} mesh
+	 *
 	 */
-	createCharacter(mesh) {
+	createCharacter() {
 		// rigidbody
 		// @ts-ignore
 		const rbDesc = this.RigidBodyDesc.kinematicPositionBased()

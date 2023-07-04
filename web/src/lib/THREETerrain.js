@@ -308,12 +308,6 @@ const THREETerrain = function (options) {
 	options.material =
 		options.material || new THREE.MeshBasicMaterial({ color: 0xee6633 });
 
-	// Encapsulating the terrain in a parent object allows us the flexibility
-	// to more easily have multiple meshes for optimization purposes.
-	var scene = new THREE.Object3D();
-	// Planes are initialized on the XY plane, so rotate the plane to make it lie flat.
-	scene.rotation.x = -0.5 * Math.PI;
-
 	// Create the terrain mesh.
 	var mesh = new THREE.Mesh(
 		new THREE.PlaneGeometry(
@@ -343,10 +337,14 @@ const THREETerrain = function (options) {
 	THREETerrain.fromArray1D(mesh.geometry.attributes.position.array, zs);
 	THREETerrain.Normalize(mesh, options);
 
+	mesh.castShadow = true;
+	mesh.receiveShadow = true;
+	// Planes are initialized on the XY plane, so rotate the plane to make it lie flat.
+	mesh.rotation.x = -0.5 * Math.PI;
+
 	// lod.addLevel(mesh, options.unit * 10 * Math.pow(2, lodLevel));
 
-	scene.add(mesh);
-	return scene;
+	return mesh;
 };
 
 /**
@@ -495,10 +493,10 @@ THREETerrain.fromArray2D = function (vertices, src) {
 /**
  * Get a 1D array of heightmap values from a 1D array of plane vertices.
  *
- * @param {Float32Array} vertices
+ * @param {Float32Array | ArrayLike<number>} vertices
  *   A 1D array containing the vertex positions of the geometry representing the
  *   terrain.
- * @param {Object} options
+ * //@param {Object} options
  *   A map of settings defining properties of the terrain. The only properties
  *   that matter here are `xSegments` and `ySegments`, which represent how many
  *   vertices wide and deep the terrain plane is, respectively (and therefore
@@ -518,14 +516,15 @@ THREETerrain.toArray1D = function (vertices) {
 /**
  * Set the height of plane vertices from a 1D array of heightmap values.
  *
- * @param {Float32Array} vertices
+ * @param {Float32Array | ArrayLike<number>} vertices
  *   A 1D array containing the vertex positions of the geometry representing the
  *   terrain.
- * @param {Number[]} src
+ * @param {Number[] | ArrayLike<number>} src
  *   A 1D array representing a heightmap to apply to the terrain.
  */
 THREETerrain.fromArray1D = function (vertices, src) {
 	for (var i = 0, l = Math.min(vertices.length / 3, src.length); i < l; i++) {
+		// @ts-ignore
 		vertices[i * 3 + 2] = src[i];
 	}
 };
