@@ -32,7 +32,7 @@ class Grad {
 
 // ##### Perlin noise stuff
 
-class noise {
+class Noise {
 	grad3 = [
 		new Grad(1, 1, 0),
 		new Grad(-1, 1, 0),
@@ -204,6 +204,8 @@ class noise {
 		);
 	};
 }
+
+const noise = new Noise()
 
 /**
  * A terrain object for use with the Three.js library.

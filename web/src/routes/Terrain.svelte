@@ -14,13 +14,13 @@
 	onMount(() => {
 		initScene();
 
-		const xS = 63,
-			yS = 63;
+		const xS = 31,
+			yS = 31;
 
 		const terrain = THREETerrain({
 			easing: THREETerrain.Linear,
 			frequency: 2.5,
-			heightmap: THREETerrain.Hill,
+			heightmap: THREETerrain.Perlin,
 			material: new THREE.MeshBasicMaterial({ color: 0xe39923 }),
 			maxHeight: 100,
 			minHeight: -100,
@@ -37,7 +37,7 @@
 			heights.push(positions[i]);
 		}
 
-		// console.log(heights);
+		console.log(heights);
 
 		scene.add(terrain);
 
@@ -51,18 +51,24 @@
 			const terrain_size = 63;
 			// @ts-ignore
 			const rbDesc = RAPIER.RigidBodyDesc.fixed().setTranslation(
-				origin.x + terrain_size * 0.5,
+				origin.x ,
 				origin.y,
-				origin.z + terrain_size * 0.5
+				origin.z 
 			);
 			const terrainBody = world.createRigidBody(rbDesc);
 
+			const hm_size = 10
+
+			const h = new Float32Array(Array((hm_size + 1)**2).fill(0))
+
+			// console.log(h)
+
 			// @ts-ignore
 			const clDesc = RAPIER.ColliderDesc.heightfield(
-				terrain_size,
-				terrain_size,
-				heights,
-				new THREE.Vector3(terrain_size, 1, terrain_size)
+				hm_size,
+				hm_size,
+				h,
+				new THREE.Vector3(1000, 1, 1000)
 			)
 				.setFriction(1)
 				.setRestitution(0);
@@ -91,7 +97,7 @@
 			2000
 		);
 		//@ts-ignore
-		camera.position.set(0, 1000, 1000);
+		camera.position.set(0, 100, 100);
 
 		camera.updateProjectionMatrix(); // update the camera's projection matrix
 
