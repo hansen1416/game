@@ -205,7 +205,7 @@ class Noise {
 	};
 }
 
-const noise = new Noise()
+const noise = new Noise();
 
 /**
  * A terrain object for use with the Three.js library.

@@ -9,10 +9,8 @@
 
 	let animationPointer;
 
-	// let heights = [];
-
 	let collider;
-	let multiplier = 1;
+	let multiplier = 0;
 
 	onMount(() => {
 		initScene();
@@ -44,23 +42,30 @@
 
 		// console.log(terrain.geometry)
 
-		// const pos_vec = [];
+		const heights = [];
+		const pos_vec = [];
 
-		// for (let i = 0; i < positions.length; i += 3) {
-		// 	// for (let i = positions.length - 1; i >= 0; i -= 3) {
-		// 	// get the z axis value from geometry positions
-		// 	// heights.push(positions[i]);
+		for (let i = 0; i < positions.length; i += 3) {
+			// for (let i = positions.length - 1; i >= 0; i -= 3) {
+			// get the z axis value from geometry positions
+			// heights.push(positions[i]);
 
-		// 	pos_vec.push(new THREE.Vector3(positions[i], positions[i+1], positions[i+2]))
-		// }
+			pos_vec.push(
+				new THREE.Vector3(
+					positions[i],
+					positions[i + 1],
+					positions[i + 2]
+				)
+			);
+		}
 
-		// pos_vec.sort((a, b) => {
-		// 	return a.x - b.x || a.y - b.y
-		// })
+		pos_vec.sort((a, b) => {
+			return a.x - b.x || b.y - a.y;
+		});
 
-		// for (let i = 0; i < pos_vec.length; i++) {
-		// 	heights.push(pos_vec[i].z);
-		// }
+		for (let i = 0; i < pos_vec.length; i++) {
+			heights.push(pos_vec[i].z);
+		}
 
 		scene.add(terrain);
 
@@ -90,42 +95,42 @@
 			);
 			const terrainBody = world.createRigidBody(rbDesc);
 
-			// const clDesc = RAPIER.ColliderDesc.heightfield(
-			// 	segments,
-			// 	segments,
-			// 	hm,
-			// 	new THREE.Vector3(size, 1, size)
-			// )
-			// 	.setFriction(1)
-			// 	.setRestitution(0);
-
-			const clDesc = RAPIER.ColliderDesc.trimesh(positions, indices)
+			const clDesc = RAPIER.ColliderDesc.heightfield(
+				segments,
+				segments,
+				new Float32Array(heights),
+				new THREE.Vector3(size, 1, size)
+			)
 				.setFriction(1)
 				.setRestitution(0);
 
+			// const clDesc = RAPIER.ColliderDesc.trimesh(positions, indices)
+			// 	.setFriction(1)
+			// 	.setRestitution(0);
+
 			collider = world.createCollider(clDesc, terrainBody);
 
-			const q = new THREE.Quaternion().setFromAxisAngle(
-				new THREE.Vector3(1, 0, 0),
-				-Math.PI / 2
-			);
+			// const q = new THREE.Quaternion().setFromAxisAngle(
+			// 	new THREE.Vector3(1, 0, 0),
+			// 	-Math.PI / 2
+			// );
 
-			collider.setRotation(q);
+			// collider.setRotation(q);
 		});
 
 		animate();
 	});
 
-	// $: if (multiplier) {
-	// 	if (collider) {
-	// 		const q = new THREE.Quaternion().setFromAxisAngle(
-	// 			new THREE.Vector3(0, 1, 0),
-	// 			(Math.PI / 32) * multiplier
-	// 		);
+	$: if (multiplier) {
+		if (collider) {
+			const q = new THREE.Quaternion().setFromAxisAngle(
+				new THREE.Vector3(0, 0, 1),
+				(Math.PI / 32) * multiplier
+			);
 
-	// 		collider.setRotation(q);
-	// 	}
-	// }
+			collider.setRotation(q);
+		}
+	}
 
 	onDestroy(() => {
 		cancelAnimationFrame(animationPointer);
