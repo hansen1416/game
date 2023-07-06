@@ -9,8 +9,7 @@
 
 	let animationPointer;
 
-	let collider;
-	let multiplier = 0;
+	// let multiplier = 0;
 
 	onMount(() => {
 		initScene();
@@ -37,8 +36,9 @@
 			ySize: size,
 		});
 
+		console.log(terrain.geometry.toJSON());
+
 		const positions = terrain.geometry.attributes.position.array;
-		const indices = terrain.geometry.index.array;
 
 		// console.log(terrain.geometry)
 
@@ -69,17 +69,6 @@
 
 		scene.add(terrain);
 
-		// const lines = new THREE.LineSegments(
-		// 	terrain.geometry,
-		// 	new THREE.LineBasicMaterial({
-		// 		color: 0xff0000,
-		// 	})
-		// );
-		// // @ts-ignore
-		// lines.rotation.x = -Math.PI / 2;
-
-		// scene.add(lines);
-
 		Promise.all([import("@dimforge/rapier3d")]).then(([RAPIER]) => {
 			const gravity = { x: 0.0, y: -9.81, z: 0.0 };
 
@@ -104,33 +93,22 @@
 				.setFriction(1)
 				.setRestitution(0);
 
-			// const clDesc = RAPIER.ColliderDesc.trimesh(positions, indices)
-			// 	.setFriction(1)
-			// 	.setRestitution(0);
-
-			collider = world.createCollider(clDesc, terrainBody);
-
-			// const q = new THREE.Quaternion().setFromAxisAngle(
-			// 	new THREE.Vector3(1, 0, 0),
-			// 	-Math.PI / 2
-			// );
-
-			// collider.setRotation(q);
+			world.createCollider(clDesc, terrainBody);
 		});
 
 		animate();
 	});
 
-	$: if (multiplier) {
-		if (collider) {
-			const q = new THREE.Quaternion().setFromAxisAngle(
-				new THREE.Vector3(0, 0, 1),
-				(Math.PI / 32) * multiplier
-			);
+	// $: if (multiplier) {
+	// 	if (collider) {
+	// 		const q = new THREE.Quaternion().setFromAxisAngle(
+	// 			new THREE.Vector3(0, 0, 1),
+	// 			(Math.PI / 32) * multiplier
+	// 		);
 
-			collider.setRotation(q);
-		}
-	}
+	// 		collider.setRotation(q);
+	// 	}
+	// }
 
 	onDestroy(() => {
 		cancelAnimationFrame(animationPointer);
@@ -214,7 +192,7 @@
 <div class="bg">
 	<canvas bind:this={canvas} />
 
-	<input class="input" type="number" bind:value={multiplier} />
+	<!-- <input class="input" type="number" bind:value={multiplier} /> -->
 </div>
 
 <style>
