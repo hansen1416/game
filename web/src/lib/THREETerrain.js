@@ -337,6 +337,7 @@ const THREETerrain = function (options) {
 		);
 	}
 	THREETerrain.fromArray1D(mesh.geometry.attributes.position.array, zs);
+	// const hm = THREETerrain.Normalize(mesh, options);
 	THREETerrain.Normalize(mesh, options);
 
 	mesh.castShadow = true;
@@ -346,6 +347,7 @@ const THREETerrain = function (options) {
 
 	// lod.addLevel(mesh, options.unit * 10 * Math.pow(2, lodLevel));
 
+	// return [mesh, hm];
 	return mesh;
 };
 
@@ -385,6 +387,8 @@ THREETerrain.Normalize = function (mesh, options) {
 	mesh.geometry.computeBoundingSphere();
 	// mesh.geometry.computeFaceNormals();
 	mesh.geometry.computeVertexNormals();
+
+	return THREETerrain.toArray1D(mesh.geometry.attributes.position.array);
 };
 
 /**

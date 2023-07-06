@@ -17,9 +17,10 @@
 	onMount(() => {
 		initScene();
 
-		const segments = 63;
+		const segments = 15;
 		const size = 1024;
 
+		// const [terrain, hm] = THREETerrain({
 		const terrain = THREETerrain({
 			easing: THREETerrain.Linear,
 			frequency: 2.5,
@@ -63,16 +64,16 @@
 
 		scene.add(terrain);
 
-		const lines = new THREE.LineSegments(
-			terrain.geometry,
-			new THREE.LineBasicMaterial({
-				color: 0xff0000,
-			})
-		);
-		// @ts-ignore
-		lines.rotation.x = -Math.PI / 2;
+		// const lines = new THREE.LineSegments(
+		// 	terrain.geometry,
+		// 	new THREE.LineBasicMaterial({
+		// 		color: 0xff0000,
+		// 	})
+		// );
+		// // @ts-ignore
+		// lines.rotation.x = -Math.PI / 2;
 
-		scene.add(lines);
+		// scene.add(lines);
 
 		Promise.all([import("@dimforge/rapier3d")]).then(([RAPIER]) => {
 			const gravity = { x: 0.0, y: -9.81, z: 0.0 };
@@ -89,11 +90,10 @@
 			);
 			const terrainBody = world.createRigidBody(rbDesc);
 
-			// // @ts-ignore
 			// const clDesc = RAPIER.ColliderDesc.heightfield(
 			// 	segments,
 			// 	segments,
-			// 	new Float32Array(heights),
+			// 	hm,
 			// 	new THREE.Vector3(size, 1, size)
 			// )
 			// 	.setFriction(1)
