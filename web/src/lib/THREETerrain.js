@@ -510,7 +510,8 @@ THREETerrain.fromArray2D = function (vertices, src) {
 THREETerrain.toArray1D = function (vertices) {
 	var tgt = new Float32Array(vertices.length / 3);
 	for (var i = 0, l = tgt.length; i < l; i++) {
-		tgt[i] = vertices[i * 3 + 2];
+		tgt[i] = vertices[i * 3 + 2]; // use z axis as height
+		// tgt[i] = vertices[i * 3 + 1]; // use y axis as height
 	}
 	return tgt;
 };
@@ -527,7 +528,8 @@ THREETerrain.toArray1D = function (vertices) {
 THREETerrain.fromArray1D = function (vertices, src) {
 	for (var i = 0, l = Math.min(vertices.length / 3, src.length); i < l; i++) {
 		// @ts-ignore
-		vertices[i * 3 + 2] = src[i];
+		vertices[i * 3 + 2] = src[i]; // use z axis as height
+		// vertices[i * 3 + 1] = src[i]; // use y axis as height
 	}
 };
 
@@ -1572,8 +1574,11 @@ THREETerrain.Perlin = function (g, options) {
 		divisor =
 			(Math.min(options.xSegments, options.ySegments) + 1) /
 			options.frequency;
-	for (var i = 0, xl = options.xSegments + 1; i < xl; i++) {
-		for (var j = 0, yl = options.ySegments + 1; j < yl; j++) {
+	const xl = options.xSegments + 1;
+	const yl = options.ySegments + 1;
+
+	for (var i = 0; i < xl; i++) {
+		for (var j = 0; j < yl; j++) {
 			g[j * xl + i] += noise.perlin(i / divisor, j / divisor) * range;
 		}
 	}

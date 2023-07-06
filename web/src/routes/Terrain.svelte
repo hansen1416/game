@@ -11,35 +11,53 @@
 
 	let heights = [];
 
+	let collider;
+	let multiplier = 1;
+
 	onMount(() => {
 		initScene();
 
-		const xS = 31,
-			yS = 31;
+		const segments = 15;
+		const size = 1024;
 
 		const terrain = THREETerrain({
 			easing: THREETerrain.Linear,
 			frequency: 2.5,
 			heightmap: THREETerrain.Perlin,
-			material: new THREE.MeshBasicMaterial({ color: 0xe39923 }),
+			material: new THREE.MeshPhongMaterial({
+				color: 0xe39923,
+				opacity: 0.7,
+				transparent: true,
+			}),
 			maxHeight: 100,
 			minHeight: -100,
 			steps: 1,
-			xSegments: xS,
-			xSize: 1024,
-			ySegments: yS,
-			ySize: 1024,
+			xSegments: segments,
+			xSize: size,
+			ySegments: segments,
+			ySize: size,
 		});
 
 		const positions = terrain.geometry.attributes.position.array;
 
 		for (let i = 2; i < positions.length; i += 3) {
+			// for (let i = positions.length - 1; i >= 0; i -= 3) {
+			// get the z axis value from geometry positions
 			heights.push(positions[i]);
 		}
 
-		console.log(heights);
-
 		scene.add(terrain);
+
+		const lines = new THREE.LineSegments(
+			terrain.geometry,
+			new THREE.LineBasicMaterial({
+				color: 0xff0000,
+			})
+		);
+		// @ts-ignore
+		lines.rotation.x = -Math.PI / 2;
+
+		scene.add(lines);
 
 		Promise.all([import("@dimforge/rapier3d")]).then(([RAPIER]) => {
 			const gravity = { x: 0.0, y: -9.81, z: 0.0 };
@@ -48,35 +66,39 @@
 
 			const origin = new THREE.Vector3(0, 0, 0);
 
-			const terrain_size = 63;
 			// @ts-ignore
 			const rbDesc = RAPIER.RigidBodyDesc.fixed().setTranslation(
-				origin.x ,
+				origin.x,
 				origin.y,
-				origin.z 
+				origin.z
 			);
 			const terrainBody = world.createRigidBody(rbDesc);
 
-			const hm_size = 10
-
-			const h = new Float32Array(Array((hm_size + 1)**2).fill(0))
-
-			// console.log(h)
-
 			// @ts-ignore
 			const clDesc = RAPIER.ColliderDesc.heightfield(
-				hm_size,
-				hm_size,
-				h,
-				new THREE.Vector3(1000, 1, 1000)
+				segments,
+				segments,
+				new Float32Array(heights),
+				new THREE.Vector3(size, 1, size)
 			)
 				.setFriction(1)
 				.setRestitution(0);
-			world.createCollider(clDesc, terrainBody);
+			collider = world.createCollider(clDesc, terrainBody);
 		});
 
 		animate();
 	});
+
+	$: if (multiplier) {
+		if (collider) {
+			const q = new THREE.Quaternion().setFromAxisAngle(
+				new THREE.Vector3(0, 1, 0),
+				(Math.PI / 32) * multiplier
+			);
+
+			collider.setRotation(q);
+		}
+	}
 
 	onDestroy(() => {
 		cancelAnimationFrame(animationPointer);
@@ -97,7 +119,7 @@
 			2000
 		);
 		//@ts-ignore
-		camera.position.set(0, 100, 100);
+		camera.position.set(0, 1000, 1000);
 
 		camera.updateProjectionMatrix(); // update the camera's projection matrix
 
@@ -159,10 +181,18 @@
 
 <div class="bg">
 	<canvas bind:this={canvas} />
+
+	<input class="input" type="number" bind:value={multiplier} />
 </div>
 
 <style>
 	.bg {
 		background-color: #0f2027;
+	}
+
+	.input {
+		position: absolute;
+		right: 0;
+		bottom: 0;
 	}
 </style>

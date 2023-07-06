@@ -45,8 +45,7 @@ export default class ItemsManager {
 		if (import.meta.env.DEV) {
 			if (!this.lines) {
 				let material = new THREE.LineBasicMaterial({
-					color: 0xffffff, // @ts-ignore
-					// vertexColors: THREE.VertexColors,
+					color: 0xffffff,
 				});
 				let geometry = new THREE.BufferGeometry();
 				this.lines = new THREE.LineSegments(geometry, material);
