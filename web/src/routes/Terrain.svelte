@@ -9,7 +9,7 @@
 
 	let animationPointer;
 
-	let heights = [];
+	// let heights = [];
 
 	let collider;
 	let multiplier = 1;
@@ -17,7 +17,7 @@
 	onMount(() => {
 		initScene();
 
-		const segments = 15;
+		const segments = 63;
 		const size = 1024;
 
 		const terrain = THREETerrain({
@@ -26,7 +26,7 @@
 			heightmap: THREETerrain.Perlin,
 			material: new THREE.MeshPhongMaterial({
 				color: 0xe39923,
-				opacity: 0.7,
+				opacity: 0.5,
 				transparent: true,
 			}),
 			maxHeight: 100,
@@ -39,12 +39,27 @@
 		});
 
 		const positions = terrain.geometry.attributes.position.array;
+		const indices = terrain.geometry.index.array;
 
-		for (let i = 2; i < positions.length; i += 3) {
-			// for (let i = positions.length - 1; i >= 0; i -= 3) {
-			// get the z axis value from geometry positions
-			heights.push(positions[i]);
-		}
+		// console.log(terrain.geometry)
+
+		// const pos_vec = [];
+
+		// for (let i = 0; i < positions.length; i += 3) {
+		// 	// for (let i = positions.length - 1; i >= 0; i -= 3) {
+		// 	// get the z axis value from geometry positions
+		// 	// heights.push(positions[i]);
+
+		// 	pos_vec.push(new THREE.Vector3(positions[i], positions[i+1], positions[i+2]))
+		// }
+
+		// pos_vec.sort((a, b) => {
+		// 	return a.x - b.x || a.y - b.y
+		// })
+
+		// for (let i = 0; i < pos_vec.length; i++) {
+		// 	heights.push(pos_vec[i].z);
+		// }
 
 		scene.add(terrain);
 
@@ -74,31 +89,43 @@
 			);
 			const terrainBody = world.createRigidBody(rbDesc);
 
-			// @ts-ignore
-			const clDesc = RAPIER.ColliderDesc.heightfield(
-				segments,
-				segments,
-				new Float32Array(heights),
-				new THREE.Vector3(size, 1, size)
-			)
+			// // @ts-ignore
+			// const clDesc = RAPIER.ColliderDesc.heightfield(
+			// 	segments,
+			// 	segments,
+			// 	new Float32Array(heights),
+			// 	new THREE.Vector3(size, 1, size)
+			// )
+			// 	.setFriction(1)
+			// 	.setRestitution(0);
+
+			const clDesc = RAPIER.ColliderDesc.trimesh(positions, indices)
 				.setFriction(1)
 				.setRestitution(0);
+
 			collider = world.createCollider(clDesc, terrainBody);
+
+			const q = new THREE.Quaternion().setFromAxisAngle(
+				new THREE.Vector3(1, 0, 0),
+				-Math.PI / 2
+			);
+
+			collider.setRotation(q);
 		});
 
 		animate();
 	});
 
-	$: if (multiplier) {
-		if (collider) {
-			const q = new THREE.Quaternion().setFromAxisAngle(
-				new THREE.Vector3(0, 1, 0),
-				(Math.PI / 32) * multiplier
-			);
+	// $: if (multiplier) {
+	// 	if (collider) {
+	// 		const q = new THREE.Quaternion().setFromAxisAngle(
+	// 			new THREE.Vector3(0, 1, 0),
+	// 			(Math.PI / 32) * multiplier
+	// 		);
 
-			collider.setRotation(q);
-		}
-	}
+	// 		collider.setRotation(q);
+	// 	}
+	// }
 
 	onDestroy(() => {
 		cancelAnimationFrame(animationPointer);
