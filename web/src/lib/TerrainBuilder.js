@@ -31,69 +31,87 @@ export default class TerrainBuilder {
 		this.physics = physics;
 	}
 
-	terrain() {
+	/**
+	 *
+	 * @param {{"width": number,"height": number,"widthSegments": number,"heightSegments": number,
+	 * "position": number[], "normal": number[], "uv": number[],}} data
+	 */
+	terrain(data) {
 		// Define the vertices and faces of the surface
-		const worldWidth = 256;
-		const worldDepth = 256;
-		// const data = generateHeight(worldWidth, worldDepth);
-
-		// const geometry = new THREE.PlaneGeometry(
-		// 	500,
-		// 	500,
-		// 	worldWidth - 1,
-		// 	worldDepth - 1
-		// );
-		// geometry.rotateX(-Math.PI / 2);
-
-		// const vertices = geometry.attributes.position.array;
-
-		// for (let i = 0, j = 0, l = vertices.length; i < l; i++, j += 3) {
-		// 	vertices[j + 1] = data[i];
-		// }
-
 		const geometry = new THREE.PlaneGeometry(
-			500,
-			500,
-			worldWidth - 1,
-			worldDepth - 1
+			data.width,
+			data.height,
+			data.widthSegments,
+			data.heightSegments
 		);
-		geometry.rotateX(-Math.PI / 2);
 
-		// const position = geometry.attributes.position;
-		// // position.usage = THREE.DynamicDrawUsage;
-
-		// for (let i = 0; i < position.count; i++) {
-		// 	const y = 2 * Math.sin(i / 2);
-		// 	position.setY(i, y);
-		// }
+		geometry.setAttribute(
+			"normal",
+			new THREE.BufferAttribute(new Float32Array(data.normal), 3)
+		);
+		geometry.setAttribute(
+			"position",
+			new THREE.BufferAttribute(new Float32Array(data.position), 3)
+		);
+		geometry.setAttribute(
+			"uv",
+			new THREE.BufferAttribute(new Float32Array(data.uv), 2)
+		);
 
 		const mesh = new THREE.Mesh(
 			geometry,
 			new THREE.MeshStandardMaterial({
 				color: 0x0b549d,
-				side: THREE.DoubleSide,
 			})
 		);
+
+		mesh.geometry.computeBoundingSphere();
+		mesh.geometry.computeVertexNormals();
 
 		mesh.receiveShadow = true;
 		mesh.castShadow = true;
 
-		// this.renderer.camera.position.set(100, 800, -800);
-		// this.renderer.camera.lookAt(-100, 810, -800);
+		mesh.rotation.x = -Math.PI / 2;
+		this.renderer.scene.add(mesh);
 
 		const origin = new THREE.Vector3(0, 0, 0);
 
-		mesh.position.copy(origin);
+		const heightMap = new Float32Array(
+			this.heightmapFromPosition(data.position)
+		);
 
-		const heightMap = new Float32Array(17 ** 2);
+		this.physics.createTerrain(origin, data.width, data.widthSegments, heightMap);
+	}
 
-		for (let i = 0; i < heightMap.length; i++) {
-			heightMap[i] = 0;
+	/**
+	 *
+	 * @param {number[]} positions
+	 * @returns
+	 */
+	heightmapFromPosition(positions) {
+		const heights = [];
+		const pos_vec = [];
+
+		for (let i = 0; i < positions.length; i += 3) {
+			// 1d array to vectors
+			pos_vec.push(
+				new THREE.Vector3(
+					positions[i],
+					positions[i + 1],
+					positions[i + 2]
+				)
+			);
+		}
+		// the first point is at top left corner for Rapier heightfiled, and colmun major
+		pos_vec.sort((a, b) => {
+			return a.x - b.x || b.y - a.y;
+		});
+
+		for (let i = 0; i < pos_vec.length; i++) {
+			heights.push(pos_vec[i].z);
 		}
 
-		this.physics.createTerrain(origin, 16, heightMap);
-
-		this.renderer.scene.add(mesh);
+		return heights;
 	}
 
 	terrain_3() {
@@ -138,7 +156,6 @@ export default class TerrainBuilder {
 
 	terrain_1() {
 		// console.log(THREETerrain);
-
 		// var xS = 63,
 		// 	yS = 63;
 		// const terrainScene = THREETerrain({

@@ -6,6 +6,7 @@
 	import {
 		createPoseLandmarker,
 		loadGLTF,
+		loadJSON,
 		invokeCamera,
 		readBuffer,
 	} from "../utils/ropes";
@@ -97,10 +98,11 @@
 			loadGLTF("/glb/dors.glb"),
 			loadGLTF("/glb/daneel.glb"),
 			fetch("/motion/motion3-1.bin"),
-		]).then(([RAPIER, dors, daneel, motion_data]) => {
+			loadJSON("/json/terrain1.json"),
+		]).then(([RAPIER, dors, daneel, motion_data, terrain_data]) => {
 			physicsWorld = new RapierWorld(RAPIER);
 
-			new TerrainBuilder(threeScene, physicsWorld).terrain();
+			new TerrainBuilder(threeScene, physicsWorld).terrain(terrain_data);
 
 			playerController = new PlayerController(threeScene, physicsWorld);
 

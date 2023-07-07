@@ -2,3 +2,4 @@ glb/
 tasks-vision/
 *.bin
 motion/
+json/

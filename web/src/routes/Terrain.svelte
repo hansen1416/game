@@ -36,7 +36,8 @@
 			ySize: size,
 		});
 
-		console.log(terrain.geometry.toJSON());
+		// console.log(terrain.geometry.getAttribute('normal'));
+		// console.log(terrain.geometry.getAttribute('uv'));
 
 		const positions = terrain.geometry.attributes.position.array;
 

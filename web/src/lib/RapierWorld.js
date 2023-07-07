@@ -75,25 +75,26 @@ export default class RapierWorld {
 	/**
 	 * Creates a new collider descriptor with a heightfield shape.
 	 * @param {vec3} origin
-	 * @param {number} terrain_size
+	 * @param {number} size
+	 * @param {number} segments
 	 * @param {Float32Array} heights - The heights of the heightfield along its local `y` axis,
 	 *                  provided as a matrix stored in column-major order.
 	 */
-	createTerrain(origin, terrain_size, heights) {
+	createTerrain(origin, size, segments, heights) {
 		// @ts-ignore
 		const rbDesc = this.RigidBodyDesc.fixed().setTranslation(
-			origin.x + terrain_size * 0.5,
+			origin.x,
 			origin.y,
-			origin.z + terrain_size * 0.5
+			origin.z
 		);
 		const terrainBody = this.world.createRigidBody(rbDesc);
 
 		// @ts-ignore
 		const clDesc = this.ColliderDesc.heightfield(
-			terrain_size,
-			terrain_size,
+			segments,
+			segments,
 			heights,
-			new THREE.Vector3(terrain_size, 1, terrain_size)
+			new THREE.Vector3(size, 1, size)
 		)
 			.setFriction(1)
 			.setRestitution(0);
