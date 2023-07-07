@@ -190,6 +190,8 @@ export default class PlayerController {
 
 		this.pitcher.onFrameUpdate();
 
+		this.physics.raycastingCharacter({x:0,y:-100,z:0})
+
 		// todo, update other players rigid and mesh
 
 		for (let i in this.projectile_rigid) {

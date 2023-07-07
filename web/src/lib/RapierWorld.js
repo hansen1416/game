@@ -6,6 +6,8 @@
  * @typedef {import('../../node_modules/@dimforge/rapier3d/dynamics/rigid_body').RigidBodyDesc} RigidBodyDesc
  * @typedef {import('../../node_modules/@dimforge/rapier3d/dynamics/coefficient_combine_rule').CoefficientCombineRule} CoefficientCombineRule
  * @typedef {import('../../node_modules/@dimforge/rapier3d/control/character_controller').KinematicCharacterController} KinematicCharacterController
+ * @typedef {import('../../node_modules/@dimforge/rapier3d/geometry/ray').Ray} Ray
+ * @typedef {import('../../node_modules/@dimforge/rapier3d/pipeline/query_pipeline').QueryFilterFlags} QueryFilterFlags
  * @typedef {{x: number, y: number, z: number}} vec3
  */
 
@@ -63,6 +65,10 @@ export default class RapierWorld {
 		this.RigidBodyDesc = RAPIER.RigidBodyDesc;
 		/** @type {CoefficientCombineRule} */
 		this.CoefficientCombineRule = RAPIER.CoefficientCombineRule;
+		/** @type {Ray} */
+		this.Ray = new RAPIER.Ray({ x: 0, y: 0, z: 0 }, { x: 0, y: 1, z: 0 });
+		/** @type {QueryFilterFlags} */
+		this.QueryFilterFlags = RAPIER.QueryFilterFlags;
 	}
 
 	/**
@@ -219,6 +225,28 @@ export default class RapierWorld {
 		this.character_rigid.setTranslation(t, true);
 
 		return t;
+	}
+
+	raycastingCharacter(origin) {
+		this.Ray.origin = origin;
+
+		const maxToi = 201.0;
+		const solid = true;
+
+		const hit = this.world.castRay(
+			this.Ray,
+			maxToi,
+			solid, // @ts-ignore
+			this.QueryFilterFlags.EXCLUDE_DYNAMIC
+		);
+		if (hit != null) {
+			// Handle the hit.
+			const pos = this.Ray.pointAt(hit.toi);
+			console.log(pos);
+			return pos;
+		}
+
+		console.log("cast result empty");
 	}
 
 	destructor() {
