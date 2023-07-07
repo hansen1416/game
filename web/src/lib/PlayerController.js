@@ -130,7 +130,7 @@ export default class PlayerController {
 			this.main_player = player;
 
 			// prepare the controller and collider
-			this.physics.createCharacter(model);
+			this.physics.createCharacter();
 
 			this.pitcher = new Pitcher(player);
 
@@ -189,8 +189,6 @@ export default class PlayerController {
 		this.applyLowerBodyAnimation2MainPlayer();
 
 		this.pitcher.onFrameUpdate();
-
-		this.physics.raycastingCharacter({x:0,y:-100,z:0})
 
 		// todo, update other players rigid and mesh
 

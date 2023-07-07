@@ -2,7 +2,6 @@ import * as THREE from "three";
 import ThreeScene from "./ThreeScene";
 import RapierWorld from "./RapierWorld";
 import { TerrainShape } from "./TerrainShape";
-import { GROUND_LEVEL } from "../utils/constants";
 import { ParametricGeometry } from "three/addons/geometries/ParametricGeometry.js";
 // import THREETerrain from "./THREE.Terrain";
 import { ImprovedNoise } from "three/addons/math/ImprovedNoise.js";
@@ -126,7 +125,7 @@ export default class TerrainBuilder {
 				const terrain = new TerrainShape(
 					this.renderer,
 					this.physics,
-					new THREE.Vector3(x, GROUND_LEVEL, y)
+					new THREE.Vector3(x, 0, y)
 				);
 
 				this.pool.push(terrain);

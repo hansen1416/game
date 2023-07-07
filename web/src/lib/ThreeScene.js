@@ -1,7 +1,6 @@
 import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 import Stats from "three/examples/jsm/libs/stats.module.js";
-import { GROUND_LEVEL } from "../utils/constants";
 
 let stats;
 
@@ -14,7 +13,7 @@ if (import.meta.env.DEV) {
 }
 
 export const SceneProperties = {
-	camera_height: GROUND_LEVEL + 2.4,
+	camera_height: 2.4,
 	camera_far_z: 4,
 };
 
@@ -74,7 +73,7 @@ export default class ThreeScene {
 
 		// mimic the sun light. maybe update light position later
 		this.light = new THREE.PointLight(0xffffff, 0.5);
-		this.light.position.set(0, GROUND_LEVEL + 10, -5);
+		this.light.position.set(0, 10, -5);
 		this.light.castShadow = true;
 		// this.light.shadow.mapSize.width = 2048;
 		// this.light.shadow.mapSize.height = 2048;

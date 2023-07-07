@@ -2,7 +2,6 @@
 	import { onDestroy, onMount } from "svelte";
 	// @ts-ignore
 	import { cloneDeep } from "lodash";
-	import { GROUND_LEVEL, PLAYER_Z } from "../utils/constants";
 	import {
 		createPoseLandmarker,
 		loadGLTF,
@@ -115,7 +114,7 @@
 				dors.scene.children[0],
 				{
 					x: 0,
-					y: GROUND_LEVEL,
+					y: 0,
 					z: 0,
 				},
 				{ x: 0, y: 0, z: 0 },
@@ -127,8 +126,8 @@
 				daneel.scene.children[0],
 				{
 					x: 0,
-					y: GROUND_LEVEL,
-					z: -PLAYER_Z,
+					y: 0,
+					z: 10,
 				},
 				{
 					x: 0,
@@ -211,7 +210,7 @@
 			const to_pos = poseToRotation.applyPosition(pose2D, FLOOR_WIDTH);
 
 			if (to_pos) {
-				player1.position.set(to_pos.x, GROUND_LEVEL, PLAYER_Z);
+				player1.position.set(to_pos.x, 0, 0);
 			}
 		*/
 

@@ -230,6 +230,9 @@ export default class RapierWorld {
 	raycastingCharacter(origin) {
 		this.Ray.origin = origin;
 
+		// `max_toi` limits the ray-cast to the segment: [ray.origin, ray.origin + ray.dir * max_toi]
+		// our terrain max/min height limited to 100/-100, and the origin is at {x, -100, z}, 
+		// so 201 is enough to find the position on the terrain
 		const maxToi = 201.0;
 		const solid = true;
 
