@@ -109,6 +109,11 @@
 
 			itemsManager.spreadItems();
 
+			// todo, read players initial position
+			// const mainplayer_init_pos = physicsWorld.raycastingTerrain({x: 0, z: 0})
+
+			// console.log(mainplayer_init_pos)
+
 			// player1
 			playerController.addPlayer(
 				dors.scene.children[0],
@@ -176,6 +181,12 @@
 				onPoseCallback
 			);
 		}
+
+		/** tetsing */
+		const mainplayer_init_pos = physicsWorld.raycastingTerrain({x: 0, z: 0})
+
+		console.log(mainplayer_init_pos)
+		/** tetsing */
 
 		// update other players except main player
 		playerController.onFrameUpdate();
