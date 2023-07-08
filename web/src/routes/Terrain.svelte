@@ -36,8 +36,23 @@
 			ySize: size,
 		});
 
-		// console.log(terrain.geometry.getAttribute('normal'));
-		// console.log(terrain.geometry.getAttribute('uv'));
+		const json_data = {
+			// @ts-ignore
+			width: terrain.geometry.parameters.width,
+			// @ts-ignore
+			height: terrain.geometry.parameters.height,
+			// @ts-ignore
+			widthSegments: terrain.geometry.parameters.widthSegments,
+			// @ts-ignore
+			heightSegments: terrain.geometry.parameters.heightSegments,
+			normal: Array.from(terrain.geometry.getAttribute("normal").array),
+			position: Array.from(
+				terrain.geometry.getAttribute("position").array
+			),
+			uv: Array.from(terrain.geometry.getAttribute("uv").array),
+		};
+
+		console.log(json_data);
 
 		const positions = terrain.geometry.attributes.position.array;
 
