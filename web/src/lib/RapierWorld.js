@@ -228,9 +228,9 @@ export default class RapierWorld {
 	}
 
 	/**
-	 * 
-	 * 
-	 * @param {{x: number, z: number}} xz_pos 
+	 *
+	 *
+	 * @param {{x: number, z: number}} xz_pos
 	 * @returns {vec3}
 	 */
 	raycastingTerrain(xz_pos) {
@@ -239,11 +239,11 @@ export default class RapierWorld {
 		this.Ray.origin.z = xz_pos.z;
 
 		// `max_toi` limits the ray-cast to the segment: [ray.origin, ray.origin + ray.dir * max_toi]
-		// our terrain max/min height limited to 100/-100, and the origin is at {x, 200, z}, 
+		// our terrain max/min height limited to 100/-100, and the origin is at {x, 200, z},
 		// so 301 is enough to find the position on the terrain
-		const maxToi = 30100.0;
+		const maxToi = 301.0;
 		const solid = true;
-console.log(this.Ray)
+
 		const hit = this.world.castRay(
 			this.Ray,
 			maxToi,
@@ -255,7 +255,7 @@ console.log(this.Ray)
 			return this.Ray.pointAt(hit.toi);
 		}
 
-		return
+		return;
 	}
 
 	destructor() {

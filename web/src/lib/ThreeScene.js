@@ -13,8 +13,8 @@ if (import.meta.env.DEV) {
 }
 
 export const SceneProperties = {
-	camera_height: 2.4,
-	camera_far_z: 4,
+	camera_height: 1.4,
+	camera_far_z: 6,
 };
 
 Object.freeze(SceneProperties);

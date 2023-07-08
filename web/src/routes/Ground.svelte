@@ -65,8 +65,7 @@
 	let video, canvas;
 
 	let cameraReady = false,
-		mannequinReady = false,
-		modelReady = false;
+		assetReady = false;
 
 	let poseDetector, poseDetectorAvailable;
 
@@ -109,11 +108,7 @@
 
 			itemsManager.spreadItems();
 
-			// todo, read players initial position
-			// const mainplayer_init_pos = physicsWorld.raycastingTerrain({x: 0, z: 0})
-
-			// console.log(mainplayer_init_pos)
-
+			// todo, consider put players position at some where invisible, adjust them later
 			// player1
 			playerController.addPlayer(
 				dors.scene.children[0],
@@ -148,8 +143,7 @@
 
 			// all models ready
 			cameraReady = true;
-			mannequinReady = true;
-			modelReady = true;
+			assetReady = true;
 		});
 	});
 
@@ -160,13 +154,24 @@
 	});
 
 	// when mannequin, model and camera are erady, start animation loop
-	$: if (cameraReady && mannequinReady && modelReady) {
+	$: if (cameraReady && assetReady) {
 		animate();
+		// set player pos, camera pos, control target
+		// we need the animation to update at least once to let raycasting work
+		playerController.initPLayerPos({ x: 0, z: 0 });
 	}
 
 	function animate() {
-		// ========= captured pose logic
+		// update other players except main player
+		playerController.onFrameUpdate();
 
+		itemsManager.onFrameUpdate();
+
+		// update physics world and threejs renderer
+		physicsWorld.onFrameUpdate();
+		threeScene.onFrameUpdate();
+
+		// ========= captured pose logic
 		if (
 			runAnimation &&
 			video &&
@@ -181,21 +186,6 @@
 				onPoseCallback
 			);
 		}
-
-		/** tetsing */
-		const mainplayer_init_pos = physicsWorld.raycastingTerrain({x: 0, z: 0})
-
-		console.log(mainplayer_init_pos)
-		/** tetsing */
-
-		// update other players except main player
-		playerController.onFrameUpdate();
-
-		itemsManager.onFrameUpdate();
-
-		// update physics world and threejs renderer
-		physicsWorld.onFrameUpdate();
-		threeScene.onFrameUpdate();
 
 		animationPointer = requestAnimationFrame(animate);
 	}

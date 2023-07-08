@@ -147,6 +147,41 @@ export default class PlayerController {
 
 	/**
 	 *
+	 * @param {{x:number, z:number}} xz_pos
+	 */
+	initPLayerPos(xz_pos) {
+		// find raycast terrain height
+		const init_pos = this.physics.raycastingTerrain(xz_pos);
+
+		if (!init_pos) {
+			console.info(
+				"raycasting didn't find position on terrain to locate player"
+			);
+		}
+
+		this.main_player.mesh.position.x = init_pos.x;
+		this.main_player.mesh.position.y = init_pos.y;
+		this.main_player.mesh.position.z = init_pos.z;
+
+		// put camera behind player
+		this.renderer.camera.position.x = this.main_player.mesh.position.x;
+		this.renderer.camera.position.y =
+			this.main_player.mesh.position.y + SceneProperties.camera_height;
+		this.renderer.camera.position.z =
+			this.main_player.mesh.position.z - SceneProperties.camera_far_z;
+
+		this.renderer.camera.lookAt(this.main_player.mesh.position);
+
+		// set control center
+		this.renderer.controls.target.set(
+			this.main_player.mesh.position.x,
+			this.main_player.mesh.position.y,
+			this.main_player.mesh.position.z
+		);
+	}
+
+	/**
+	 *
 	 * @param {string} uuid
 	 */
 	removePlayer(uuid) {
@@ -178,30 +213,12 @@ export default class PlayerController {
 	 * it controls the other players movement
 	 */
 	onFrameUpdate() {
+		// todo, update other players rigid and mesh
 		for (let i = 0; i < this.players.length; i++) {
 			if (this.players[i].speed) {
 				this.players[i].mesh.position.add(this.players[i].speed);
 			}
 		}
-
-		// captured pose only control upper body
-		// we need to apply animation to lower body of player depends on player's `speed`
-		this.applyLowerBodyAnimation2MainPlayer();
-
-		this.pitcher.onFrameUpdate();
-
-		// todo, update other players rigid and mesh
-
-		for (let i in this.projectile_rigid) {
-			const t = this.projectile_rigid[i].translation();
-			this.projectile_meshes[i].position.set(t.x, t.y, t.z);
-
-			const r = this.projectile_rigid[i].rotation();
-			this.projectile_meshes[i].setRotationFromQuaternion(
-				new THREE.Quaternion(r.x, r.y, r.z, r.w)
-			);
-		}
-
 	}
 
 	applyLowerBodyAnimation2MainPlayer() {
@@ -320,6 +337,22 @@ export default class PlayerController {
 		this.pitcher.onPoseApplied();
 
 		this.cameraFollow();
+
+		// captured pose only control upper body
+		// we need to apply animation to lower body of player depends on player's `speed`
+		this.applyLowerBodyAnimation2MainPlayer();
+
+		this.pitcher.onFrameUpdate();
+
+		for (let i in this.projectile_rigid) {
+			const t = this.projectile_rigid[i].translation();
+			this.projectile_meshes[i].position.set(t.x, t.y, t.z);
+
+			const r = this.projectile_rigid[i].rotation();
+			this.projectile_meshes[i].setRotationFromQuaternion(
+				new THREE.Quaternion(r.x, r.y, r.z, r.w)
+			);
+		}
 	}
 
 	/**
@@ -347,7 +380,7 @@ export default class PlayerController {
 		// its direction is controlled by mesh shoulder
 		const camera_target_pos = new THREE.Vector3(
 			this.main_player.mesh.position.x + camera_dir.x,
-			this.renderer.camera.position.y,
+			this.main_player.mesh.position.y + SceneProperties.camera_height,
 			this.main_player.mesh.position.z + camera_dir.z
 		);
 
