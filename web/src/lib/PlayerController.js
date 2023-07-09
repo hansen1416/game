@@ -300,12 +300,8 @@ export default class PlayerController {
 		// we need to apply animation to lower body of player depends on player's `speed`
 		this.applyLowerBodyAnimation2MainPlayer();
 
-		// this.pitcher.trackHandsPos();
-
-		// // update hands track, for pitching
-		// this.pitcher.onPoseApplied();
-
-		// this.pitcher.onFrameUpdate();
+		// update hands track, for pitching
+		this.pitcher.onPoseCallback(this.main_player.speed);
 	}
 
 	/**
@@ -327,6 +323,8 @@ export default class PlayerController {
 			shoulder_vector.z,
 			-shoulder_vector.x
 		);
+
+		// todo, calculate speed direction, and control it by speed_scalar
 
 		// scale the speed by x,z, this isn't accurate due to y=0
 		// the correct approach is to gradually reduce the length of speed vector,
@@ -411,6 +409,9 @@ export default class PlayerController {
 		this.renderer.camera.lookAt(this.main_player.mesh.position);
 	}
 
+	/**
+	 * apply animation data to lower body, like walk, run, etc
+	 */
 	applyLowerBodyAnimation2MainPlayer() {
 		if (!this.animation_data) {
 			return;
