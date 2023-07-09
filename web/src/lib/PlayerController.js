@@ -162,12 +162,27 @@ export default class PlayerController {
 			this.main_player.mesh.position.z = init_pos.z;
 		}
 
+		let camera_pos = this.physics.raycastingTerrain({
+			x: this.main_player.mesh.position.x,
+			z: this.main_player.mesh.position.z - SceneProperties.camera_far_z,
+		});
+
+		if (!camera_pos) {
+			camera_pos = {
+				x: this.main_player.mesh.position.x,
+				y: this.main_player.mesh.position.y,
+				z:
+					this.main_player.mesh.position.z -
+					SceneProperties.camera_far_z,
+			};
+		}
+
+		camera_pos.y += SceneProperties.camera_height;
+
 		// put camera behind player
-		this.renderer.camera.position.x = this.main_player.mesh.position.x;
-		this.renderer.camera.position.y =
-			this.main_player.mesh.position.y + SceneProperties.camera_height;
-		this.renderer.camera.position.z =
-			this.main_player.mesh.position.z - SceneProperties.camera_far_z;
+		this.renderer.camera.position.copy(
+			new THREE.Vector3(camera_pos.x, camera_pos.y, camera_pos.z)
+		);
 
 		this.renderer.camera.lookAt(this.main_player.mesh.position);
 
@@ -377,14 +392,25 @@ export default class PlayerController {
 	cameraFollow(camera_direction) {
 		// the height of camera is constant
 		// its direction is controlled by mesh shoulder
-		const camera_target_pos = new THREE.Vector3(
-			this.main_player.mesh.position.x + camera_direction.x,
-			this.main_player.mesh.position.y + SceneProperties.camera_height,
-			this.main_player.mesh.position.z + camera_direction.y
-		);
+		let camera_pos = this.physics.raycastingTerrain({
+			x: this.main_player.mesh.position.x + camera_direction.x,
+			z: this.main_player.mesh.position.z + camera_direction.y,
+		});
+
+		if (!camera_pos) {
+			camera_pos = {
+				x: this.main_player.mesh.position.x,
+				y: this.main_player.mesh.position.y,
+				z:
+					this.main_player.mesh.position.z -
+					SceneProperties.camera_far_z,
+			};
+		}
+
+		camera_pos.y += SceneProperties.camera_height;
 
 		this.renderer.camera.position.lerp(
-			camera_target_pos,
+			new THREE.Vector3(camera_pos.x, camera_pos.y, camera_pos.z),
 			this.camera_sensitivity
 		);
 		this.renderer.camera.lookAt(this.main_player.mesh.position);
