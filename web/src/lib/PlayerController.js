@@ -255,7 +255,7 @@ export default class PlayerController {
 		}
 
 		// the shoulder pose rotation control the rotation of mesh
-		const shoulder_vector = new THREE.Vector3(
+		const shoulder_vector_pose = new THREE.Vector3(
 			pose3D[BlazePoseKeypointsValues["RIGHT_SHOULDER"]].x -
 				pose3D[BlazePoseKeypointsValues["LEFT_SHOULDER"]].x,
 			pose3D[BlazePoseKeypointsValues["RIGHT_SHOULDER"]].y -
@@ -267,21 +267,35 @@ export default class PlayerController {
 		// this must happend before apply pose to bones,
 		// cause we need to apply rotation to the captured pose position
 		// rotate main player's mesh and rigid
-		this.rotateMainPlayer(shoulder_vector);
+		this.rotateMainPlayer(shoulder_vector_pose);
 
 		// this.main_player.pose2totation.applyPose2Bone(pose3Dvec, lower_body);
-		this.main_player.applyPose2Bone(pose3D, lower_body);
+		const shoulder_vector_mesh = this.main_player.applyPose2Bone(
+			pose3D,
+			lower_body
+		);
 
 		// the shoulder mesh rotation control the camera direction and speed direction
-		const xz_direction = this.main_player.updateShoulderVectorMesh();
+		const xz_direction = new THREE.Vector2(
+			shoulder_vector_mesh.z,
+			-shoulder_vector_mesh.x
+		);
+		//  this.main_player.updateShoulderVectorMesh();
 
 		// calculate target translation by xz_direction and raycasting
 		// move main player's mesh and rigid to the target translation
 		// update player's speed
 		this.moveMainPlayer(xz_direction);
 
+		const camera_direction = new THREE.Vector2(
+			-shoulder_vector_mesh.z,
+			shoulder_vector_mesh.x
+		)
+			.normalize()
+			.multiplyScalar(SceneProperties.camera_far_z);
+
 		// todo need to calculate camera position by raycasting, let camera always above ground
-		this.cameraFollow();
+		this.cameraFollow(camera_direction);
 
 		// captured pose only control upper body
 		// we need to apply animation to lower body of player depends on player's `speed`
@@ -357,18 +371,16 @@ export default class PlayerController {
 		we should have the camera position, which is always at the back of player
 
 		slerp by `camera_sensitivity` each step, so the camera is smooth
-	 */
-	cameraFollow() {
-		const camera_dir = this.main_player
-			.getCameraDirection()
-			.multiplyScalar(SceneProperties.camera_far_z);
 
+	 * @param {THREE.Vector2} camera_direction
+	 */
+	cameraFollow(camera_direction) {
 		// the height of camera is constant
 		// its direction is controlled by mesh shoulder
 		const camera_target_pos = new THREE.Vector3(
-			this.main_player.mesh.position.x + camera_dir.x,
+			this.main_player.mesh.position.x + camera_direction.x,
 			this.main_player.mesh.position.y + SceneProperties.camera_height,
-			this.main_player.mesh.position.z + camera_dir.z
+			this.main_player.mesh.position.z + camera_direction.y
 		);
 
 		this.renderer.camera.position.lerp(
