@@ -199,9 +199,7 @@
 		const pose3D = cloneDeep(result.worldLandmarks[0]);
 		const pose2D = cloneDeep(result.landmarks[0]);
 
-		playerController.applyPose2MainPlayer(pose3D, pose2D, false);
-
-		// todo, need to apply running animation on legs
+		playerController.onPoseCallback(pose3D, pose2D, false);
 
 		/**
 

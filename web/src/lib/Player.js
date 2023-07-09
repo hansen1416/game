@@ -93,19 +93,18 @@ export default class Player {
 
 	/**
 	 *
-	 * @param {{x?: number, y?:number, z?: number}} obj
+	 * @param {import("./RapierWorld").vec3} obj
 	 */
 	updateSpeed(obj) {
 		if (obj.x !== undefined) {
 			this.#speed.x = obj.x;
 		}
+		if (obj.y !== undefined) {
+			this.#speed.y = obj.y;
+		}
 		if (obj.z !== undefined) {
 			this.#speed.z = obj.z;
 		}
-	}
-
-	scaleSpeed() {
-		this.#speed.normalize().multiplyScalar(this.#speed_scalar);
 	}
 
 	/**

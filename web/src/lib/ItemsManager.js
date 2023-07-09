@@ -80,8 +80,6 @@ export default class ItemsManager {
 	spreadItems() {
 		// const points = poissonDiskSampling(GROUND_WIDTH/10, GROUND_HEIGHT/10, 20, 30);
 
-
-
 		this.addItem({ x: 2, y: 0.8, z: 8 });
 	}
 }

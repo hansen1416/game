@@ -212,19 +212,10 @@ export default class RapierWorld {
 
 	/**
 	 *
-	 * @param {vec3} speed
-	 * @returns
+	 * @param {vec3} translation
 	 */
-	moveCharacter(speed) {
-		const t = this.character_rigid.translation();
-
-		t.x += speed.x;
-		t.y += speed.y;
-		t.z += speed.z;
-
-		this.character_rigid.setTranslation(t, true);
-
-		return t;
+	moveCharacter(translation) {
+		this.character_rigid.setTranslation(translation, true);
 	}
 
 	/**
@@ -254,6 +245,10 @@ export default class RapierWorld {
 			// Handle the hit.
 			return this.Ray.pointAt(hit.toi);
 		}
+
+		console.info(
+			"raycasting didn't find position on terrain to locate player"
+		);
 
 		return;
 	}

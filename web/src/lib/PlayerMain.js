@@ -89,24 +89,11 @@ export default class PlayerMain extends Player {
 				left_shoulder_pos
 			)
 		);
-	}
 
-	/**
-	 * movement direction is always same as the direction the mesh facing
-	 * the velocity is controlled by `speed_scalar`
-	 */
-	calculateSpeed() {
-		this.updateSpeed({
-			x: this.shoulder_vector_mesh.z,
-			z: -this.shoulder_vector_mesh.x,
-		});
-
-		// todo, consider terrain height, update y axis
-		this.updateSpeed({
-			y: 0,
-		});
-
-		this.scaleSpeed();
+		return new THREE.Vector2(
+			this.shoulder_vector_mesh.z,
+			-this.shoulder_vector_mesh.x
+		);
 	}
 
 	/**

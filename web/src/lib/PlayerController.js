@@ -154,14 +154,13 @@ export default class PlayerController {
 		const init_pos = this.physics.raycastingTerrain(xz_pos);
 
 		if (!init_pos) {
-			console.info(
-				"raycasting didn't find position on terrain to locate player"
-			);
+			this.main_player.mesh.position.x = xz_pos.x;
+			this.main_player.mesh.position.z = xz_pos.z;
+		} else {
+			this.main_player.mesh.position.x = init_pos.x;
+			this.main_player.mesh.position.y = init_pos.y;
+			this.main_player.mesh.position.z = init_pos.z;
 		}
-
-		this.main_player.mesh.position.x = init_pos.x;
-		this.main_player.mesh.position.y = init_pos.y;
-		this.main_player.mesh.position.z = init_pos.z;
 
 		// put camera behind player
 		this.renderer.camera.position.x = this.main_player.mesh.position.x;
@@ -219,65 +218,16 @@ export default class PlayerController {
 				this.players[i].mesh.position.add(this.players[i].speed);
 			}
 		}
-	}
 
-	applyLowerBodyAnimation2MainPlayer() {
-		if (!this.animation_data) {
-			return;
+		for (let i in this.projectile_rigid) {
+			const t = this.projectile_rigid[i].translation();
+			this.projectile_meshes[i].position.set(t.x, t.y, t.z);
+
+			const r = this.projectile_rigid[i].rotation();
+			this.projectile_meshes[i].setRotationFromQuaternion(
+				new THREE.Quaternion(r.x, r.y, r.z, r.w)
+			);
 		}
-
-		// console.log(this.animation_data);
-
-		//how to do?
-		this.main_player.applyAnimation2Bone(
-			this.animation_data[this.animation_data_idx]
-		);
-
-		this.animation_data_idx++;
-
-		if (this.animation_data_idx >= this.animation_data.length) {
-			this.animation_data_idx = 0;
-		}
-	}
-
-	/**
-	 *
-	 * @param {THREE.Vector3} position
-	 * @param {boolean} left
-	 */
-	addProjectileToHand(position, left = false) {
-		// console.log(position, this);
-
-		const mesh = this.renderer.createProjectile();
-
-		mesh.position.copy(position);
-
-		this.setProjectile(mesh, left);
-	}
-
-	/**
-	 *
-	 * @param {THREE.Vector3} position
-	 * @param {boolean} left
-	 */
-	updateProjectilePos(position, left = false) {
-		this.getProjectile(left).position.copy(position);
-	}
-
-	/**
-	 *
-	 * @param {THREE.Vector3} shoulder_vector
-	 */
-	rotateMainPlayer(shoulder_vector) {
-		const quaternion = this.main_player.rotate(shoulder_vector);
-
-		this.physics.rotateCharacter(quaternion);
-	}
-
-	moveMainPlayer() {
-		const translation = this.physics.moveCharacter(this.main_player.speed);
-
-		this.main_player.move(translation);
 	}
 
 	/**
@@ -289,7 +239,7 @@ export default class PlayerController {
 	 * @param {boolean} lower_body
 	 * @returns
 	 */
-	applyPose2MainPlayer(pose3D, pose2D, lower_body = false) {
+	onPoseCallback(pose3D, pose2D, lower_body = false) {
 		if (!this.main_player) {
 			return;
 		}
@@ -323,18 +273,16 @@ export default class PlayerController {
 		this.main_player.applyPose2Bone(pose3D, lower_body);
 
 		// the shoulder mesh rotation control the camera direction and speed direction
-		this.main_player.updateShoulderVectorMesh();
+		const xz_direction = this.main_player.updateShoulderVectorMesh();
 
 		// `speed` is just a vector that add to player `position` in each frame
-		this.main_player.calculateSpeed();
 
-		// move main player's mesh and rigid
-		this.moveMainPlayer();
+		// calculate target translation by xz_direction and raycasting
+		// move main player's mesh and rigid to the target translation
+		// update player's speed
+		this.moveMainPlayer(xz_direction);
 
-		this.pitcher.trackHandsPos();
-
-		// update hands track, for pitching
-		this.pitcher.onPoseApplied();
+		// todo need to calculate camera position by raycasting, let camera always above ground
 
 		this.cameraFollow();
 
@@ -342,17 +290,59 @@ export default class PlayerController {
 		// we need to apply animation to lower body of player depends on player's `speed`
 		this.applyLowerBodyAnimation2MainPlayer();
 
-		this.pitcher.onFrameUpdate();
+		// this.pitcher.trackHandsPos();
 
-		for (let i in this.projectile_rigid) {
-			const t = this.projectile_rigid[i].translation();
-			this.projectile_meshes[i].position.set(t.x, t.y, t.z);
+		// // update hands track, for pitching
+		// this.pitcher.onPoseApplied();
 
-			const r = this.projectile_rigid[i].rotation();
-			this.projectile_meshes[i].setRotationFromQuaternion(
-				new THREE.Quaternion(r.x, r.y, r.z, r.w)
-			);
+		// this.pitcher.onFrameUpdate();
+	}
+
+	/**
+	 *
+	 * @param {THREE.Vector3} shoulder_vector
+	 */
+	rotateMainPlayer(shoulder_vector) {
+		const quaternion = this.main_player.rotate(shoulder_vector);
+
+		this.physics.rotateCharacter(quaternion);
+	}
+
+	/**
+	 *
+	 * @param {THREE.Vector2} xz_direction
+	 */
+	moveMainPlayer(xz_direction) {
+		// scale the speed by x,z, this isn't accurate due to y=0
+		// the correct approach is to gradually reduce the length of speed vector,
+		// until it's perfectly match the terrain surface
+		// but if the step is small enough, the error maybe neglectable
+		xz_direction.normalize().multiplyScalar(this.main_player.speed_scalar);
+
+		// find terrain height
+		let target_translation = this.physics.raycastingTerrain({
+			x: xz_direction.x + this.main_player.mesh.position.x,
+			z: xz_direction.y + this.main_player.mesh.position.z,
+		});
+
+		if (!target_translation) {
+			// in case raycasting not find a position on terrain
+			target_translation = {
+				x: xz_direction.x + this.main_player.mesh.position.x,
+				y: this.main_player.mesh.position.y,
+				z: xz_direction.y + this.main_player.mesh.position.z,
+			};
 		}
+
+		this.main_player.updateSpeed({
+			x: target_translation.x - this.main_player.mesh.position.x,
+			y: target_translation.y - this.main_player.mesh.position.y,
+			z: target_translation.z - this.main_player.mesh.position.z,
+		});
+
+		this.physics.moveCharacter(target_translation);
+
+		this.main_player.move(target_translation);
 	}
 
 	/**
@@ -389,6 +379,49 @@ export default class PlayerController {
 			this.camera_sensitivity
 		);
 		this.renderer.camera.lookAt(this.main_player.mesh.position);
+	}
+
+	applyLowerBodyAnimation2MainPlayer() {
+		if (!this.animation_data) {
+			return;
+		}
+
+		// console.log(this.animation_data);
+
+		//
+		this.main_player.applyAnimation2Bone(
+			this.animation_data[this.animation_data_idx]
+		);
+
+		this.animation_data_idx++;
+
+		if (this.animation_data_idx >= this.animation_data.length) {
+			this.animation_data_idx = 0;
+		}
+	}
+
+	/**
+	 *
+	 * @param {THREE.Vector3} position
+	 * @param {boolean} left
+	 */
+	addProjectileToHand(position, left = false) {
+		// console.log(position, this);
+
+		const mesh = this.renderer.createProjectile();
+
+		mesh.position.copy(position);
+
+		this.setProjectile(mesh, left);
+	}
+
+	/**
+	 *
+	 * @param {THREE.Vector3} position
+	 * @param {boolean} left
+	 */
+	updateProjectilePos(position, left = false) {
+		this.getProjectile(left).position.copy(position);
 	}
 
 	/**
