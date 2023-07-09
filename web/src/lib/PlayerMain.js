@@ -71,47 +71,11 @@ export default class PlayerMain extends Player {
 		return this.mesh.getWorldQuaternion(q);
 	}
 
-	// /**
-	//  * shoulder mesh rotation control the camera direction and speed direction
-	//  * update it on each frame
-	//  */
-	// updateShoulderVectorMesh() {
-	// 	// return this.#shoulder_track.peekBack();
-	// 	const left_shoulder_pos = new THREE.Vector3();
-	// 	const right_shoulder_pos = new THREE.Vector3();
-
-	// 	this.bones.LeftShoulder.getWorldPosition(left_shoulder_pos);
-	// 	this.bones.RightShoulder.getWorldPosition(right_shoulder_pos);
-
-	// 	this.shoulder_vector_mesh.copy(
-	// 		new THREE.Vector3().subVectors(
-	// 			right_shoulder_pos,
-	// 			left_shoulder_pos
-	// 		)
-	// 	);
-
-	// 	return new THREE.Vector2(
-	// 		this.shoulder_vector_mesh.z,
-	// 		-this.shoulder_vector_mesh.x
-	// 	);
-	// }
-
-	// /**
-	//  * the camera direction
-	//  * @returns {THREE.Vector3}
-	//  */
-	// getCameraDirection() {
-	// 	return new THREE.Vector3(
-	// 		-this.shoulder_vector_mesh.z,
-	// 		0,
-	// 		this.shoulder_vector_mesh.x
-	// 	).normalize();
-	// }
-
 	/**
 	 *
 	 * @param {{x:number, y:number, z:number}[]} pose3D
 	 * @param {boolean} lower_body
+	 * @returns {THREE.Vector3}
 	 */
 	applyPose2Bone(pose3D, lower_body = false) {
 		// multiply x,y by width/height factor

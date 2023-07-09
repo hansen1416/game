@@ -290,27 +290,11 @@ export default class PlayerController {
 			lower_body
 		);
 
-		// the shoulder mesh rotation control the camera direction and speed direction
-		const xz_direction = new THREE.Vector2(
-			shoulder_vector_mesh.z,
-			-shoulder_vector_mesh.x
-		);
-		//  this.main_player.updateShoulderVectorMesh();
-
 		// calculate target translation by xz_direction and raycasting
 		// move main player's mesh and rigid to the target translation
 		// update player's speed
-		this.moveMainPlayer(xz_direction);
-
-		const camera_direction = new THREE.Vector2(
-			-shoulder_vector_mesh.z,
-			shoulder_vector_mesh.x
-		)
-			.normalize()
-			.multiplyScalar(SceneProperties.camera_far_z);
-
-		// todo need to calculate camera position by raycasting, let camera always above ground
-		this.cameraFollow(camera_direction);
+		// the shoulder mesh rotation control the camera direction and speed direction
+		this.moveMainPlayer(shoulder_vector_mesh);
 
 		// captured pose only control upper body
 		// we need to apply animation to lower body of player depends on player's `speed`
@@ -326,7 +310,7 @@ export default class PlayerController {
 
 	/**
 	 *
-	 * @param {THREE.Vector3} shoulder_vector
+	 * @param {THREE.Vector3} shoulder_vector right_shoulder_position - left_shoulder_position
 	 */
 	rotateMainPlayer(shoulder_vector) {
 		const quaternion = this.main_player.rotate(shoulder_vector);
@@ -336,27 +320,34 @@ export default class PlayerController {
 
 	/**
 	 *
-	 * @param {THREE.Vector2} xz_direction
+	 * @param {THREE.Vector3} shoulder_vector right_shoulder_position - left_shoulder_position
 	 */
-	moveMainPlayer(xz_direction) {
+	moveMainPlayer(shoulder_vector) {
+		const speed_direction = new THREE.Vector2(
+			shoulder_vector.z,
+			-shoulder_vector.x
+		);
+
 		// scale the speed by x,z, this isn't accurate due to y=0
 		// the correct approach is to gradually reduce the length of speed vector,
 		// until it's perfectly match the terrain surface
 		// but if the step is small enough, the error maybe neglectable
-		xz_direction.normalize().multiplyScalar(this.main_player.speed_scalar);
+		speed_direction
+			.normalize()
+			.multiplyScalar(this.main_player.speed_scalar);
 
 		// find terrain height
 		let target_translation = this.physics.raycastingTerrain({
-			x: xz_direction.x + this.main_player.mesh.position.x,
-			z: xz_direction.y + this.main_player.mesh.position.z,
+			x: speed_direction.x + this.main_player.mesh.position.x,
+			z: speed_direction.y + this.main_player.mesh.position.z,
 		});
 
 		if (!target_translation) {
 			// in case raycasting not find a position on terrain
 			target_translation = {
-				x: xz_direction.x + this.main_player.mesh.position.x,
+				x: speed_direction.x + this.main_player.mesh.position.x,
 				y: this.main_player.mesh.position.y,
-				z: xz_direction.y + this.main_player.mesh.position.z,
+				z: speed_direction.y + this.main_player.mesh.position.z,
 			};
 		}
 
@@ -367,11 +358,9 @@ export default class PlayerController {
 		});
 
 		this.physics.moveCharacter(target_translation);
-
 		this.main_player.move(target_translation);
-	}
 
-	/**
+		/**
 		given two shoulder positions, calculate the middle orthogonal vector
 
 		const direction = new THREE.Vector2().subVectors(point2, point1).normalize();
@@ -387,9 +376,15 @@ export default class PlayerController {
 
 		slerp by `camera_sensitivity` each step, so the camera is smooth
 
-	 * @param {THREE.Vector2} camera_direction
-	 */
-	cameraFollow(camera_direction) {
+		*/
+
+		const camera_direction = new THREE.Vector2(
+			-shoulder_vector.z,
+			shoulder_vector.x
+		)
+			.normalize()
+			.multiplyScalar(SceneProperties.camera_far_z);
+
 		// the height of camera is constant
 		// its direction is controlled by mesh shoulder
 		let camera_pos = this.physics.raycastingTerrain({
