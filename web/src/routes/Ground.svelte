@@ -201,18 +201,6 @@
 
 		playerController.onPoseCallback(pose3D, pose2D, false);
 
-		/**
-
-			// move the position of model
-			const pose2D = cloneDeep(result.landmarks[0]);
-
-			const to_pos = poseToRotation.applyPosition(pose2D, FLOOR_WIDTH);
-
-			if (to_pos) {
-				player1.position.set(to_pos.x, 0, 0);
-			}
-		*/
-
 		poseDetectorAvailable = true;
 	}
 </script>

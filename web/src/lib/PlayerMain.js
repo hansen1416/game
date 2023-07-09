@@ -447,83 +447,6 @@ export default class PlayerMain extends Player {
 	}
 
 	/**
-	 * pose2D are [{x:0.5, y:0.5, z:-1}, ...]
-	 *
-	 * x in [0,1], 1 means reaching the right end of the video view port,
-	 * to the left end in threejs world
-	 *
-	 * y in [0,1]. indicate the height of the model
-	 *
-	 * z not to be trusted
-	 *
-	 * @param {object} pose2D
-	 * @param {number} movableWidth
-	 * @returns
-	 */
-	applyPosition(pose2D, movableWidth) {
-		if (!pose2D || !pose2D.length) {
-			return;
-		}
-
-		// const left_shoulder =
-		// 	pose2D[this.joints_map["RIGHT_SHOULDER"]];
-		// const right_shoulder =
-		// 	pose2D[this.joints_map["LEFT_SHOULDER"]];
-		const left_hip = pose2D[this.joints_map["RIGHT_HIP"]];
-		const right_hip = pose2D[this.joints_map["LEFT_HIP"]];
-
-		// if (
-		// 	left_shoulder.visibility < 0.5 ||
-		// 	right_shoulder.visibility < 0.5 ||
-		// 	left_hip.visibility < 0.5 ||
-		// 	right_hip.visibility < 0.5
-		// ) {
-		// 	return;
-		// }
-
-		// use middle point of hips as model position
-		// because we placed abdominal at (0,0,0)
-		const pixel_pos = {
-			x: (left_hip.x + right_hip.x) / 2,
-			// y: (left_hip.y + right_hip.y) / 2,
-		};
-
-		// // 1 - x because left/right are swaped
-		// let object_x =
-		// 	(1 - pixel_pos.x / videoWidth) * movableWidth - movableWidth / 2;
-		// // 1 - y because in threejs y axis is twowards top
-		// let object_y =
-		// 	(1 - pixel_pos.y / videoHeight) * visibleHeight - visibleHeight / 2;
-
-		let object_x = pixel_pos.x * movableWidth - movableWidth / 2;
-
-		if (object_x < -movableWidth / 2) {
-			object_x = -movableWidth / 2;
-		}
-
-		if (object_x > movableWidth / 2) {
-			object_x = movableWidth / 2;
-		}
-		/*
-		let object_y = pixel_pos.y * visibleHeight - visibleHeight / 2;
-
-		if (object_y < -visibleHeight / 2) {
-			object_y = -visibleHeight / 2;
-		}
-
-		if (object_y > visibleHeight / 2) {
-			object_y = visibleHeight / 2;
-		}
-*/
-		// this.body.position.set(object_x, object_y, 0);
-		// limit model in the center +- 0.3 range
-		// this.bones["Hips"].position.x = object_x * 0.3;
-		return {
-			x: object_x,
-		};
-	}
-
-	/**
 	 * @param {import("./RapierWorld").vec3[]} data
 	 * @param {string} bone_name
 	 * @param {string} parent_bone_name
@@ -667,5 +590,82 @@ export default class PlayerMain extends Player {
 			new THREE.Euler(1.035, 0, 0),
 			new THREE.Vector3(0, 0, 1)
 		);
+	}
+
+	/**
+	 * pose2D are [{x:0.5, y:0.5, z:-1}, ...]
+	 *
+	 * x in [0,1], 1 means reaching the right end of the video view port,
+	 * to the left end in threejs world
+	 *
+	 * y in [0,1]. indicate the height of the model
+	 *
+	 * z not to be trusted
+	 *
+	 * @param {object} pose2D
+	 * @param {number} movableWidth
+	 * @returns
+	 */
+	applyPosition(pose2D, movableWidth) {
+		if (!pose2D || !pose2D.length) {
+			return;
+		}
+
+		// const left_shoulder =
+		// 	pose2D[this.joints_map["RIGHT_SHOULDER"]];
+		// const right_shoulder =
+		// 	pose2D[this.joints_map["LEFT_SHOULDER"]];
+		const left_hip = pose2D[this.joints_map["RIGHT_HIP"]];
+		const right_hip = pose2D[this.joints_map["LEFT_HIP"]];
+
+		// if (
+		// 	left_shoulder.visibility < 0.5 ||
+		// 	right_shoulder.visibility < 0.5 ||
+		// 	left_hip.visibility < 0.5 ||
+		// 	right_hip.visibility < 0.5
+		// ) {
+		// 	return;
+		// }
+
+		// use middle point of hips as model position
+		// because we placed abdominal at (0,0,0)
+		const pixel_pos = {
+			x: (left_hip.x + right_hip.x) / 2,
+			// y: (left_hip.y + right_hip.y) / 2,
+		};
+
+		// // 1 - x because left/right are swaped
+		// let object_x =
+		// 	(1 - pixel_pos.x / videoWidth) * movableWidth - movableWidth / 2;
+		// // 1 - y because in threejs y axis is twowards top
+		// let object_y =
+		// 	(1 - pixel_pos.y / videoHeight) * visibleHeight - visibleHeight / 2;
+
+		let object_x = pixel_pos.x * movableWidth - movableWidth / 2;
+
+		if (object_x < -movableWidth / 2) {
+			object_x = -movableWidth / 2;
+		}
+
+		if (object_x > movableWidth / 2) {
+			object_x = movableWidth / 2;
+		}
+		/*
+			let object_y = pixel_pos.y * visibleHeight - visibleHeight / 2;
+	
+			if (object_y < -visibleHeight / 2) {
+				object_y = -visibleHeight / 2;
+			}
+	
+			if (object_y > visibleHeight / 2) {
+				object_y = visibleHeight / 2;
+			}
+	*/
+		// this.body.position.set(object_x, object_y, 0);
+		// limit model in the center +- 0.3 range
+		// this.bones["Hips"].position.x = object_x * 0.3;
+		return {
+			x: object_x,
+		};
 	}
 }

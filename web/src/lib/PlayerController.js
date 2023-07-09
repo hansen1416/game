@@ -275,15 +275,12 @@ export default class PlayerController {
 		// the shoulder mesh rotation control the camera direction and speed direction
 		const xz_direction = this.main_player.updateShoulderVectorMesh();
 
-		// `speed` is just a vector that add to player `position` in each frame
-
 		// calculate target translation by xz_direction and raycasting
 		// move main player's mesh and rigid to the target translation
 		// update player's speed
 		this.moveMainPlayer(xz_direction);
 
 		// todo need to calculate camera position by raycasting, let camera always above ground
-
 		this.cameraFollow();
 
 		// captured pose only control upper body
