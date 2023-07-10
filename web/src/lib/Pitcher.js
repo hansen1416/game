@@ -231,20 +231,18 @@ export default class Pitcher {
 
 		// check hands movement, whether lauch the projectile or not
 		for (let f of [true, false]) {
-			if (
-				this.getHandsWaitingFlag(f) ||
-				!this.#determinTossGesture(player_facing, f)
-			) {
+			if (this.getHandsWaitingFlag(f)) {
 				continue;
 			}
-			// const velocity = this.#calculateAngularVelocity(f);
-			const velocity = player_facing
-				.clone()
-				.normalize()
-				.multiplyScalar(50);
 
-			// console.log("velocity", velocity);
-			if (velocity) {
+			// const velocity = this.#calculateAngularVelocity(f);
+
+			if (this.#determinTossGesture(player_facing, f)) {
+				const velocity = player_facing
+					.clone()
+					.normalize()
+					.multiplyScalar(300);
+
 				this.fire("shoot", [velocity, f]);
 
 				// mark hand empty, waiting for new object to load
