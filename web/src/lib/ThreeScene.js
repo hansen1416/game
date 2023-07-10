@@ -69,11 +69,11 @@ export default class ThreeScene {
 		this.camera.updateProjectionMatrix(); // update the camera's projection matrix
 
 		// env light
-		this.scene.add(new THREE.AmbientLight(0xffffff, 0.5));
+		this.scene.add(new THREE.AmbientLight(0xffffff, 0.3));
 
 		// mimic the sun light. maybe update light position later
-		this.light = new THREE.PointLight(0xffffff, 0.5);
-		this.light.position.set(0, 10, -5);
+		this.light = new THREE.PointLight(0xffffff, 0.7);
+		this.light.position.set(0, 100, 0);
 		this.light.castShadow = true;
 		// this.light.shadow.mapSize.width = 2048;
 		// this.light.shadow.mapSize.height = 2048;
@@ -86,7 +86,8 @@ export default class ThreeScene {
 		});
 
 		this.renderer.shadowMap.enabled = true;
-		this.renderer.shadowMap.type = THREE.BasicShadowMap; //THREE.PCFSoftShadowMap;
+		// this.renderer.shadowMap.type = THREE.BasicShadowMap;
+		this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 		this.renderer.toneMappingExposure = 0.5;
 
 		this.controls = new OrbitControls(this.camera, canvas);

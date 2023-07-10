@@ -192,6 +192,8 @@ export default class PlayerController {
 			this.main_player.mesh.position.y,
 			this.main_player.mesh.position.z
 		);
+
+		this.renderer.controls.saveState()
 	}
 
 	/**
