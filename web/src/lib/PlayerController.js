@@ -107,7 +107,7 @@ export default class PlayerController {
 	 * @param {Array[]} data
 	 */
 	setAnimationData(data) {
-		this.animation_data = data;
+		this.animation_data = data.slice(40, 74);
 	}
 
 	/**
@@ -193,7 +193,7 @@ export default class PlayerController {
 			this.main_player.mesh.position.z
 		);
 
-		this.renderer.controls.saveState()
+		this.renderer.controls.saveState();
 	}
 
 	/**
