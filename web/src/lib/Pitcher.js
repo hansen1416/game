@@ -241,7 +241,7 @@ export default class Pitcher {
 				const velocity = player_facing
 					.clone()
 					.normalize()
-					.multiplyScalar(300);
+					.multiplyScalar(60);
 
 				this.fire("shoot", [velocity, f]);
 
