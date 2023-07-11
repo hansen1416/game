@@ -142,7 +142,25 @@
 				playerController.setAnimationData(readBuffer(buffer));
 			});
 
-			threeScene.scene.add(trees.scene.children[0]);
+			// const baume =
+			// 	trees.scene.children[0].children[0].children[0].children;
+
+			// for (let i = 0; i < baume.length; i++) {
+			// 	// console.log(baume[i]);
+
+			// 	baume[i].position.y = 50;
+
+			// 	threeScene.scene.add(baume[i]);
+			// }
+
+			trees.scene.children[0].traverse((node) => {
+				// @ts-ignore
+				if (node.isMesh) {
+					node.position.y = 30;
+
+					threeScene.scene.add(node);
+				}
+			});
 
 			// all models ready
 			assetReady = true;
