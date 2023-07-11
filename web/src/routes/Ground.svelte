@@ -97,7 +97,8 @@
 			loadGLTF("/glb/daneel.glb"),
 			fetch("/motion/motion3-1.bin"),
 			loadJSON("/json/terrain1.json"),
-		]).then(([RAPIER, dors, daneel, motion_data, terrain_data]) => {
+			loadGLTF("/glb/trees.glb"),
+		]).then(([RAPIER, dors, daneel, motion_data, terrain_data, trees]) => {
 			physicsWorld = new RapierWorld(RAPIER);
 
 			new TerrainBuilder(threeScene, physicsWorld).terrain(terrain_data);
@@ -141,8 +142,9 @@
 				playerController.setAnimationData(readBuffer(buffer));
 			});
 
+			threeScene.scene.add(trees.scene.children[0]);
+
 			// all models ready
-			cameraReady = true;
 			assetReady = true;
 		});
 	});
