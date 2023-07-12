@@ -151,4 +151,33 @@ export default class ThreeScene {
 	resetControl() {
 		this.controls.reset();
 	}
+
+/**
+	unload(target:THREE.Object3D){
+        target.removeFromParent();
+        target.traverse((child:any) => {
+            // disposing materials
+            if (child.material && !child.material._isDisposed){
+                // disposing textures
+                for (const value of Object.values(child.material) as any[]){
+                    if (!value) continue;
+                    if (value.dispose && !value._isDisposed){
+                        value.dispose();
+                        value._isDisposed = true;
+                    }
+                }
+                child.material.dispose();
+                child.material._isDisposed = true;
+            }
+            // disposing geometries
+            if (child.geometry?.dispose && !child.geometry._isDisposed){
+                child.geometry.dispose();
+                child.geometry._isDisposed = true;
+            }
+        });
+    }
+
+	missing child.skeleton.boneTexture.dispose(); and you all set :+1:
+but if you never use skinned mesh, you can skip this.
+ */
 }

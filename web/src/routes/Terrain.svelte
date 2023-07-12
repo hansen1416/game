@@ -14,8 +14,8 @@
 	onMount(() => {
 		initScene();
 
-		const segments = 15;
-		const size = 1024;
+		const segments = 127;
+		const size = 4096;
 
 		// const [terrain, hm] = THREETerrain({
 		const terrain = THREETerrain({
