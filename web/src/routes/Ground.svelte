@@ -97,7 +97,8 @@
 			loadGLTF("/glb/daneel.glb"),
 			fetch("/motion/motion3-1.bin"),
 			loadJSON("/json/terrain1.json"),
-		]).then(([RAPIER, dors, daneel, motion_data, terrain_data]) => {
+			loadGLTF("/glb/trees.glb"),
+		]).then(([RAPIER, dors, daneel, motion_data, terrain_data, trees]) => {
 			physicsWorld = new RapierWorld(RAPIER);
 
 			new TerrainBuilder(threeScene, physicsWorld).terrain(terrain_data);
@@ -141,8 +142,27 @@
 				playerController.setAnimationData(readBuffer(buffer));
 			});
 
+			// const baume =
+			// 	trees.scene.children[0].children[0].children[0].children;
+
+			// for (let i = 0; i < baume.length; i++) {
+			// 	// console.log(baume[i]);
+
+			// 	baume[i].position.y = 50;
+
+			// 	threeScene.scene.add(baume[i]);
+			// }
+
+			trees.scene.children[0].traverse((node) => {
+				// @ts-ignore
+				if (node.isMesh) {
+					node.position.y = 30;
+
+					threeScene.scene.add(node);
+				}
+			});
+
 			// all models ready
-			cameraReady = true;
 			assetReady = true;
 		});
 	});
