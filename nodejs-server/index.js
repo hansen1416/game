@@ -26,4 +26,7 @@ const terrain = THREETerrain({
 
 puppeteer.launch({ headless: "new" }).then((browser) => {
 	console.log(browser);
+
+
+    browser.close();
 });
