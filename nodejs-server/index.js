@@ -1,11 +1,13 @@
 const THREETerrain = require("./THREETerrain");
 const THREE = require("three");
-const puppeteer = require("puppeteer");
+const express = require("express");
+const { aaa } = require("./lib/a");
+
+const app = express();
 
 const segments = 127;
 const size = 4096;
 
-// const [terrain, hm] = THREETerrain({
 const terrain = THREETerrain({
 	easing: THREETerrain.Linear,
 	frequency: 2.5,
@@ -24,9 +26,14 @@ const terrain = THREETerrain({
 	ySize: size,
 });
 
-puppeteer.launch({ headless: "new" }).then((browser) => {
-	console.log(browser);
-
-
-    browser.close();
+app.get("/", (req, res) => {
+	const posts = aaa();
+	res.json(posts);
 });
+
+const port = process.env.PORT || 3000;
+app.listen(port, () => {
+	console.log(`API server listening on port ${port}`);
+});
+
+// nodemon --watch server --ext ts --exec ts-node --ignore '*.test.ts' --delay 3 server/server.ts
