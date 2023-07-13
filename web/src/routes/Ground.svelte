@@ -98,7 +98,8 @@
 			fetch("/motion/motion3-1.bin"),
 			loadJSON("/json/terrain1.json"),
 			loadGLTF("/glb/trees.glb"),
-		]).then(([RAPIER, dors, daneel, motion_data, terrain_data, trees]) => {
+			fetch(import.meta.env.VITE_API_DOMAIN + 'terrain')
+		]).then(([RAPIER, dors, daneel, motion_data, terrain_data, trees, terrain_api]) => {
 			physicsWorld = new RapierWorld(RAPIER);
 
 			new TerrainBuilder(threeScene, physicsWorld).terrain(terrain_data);
@@ -161,6 +162,10 @@
 					threeScene.scene.add(node);
 				}
 			});
+
+			terrain_api.json().then((res) => {
+				console.log(res)
+			})
 
 			// all models ready
 			assetReady = true;
