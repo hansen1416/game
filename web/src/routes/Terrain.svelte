@@ -3,6 +3,7 @@
 	import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 	import { onDestroy, onMount } from "svelte";
 	import THREETerrain from "../lib/THREETerrain";
+	import Api from "../request/Api";
 
 	let scene, camera, light, renderer, controls, canvas;
 	let world, lines;

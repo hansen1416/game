@@ -34,8 +34,9 @@ export default class TerrainBuilder {
 	 *
 	 * @param {{"width": number,"height": number,"widthSegments": number,"heightSegments": number,
 	 * "position": number[], "normal": number[], "uv": number[],}} data
+	 * @param {THREE.Vector3} origin
 	 */
-	terrain(data) {
+	terrain(data, origin) {
 		// Define the vertices and faces of the surface
 		const geometry = new THREE.PlaneGeometry(
 			data.width,
@@ -44,18 +45,18 @@ export default class TerrainBuilder {
 			data.heightSegments
 		);
 
-		geometry.setAttribute(
-			"normal",
-			new THREE.BufferAttribute(new Float32Array(data.normal), 3)
-		);
+		// geometry.setAttribute(
+		// 	"normal",
+		// 	new THREE.BufferAttribute(new Float32Array(data.normal), 3)
+		// );
 		geometry.setAttribute(
 			"position",
 			new THREE.BufferAttribute(new Float32Array(data.position), 3)
 		);
-		geometry.setAttribute(
-			"uv",
-			new THREE.BufferAttribute(new Float32Array(data.uv), 2)
-		);
+		// geometry.setAttribute(
+		// 	"uv",
+		// 	new THREE.BufferAttribute(new Float32Array(data.uv), 2)
+		// );
 
 		const mesh = new THREE.Mesh(
 			geometry,
@@ -71,9 +72,9 @@ export default class TerrainBuilder {
 		mesh.castShadow = true;
 
 		mesh.rotation.x = -Math.PI / 2;
-		this.renderer.scene.add(mesh);
+		mesh.position.copy(origin)
 
-		const origin = new THREE.Vector3(0, 0, 0);
+		this.renderer.scene.add(mesh);
 
 		const heightMap = new Float32Array(
 			this.heightmapFromPosition(data.position)

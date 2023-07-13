@@ -42,7 +42,7 @@ export default class ItemsManager {
 			);
 		}
 
-		if (import.meta.env.DEV) {
+		if (import.meta.env.DEV && false) {
 			if (!this.lines) {
 				let material = new THREE.LineBasicMaterial({
 					color: 0xffffff,

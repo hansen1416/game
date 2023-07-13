@@ -57,7 +57,7 @@ export default class ThreeScene {
 			75,
 			width / height,
 			0.01,
-			2000
+			20000
 		);
 
 		this.camera.position.set(

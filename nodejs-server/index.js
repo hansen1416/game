@@ -2,8 +2,7 @@ const THREETerrain = require("./lib/THREETerrain");
 const THREE = require("three");
 
 const express = require("express");
-const cors = require('cors')
-
+const cors = require("cors");
 
 const app = express();
 
@@ -12,13 +11,11 @@ const app = express();
 // 	optionsSuccessStatus: 200 // some legacy browsers (IE11, various SmartTVs) choke on 204
 //   }
 
-app.use(cors())
+app.use(cors());
 
-
-app.get("/terrain", (req, res) => {
-
-	const segments = 127;
-	const size = 4096;
+function generateTerrain() {
+	const segments = 63;
+	const size = 1024;
 
 	const terrain = THREETerrain({
 		easing: THREETerrain.Linear,
@@ -48,13 +45,96 @@ app.get("/terrain", (req, res) => {
 		// @ts-ignore
 		heightSegments: terrain.geometry.parameters.heightSegments,
 		normal: Array.from(terrain.geometry.getAttribute("normal").array),
-		position: Array.from(
-			terrain.geometry.getAttribute("position").array
-		),
+		position: Array.from(terrain.geometry.getAttribute("position").array),
 		uv: Array.from(terrain.geometry.getAttribute("uv").array),
 	};
 
-	res.json(json_data);
+	return json_data;
+}
+
+function getEdgeHeight(positions) {
+	const pos_vec = [];
+
+	for (let i = 0; i < positions.length; i += 3) {
+		// 1d array to vectors
+		pos_vec.push(
+			new THREE.Vector3(positions[i], positions[i + 1], positions[i + 2])
+		);
+	}
+	// the first point is at top left corner for Rapier heightfiled, and colmun major
+	pos_vec.sort((a, b) => {
+		return a.x - b.x || b.y - a.y;
+	});
+
+	const north = {};
+	const east = {};
+	const south = {};
+	const west = {};
+
+	for (let i = 0; i < pos_vec.length; i++) {
+		const vec = pos_vec[i];
+
+		if (vec.y === 512) {
+			north[~~vec.x + ":" + ~~vec.y] = pos_vec[i];
+		}
+
+		if (vec.x === 512) {
+			east[~~vec.x + ":" + ~~vec.y] = pos_vec[i];
+		}
+
+		if (vec.y === -512) {
+			south[~~vec.x + ":" + ~~vec.y] = pos_vec[i];
+		}
+
+		if (vec.x === -512) {
+			west[~~vec.x + ":" + ~~vec.y] = pos_vec[i];
+		}
+	}
+
+	return {
+		north,
+		east,
+		south,
+		west,
+	};
+}
+
+function isClose(a, b) {
+	return a - b < 0.01;
+}
+
+/**
+ *
+ * @param {*} terrain_1
+ * @param {*} terrain_2
+ * @param {string} direction indicate `terrain_2` is at which direction of `terrain_1`
+ */
+function mergeTerrain(terrain_1, terrain_2, direction) {
+	const edge = getEdgeHeight(terrain_1.position)[direction];
+
+	const positions = terrain_2.position;
+
+	if (direction === "west") {
+		for (let i = 0; i < positions.length; i += 3) {
+			for (let j = 0; j < edge.length; j += 1) {
+				if (
+					edge[~~(-positions[i]) + '' + ~~positions[i + 1]]
+				) {
+					positions[i + 2] = edge[j].z;
+				}
+			}
+		}
+	}
+}
+
+app.get("/terrain", (req, res) => {
+	const terrain_1 = generateTerrain();
+
+	const terrain_2 = generateTerrain();
+
+	mergeTerrain(terrain_1, terrain_2, "west");
+
+	res.json([terrain_1, terrain_2]);
 });
 
 const port = process.env.PORT || 4096;

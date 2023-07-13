@@ -1,5 +1,6 @@
 <script>
 	import { onDestroy, onMount } from "svelte";
+	import * as THREE from "three";
 	// @ts-ignore
 	import { cloneDeep } from "lodash";
 	import {
@@ -58,6 +59,8 @@
 	let threeScene;
 	/** @type {RapierWorld} */
 	let physicsWorld;
+	/** @type {TerrainBuilder} */
+	let terrainBuiler;
 	/** @type {ItemsManager} */
 	let itemsManager;
 	/** @type {PlayerController} */
@@ -80,7 +83,7 @@
 	const sceneHeight = document.documentElement.clientHeight;
 
 	onMount(() => {
-		if (true) {
+		if (false) {
 			invokeCamera(video, () => {
 				cameraReady = true;
 			});
@@ -90,9 +93,13 @@
 
 				poseDetectorAvailable = true;
 			});
+		} else {
+			cameraReady = true;
 		}
 
 		threeScene = new ThreeScene(canvas, sceneWidth, sceneHeight);
+		/** @ts-ignore */
+		threeScene.camera.position.set(0, 2000, 2000);
 
 		Promise.all([
 			import("@dimforge/rapier3d"),
@@ -114,8 +121,19 @@
 			]) => {
 				physicsWorld = new RapierWorld(RAPIER);
 
-				new TerrainBuilder(threeScene, physicsWorld).terrain(
-					terrain_data
+				const terrainBuiler = new TerrainBuilder(
+					threeScene,
+					physicsWorld
+				);
+
+				terrainBuiler.terrain(
+					terrain_data[0],
+					new THREE.Vector3(512, 0, 512)
+				);
+
+				terrainBuiler.terrain(
+					terrain_data[1],
+					new THREE.Vector3(-512, 0, 512)
 				);
 
 				playerController = new PlayerController(
@@ -197,7 +215,7 @@
 		animate();
 		// set player pos, camera pos, control target
 		// we need the animation to update at least once to let raycasting work
-		playerController.initPLayerPos({ x: 0, z: 0 });
+		// playerController.initPLayerPos({ x: 0, z: 0 });
 	}
 
 	function animate() {
