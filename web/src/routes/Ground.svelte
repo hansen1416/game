@@ -5,7 +5,7 @@
 	import {
 		createPoseLandmarker,
 		loadGLTF,
-		loadJSON,
+		// loadJSON,
 		invokeCamera,
 		readBuffer,
 	} from "../utils/ropes";
@@ -14,6 +14,7 @@
 	import TerrainBuilder from "../lib/TerrainBuilder";
 	import ItemsManager from "../lib/ItemsManager";
 	import PlayerController from "../lib/PlayerController";
+	import Api from "../request/Api";
 
 	/**
 	 * what do I need?
@@ -73,6 +74,8 @@
 		showVideo = false,
 		animationPointer;
 
+	let api = new Api();
+
 	const sceneWidth = document.documentElement.clientWidth;
 	const sceneHeight = document.documentElement.clientHeight;
 
@@ -96,80 +99,91 @@
 			loadGLTF("/glb/dors.glb"),
 			loadGLTF("/glb/daneel.glb"),
 			fetch("/motion/motion3-1.bin"),
-			loadJSON("/json/terrain1.json"),
+			// loadJSON("/json/terrain1.json"),
 			loadGLTF("/glb/trees.glb"),
-			fetch(import.meta.env.VITE_API_DOMAIN + 'terrain')
-		]).then(([RAPIER, dors, daneel, motion_data, terrain_data, trees, terrain_api]) => {
-			physicsWorld = new RapierWorld(RAPIER);
+			api.get("terrain"),
+		]).then(
+			([
+				RAPIER,
+				dors,
+				daneel,
+				motion_data,
+				// terrain_data,
+				trees,
+				terrain_data,
+			]) => {
+				physicsWorld = new RapierWorld(RAPIER);
 
-			new TerrainBuilder(threeScene, physicsWorld).terrain(terrain_data);
+				new TerrainBuilder(threeScene, physicsWorld).terrain(
+					terrain_data
+				);
 
-			playerController = new PlayerController(threeScene, physicsWorld);
+				playerController = new PlayerController(
+					threeScene,
+					physicsWorld
+				);
 
-			itemsManager = new ItemsManager(threeScene, physicsWorld);
+				itemsManager = new ItemsManager(threeScene, physicsWorld);
 
-			itemsManager.spreadItems();
+				itemsManager.spreadItems();
 
-			// todo, consider put players position at some where invisible, adjust them later
-			// player1
-			playerController.addPlayer(
-				dors.scene.children[0],
-				{
-					x: 0,
-					y: 0,
-					z: 0,
-				},
-				{ x: 0, y: 0, z: 0 },
-				true
-			);
+				// todo, consider put players position at some where invisible, adjust them later
+				// player1
+				playerController.addPlayer(
+					dors.scene.children[0],
+					{
+						x: 0,
+						y: 0,
+						z: 0,
+					},
+					{ x: 0, y: 0, z: 0 },
+					true
+				);
 
-			// player2
-			playerController.addPlayer(
-				daneel.scene.children[0],
-				{
-					x: 0,
-					y: 0,
-					z: 10,
-				},
-				{
-					x: 0,
-					y: -Math.PI,
-					z: 0,
-				}
-			);
+				// player2
+				playerController.addPlayer(
+					daneel.scene.children[0],
+					{
+						x: 0,
+						y: 0,
+						z: 10,
+					},
+					{
+						x: 0,
+						y: -Math.PI,
+						z: 0,
+					}
+				);
 
-			// running animation
-			motion_data.arrayBuffer().then((buffer) => {
-				playerController.setAnimationData(readBuffer(buffer));
-			});
+				// running animation
+				motion_data.arrayBuffer().then((buffer) => {
+					playerController.setAnimationData(readBuffer(buffer));
+				});
 
-			// const baume =
-			// 	trees.scene.children[0].children[0].children[0].children;
+				// const baume =
+				// 	trees.scene.children[0].children[0].children[0].children;
 
-			// for (let i = 0; i < baume.length; i++) {
-			// 	// console.log(baume[i]);
+				// for (let i = 0; i < baume.length; i++) {
+				// 	// console.log(baume[i]);
 
-			// 	baume[i].position.y = 50;
+				// 	baume[i].position.y = 50;
 
-			// 	threeScene.scene.add(baume[i]);
-			// }
+				// 	threeScene.scene.add(baume[i]);
+				// }
 
-			trees.scene.children[0].traverse((node) => {
-				// @ts-ignore
-				if (node.isMesh) {
-					node.position.y = 30;
+				trees.scene.children[0].traverse((node) => {
+					// @ts-ignore
+					if (node.isMesh) {
+						node.position.y = 30;
 
-					threeScene.scene.add(node);
-				}
-			});
+						threeScene.scene.add(node);
+					}
+				});
 
-			terrain_api.json().then((res) => {
-				console.log(res)
-			})
-
-			// all models ready
-			assetReady = true;
-		});
+				// all models ready
+				assetReady = true;
+			}
+		);
 	});
 
 	onDestroy(() => {
