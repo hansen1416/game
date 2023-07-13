@@ -116,12 +116,10 @@ function mergeTerrain(terrain_1, terrain_2, direction) {
 
 	if (direction === "west") {
 		for (let i = 0; i < positions.length; i += 3) {
-			for (let j = 0; j < edge.length; j += 1) {
-				if (
-					edge[~~(-positions[i]) + '' + ~~positions[i + 1]]
-				) {
-					positions[i + 2] = edge[j].z;
-				}
+			const key = ~~-positions[i] + ":" + ~~positions[i + 1];
+
+			if (edge[key]) {
+				positions[i + 2] = edge[key].z;
 			}
 		}
 	}

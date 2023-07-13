@@ -69,15 +69,25 @@ export default class ThreeScene {
 		this.camera.updateProjectionMatrix(); // update the camera's projection matrix
 
 		// env light
-		this.scene.add(new THREE.AmbientLight(0xffffff, 0.3));
+		this.scene.add(new THREE.AmbientLight(0xffffff, 0.1));
 
+		/**
 		// mimic the sun light. maybe update light position later
 		this.light = new THREE.PointLight(0xffffff, 0.7);
 		this.light.position.set(0, 100, 0);
 		this.light.castShadow = true;
 		// this.light.shadow.mapSize.width = 2048;
 		// this.light.shadow.mapSize.height = 2048;
+ */
+		this.light = new THREE.DirectionalLight(0xffffff, 0.9);
+		this.light.position.set(0, 1000, 0);
+		this.light.castShadow = true;
+
+		this.light.target = new THREE.Object3D();
+		this.light.target.position.set(0, 0, 1000);
+
 		this.scene.add(this.light);
+		this.scene.add(this.light.target);
 
 		this.renderer = new THREE.WebGLRenderer({
 			canvas: canvas,
@@ -152,7 +162,7 @@ export default class ThreeScene {
 		this.controls.reset();
 	}
 
-/**
+	/**
 	unload(target:THREE.Object3D){
         target.removeFromParent();
         target.traverse((child:any) => {
