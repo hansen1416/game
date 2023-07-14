@@ -52,7 +52,7 @@ function generateTerrain() {
 	return json_data;
 }
 
-function getEdgeHeight(positions) {
+function getEdges(positions) {
 	const pos_vec = [];
 
 	for (let i = 0; i < positions.length; i += 3) {
@@ -99,34 +99,62 @@ function getEdgeHeight(positions) {
 	};
 }
 
-function isClose(a, b) {
-	return a - b < 0.01;
-}
-
 /**
  *
- * @param {*} terrain_1
- * @param {*} terrain_2
- * @param {string} direction indicate `terrain_2` is at which direction of `terrain_1`
+ * @param {*} terrain1
+ * @param {*} terrain2
+ * @param {string} direction1 indicate `terrain2` is at `direction1` side of `terrain1`
+ * @param {string} direction2 indicate `terrain1` is at `direction1` side of `terrain2`
  */
-function mergeTerrain(terrain_1, terrain_2, direction) {
-	const edge = getEdgeHeight(terrain_1.position)[direction];
+function mergeTerrain(terrain1, terrain2, direction1, direction2) {
+	const edge1 = getEdges(terrain1.position)[direction1];
+	const edge2 = getEdges(terrain2.position)[direction2];
 
-	const positions = terrain_2.position;
+	// console.log(edge1, edge2);
 
-	const depth = 16;
+	const positions1 = terrain1.position;
+	const positions2 = terrain2.position;
 
-	if (direction === "west") {
-		for (let i = 0; i < positions.length; i += 3) {
+	const depth = 8;
+
+	if (direction1 === "west") {
+		const edge = {};
+
+		for (let k in edge1) {
+			edge[k] = new THREE.Vector3(
+				edge1[k].x,
+				edge1[k].y,
+				(edge1[k].z + edge2[~~-edge1[k].x + ":" + ~~edge1[k].y].z) / 2
+			);
+		}
+
+		for (let i = 0; i < positions1.length; i += 3) {
 			for (let j = depth; j >= 0; j--) {
 				const key =
-					~~(-positions[i] - (1024 / 63) * j) +
+					~~(positions1[i] - (1024 / 63) * j) +
 					":" +
-					~~positions[i + 1];
+					~~positions1[i + 1];
 
 				if (edge[key]) {
-					positions[i + 2] +=
-						((edge[key].z - positions[i + 2]) * (depth - j)) /
+					positions1[i + 2] +=
+						((edge[key].z - positions1[i + 2]) * (depth - j)) /
+						depth;
+
+					break;
+				}
+			}
+		}
+
+		for (let i = 0; i < positions2.length; i += 3) {
+			for (let j = depth; j >= 0; j--) {
+				const key =
+					~~(-positions2[i] - (1024 / 63) * j) +
+					":" +
+					~~positions2[i + 1];
+
+				if (edge[key]) {
+					positions2[i + 2] +=
+						((edge[key].z - positions2[i + 2]) * (depth - j)) /
 						depth;
 
 					break;
@@ -137,13 +165,13 @@ function mergeTerrain(terrain_1, terrain_2, direction) {
 }
 
 app.get("/terrain", (req, res) => {
-	const terrain_1 = generateTerrain();
+	const terrain1 = generateTerrain();
 
-	const terrain_2 = generateTerrain();
+	const terrain2 = generateTerrain();
 
-	mergeTerrain(terrain_1, terrain_2, "west");
+	mergeTerrain(terrain1, terrain2, "west", "east");
 
-	res.json([terrain_1, terrain_2]);
+	res.json([terrain1, terrain2]);
 });
 
 const port = process.env.PORT || 4096;
