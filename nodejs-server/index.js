@@ -52,6 +52,10 @@ function generateTerrain() {
 	return json_data;
 }
 
+function edgeKey(x_float, y_float) {
+	return ~~x_float + ":" + ~~y_float;
+}
+
 function getEdges(positions) {
 	const pos_vec = [];
 
@@ -75,19 +79,19 @@ function getEdges(positions) {
 		const vec = pos_vec[i];
 
 		if (vec.y === 512) {
-			north[~~vec.x + ":" + ~~vec.y] = pos_vec[i];
+			north[edgeKey(vec.x, vec.y)] = pos_vec[i];
 		}
 
 		if (vec.x === 512) {
-			east[~~vec.x + ":" + ~~vec.y] = pos_vec[i];
+			east[edgeKey(vec.x, vec.y)] = pos_vec[i];
 		}
 
 		if (vec.y === -512) {
-			south[~~vec.x + ":" + ~~vec.y] = pos_vec[i];
+			south[edgeKey(vec.x, vec.y)] = pos_vec[i];
 		}
 
 		if (vec.x === -512) {
-			west[~~vec.x + ":" + ~~vec.y] = pos_vec[i];
+			west[edgeKey(vec.x, vec.y)] = pos_vec[i];
 		}
 	}
 
@@ -103,62 +107,91 @@ function getEdges(positions) {
  *
  * @param {*} terrain1
  * @param {*} terrain2
- * @param {string} direction1 indicate `terrain2` is at `direction1` side of `terrain1`
- * @param {string} direction2 indicate `terrain1` is at `direction1` side of `terrain2`
+ * @param {string} edge_name1 indicate `terrain2` is at `direction1` side of `terrain1`
  */
-function mergeTerrain(terrain1, terrain2, direction1, direction2) {
-	const edge1 = getEdges(terrain1.position)[direction1];
-	const edge2 = getEdges(terrain2.position)[direction2];
+function mergeTerrain(terrain1, terrain2, edge_name1) {
+	let edge_name2;
+
+	if (edge_name1 === "west") {
+		edge_name2 = "east";
+	} else if (edge_name1 === "north") {
+		edge_name2 = "south";
+	} else if (edge_name1 === "east") {
+		edge_name2 = "west";
+	} else if (edge_name1 === "south") {
+		edge_name2 = "north";
+	}
+
+	const edge1 = getEdges(terrain1.position)[edge_name1];
+	const edge2 = getEdges(terrain2.position)[edge_name2];
 
 	// console.log(edge1, edge2);
 
 	const positions1 = terrain1.position;
 	const positions2 = terrain2.position;
 
-	const depth = 8;
+	const spread = 8;
+	const step = 1024 / 63;
 
-	if (direction1 === "west") {
-		const edge = {};
+	const edge = {};
 
-		for (let k in edge1) {
-			edge[k] = new THREE.Vector3(
-				edge1[k].x,
-				edge1[k].y,
-				(edge1[k].z + edge2[~~-edge1[k].x + ":" + ~~edge1[k].y].z) / 2
-			);
+	for (let k in edge1) {
+		let z;
+
+		if (edge_name1 === "west" || edge_name1 === "east") {
+			z = (edge1[k].z + edge2[edgeKey(-edge1[k].x, edge1[k].y)].z) / 2;
+		} else if (edge_name1 === "north" || edge_name1 === "south") {
+			z = (edge1[k].z + edge2[edgeKey(edge1[k].x, -edge1[k].y)].z) / 2;
 		}
 
-		for (let i = 0; i < positions1.length; i += 3) {
-			for (let j = depth; j >= 0; j--) {
-				const key =
-					~~(positions1[i] - (1024 / 63) * j) +
-					":" +
-					~~positions1[i + 1];
+		edge[k] = new THREE.Vector3(edge1[k].x, edge1[k].y, z);
+	}
 
-				if (edge[key]) {
-					positions1[i + 2] +=
-						((edge[key].z - positions1[i + 2]) * (depth - j)) /
-						depth;
+	for (let i = 0; i < positions1.length; i += 3) {
+		for (let j = spread; j >= 0; j--) {
+			let pos1_key;
+			let pos2_key;
 
-					break;
-				}
+			if (edge_name1 === "west") {
+				pos1_key = edgeKey(positions1[i] - step * j, positions1[i + 1]);
+
+				pos2_key = edgeKey(
+					-positions2[i] - step * j,
+					positions2[i + 1]
+				);
+			} else if (edge_name1 === "north") {
+				pos1_key = edgeKey(positions1[i], positions1[i + 1] + step * j);
+
+				pos2_key = edgeKey(
+					positions2[i],
+					-positions2[i + 1] + step * j
+				);
+			} else if (edge_name1 === "east") {
+				pos1_key = edgeKey(positions1[i] + step * j, positions1[i + 1]);
+
+				pos2_key = edgeKey(
+					-positions2[i] + step * j,
+					positions2[i + 1]
+				);
+			} else if (edge_name1 === "south") {
+				pos1_key = edgeKey(positions1[i], positions1[i + 1] - step * j);
+
+				pos2_key = edgeKey(
+					positions2[i],
+					-positions2[i + 1] - step * j
+				);
 			}
-		}
 
-		for (let i = 0; i < positions2.length; i += 3) {
-			for (let j = depth; j >= 0; j--) {
-				const key =
-					~~(-positions2[i] - (1024 / 63) * j) +
-					":" +
-					~~positions2[i + 1];
+			if (edge[pos1_key]) {
+				positions1[i + 2] +=
+					((edge[pos1_key].z - positions1[i + 2]) * (spread - j)) /
+					spread;
+			}
 
-				if (edge[key]) {
-					positions2[i + 2] +=
-						((edge[key].z - positions2[i + 2]) * (depth - j)) /
-						depth;
-
-					break;
-				}
+			if (edge[pos2_key]) {
+				positions2[i + 2] +=
+					((edge[pos2_key].z - positions2[i + 2]) * (spread - j)) /
+					spread;
 			}
 		}
 	}
@@ -169,7 +202,10 @@ app.get("/terrain", (req, res) => {
 
 	const terrain2 = generateTerrain();
 
-	mergeTerrain(terrain1, terrain2, "west", "east");
+	// mergeTerrain(terrain1, terrain2, "west");
+	// mergeTerrain(terrain1, terrain2, "north");
+	// mergeTerrain(terrain1, terrain2, "east");
+	mergeTerrain(terrain1, terrain2, "south");
 
 	res.json([terrain1, terrain2]);
 });

@@ -128,12 +128,12 @@
 
 				terrainBuiler.terrain(
 					terrain_data[0],
-					new THREE.Vector3(512, 0, 512)
+					new THREE.Vector3(512, 0, -512)
 				);
 
 				terrainBuiler.terrain(
 					terrain_data[1],
-					new THREE.Vector3(-512, 0, 512)
+					new THREE.Vector3(512, 0, 512)
 				);
 
 				playerController = new PlayerController(
