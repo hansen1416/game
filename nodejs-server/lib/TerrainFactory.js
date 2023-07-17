@@ -38,7 +38,7 @@ class TerrainFactory {
 		for (let k in edge1) {
 			if (edge_name1 === "west" || edge_name1 === "east") {
 				if (
-					this.#isCloseEnough(
+					!this.#isCloseEnough(
 						edge1[k].z,
 						edge2[this.#edgeKey(-edge1[k].x, edge1[k].y)].z
 					)
@@ -48,7 +48,7 @@ class TerrainFactory {
 				}
 			} else if (edge_name1 === "north" || edge_name1 === "south") {
 				if (
-					this.#isCloseEnough(
+					!this.#isCloseEnough(
 						edge1[k].z,
 						edge2[this.#edgeKey(edge1[k].x, -edge1[k].y)].z
 					)
@@ -166,7 +166,7 @@ class TerrainFactory {
 	 *
 	 * @param {*} terrain1
 	 * @param {*} terrain2
-	 * @param {string} edge_name1 indicate `terrain2` is at `direction1` side of `terrain1`
+	 * @param {string} edge_name1 indicate `terrain2` is at `edge_name1` side of `terrain1`
 	 */
 	mergeTerrain(terrain1, terrain2, edge_name1) {
 		let edge_name2;
@@ -184,7 +184,7 @@ class TerrainFactory {
 		const edge1 = this.#getEdges(terrain1.position)[edge_name1];
 		const edge2 = this.#getEdges(terrain2.position)[edge_name2];
 
-		if (this.#areEdgesMerged(edge1, edge2)) {
+		if (this.#areEdgesMerged(edge1, edge2, edge_name1)) {
 			// console.log("edges are not merged");
 			return;
 		}
@@ -326,6 +326,15 @@ class TerrainFactory {
 		);
 	}
 
+	// saveTerrain(x, z, terrain) {
+	// 	const terrain_name = this.#getTerrainNameByIndices(x, z);
+
+	// 	fs.writeFileSync(
+	// 		this.#terrain_path + terrain_name,
+	// 		JSON.stringify(terrain)
+	// 	);
+	// }
+
 	/**
 	 * check the surrronding terrains, and merge them if they exist
 	 */
@@ -411,5 +420,19 @@ class TerrainFactory {
 	}
 }
 
+module.exports = TerrainFactory;
 
-module.exports = TerrainFactory
+// determine if currenct executed file is this file
+if (require.main === module) {
+	const terrain_factory = new TerrainFactory();
+
+	terrain_factory.iterateTerrain(3);
+
+	// const terrain1 = terrain_factory.fetchTerrain(0, 0);
+	// const terrain2 = terrain_factory.fetchTerrain(-1, 0);
+
+	// terrain_factory.mergeTerrain(terrain1, terrain2, "west");
+
+	// terrain_factory.saveTerrain(0, 0, terrain1);
+	// terrain_factory.saveTerrain(-1, 0, terrain2);
+}
