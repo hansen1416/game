@@ -194,7 +194,7 @@ class TerrainFactory {
 		const positions1 = terrain1.position;
 		const positions2 = terrain2.position;
 
-		const spread = 8;
+		const spread = 16;
 		const step = 1024 / 63;
 
 		const edge = {};
