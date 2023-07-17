@@ -15,9 +15,10 @@ app.use(cors());
 app.get("/terrain", (req, res) => {
 	const tf = new TerrainFactory();
 
-	const data = tf.fetchTerrain(0, 0);
+	const data1 = tf.fetchTerrain(0, 0);
+	const data2 = tf.fetchTerrain(-1, 0);
 
-	res.json([data, data]);
+	res.json([data1, data2]);
 });
 
 const port = process.env.PORT || 4096;

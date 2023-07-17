@@ -411,6 +411,5 @@ class TerrainFactory {
 	}
 }
 
-const tf = new TerrainFactory();
 
-tf.iterateTerrain(3);
+module.exports = TerrainFactory
