@@ -1,5 +1,4 @@
-const THREETerrain = require("./lib/THREETerrain");
-const THREE = require("three");
+const TerrainFactory = require("./lib/TerrainFactory");
 
 const express = require("express");
 const cors = require("cors");
@@ -14,16 +13,11 @@ const app = express();
 app.use(cors());
 
 app.get("/terrain", (req, res) => {
-	const terrain1 = generateTerrain();
+	const tf = new TerrainFactory();
 
-	const terrain2 = generateTerrain();
+	const data = tf.fetchTerrain(0, 0);
 
-	// mergeTerrain(terrain1, terrain2, "west");
-	// mergeTerrain(terrain1, terrain2, "north");
-	// mergeTerrain(terrain1, terrain2, "east");
-	mergeTerrain(terrain1, terrain2, "south");
-
-	res.json([terrain1, terrain2]);
+	res.json([data, data]);
 });
 
 const port = process.env.PORT || 4096;

@@ -1,9 +1,70 @@
+/**
+ * @typedef {{width: number, height: number, widthSegments: number, heightSegments: number, position: number[]}} TerrainStruct
+ */
+
 const THREE = require("three");
 const THREETerrain = require("./THREETerrain");
 const fs = require("fs");
+const path = require("path");
 
 class TerrainFactory {
+	#terrain_path = path.join(__dirname, "../terrain/");
+
 	constructor() {}
+
+	/**
+	 * pad number with leading zeros, to length 8
+	 */
+	#pad = (num) => {
+		return ("00000000" + num).slice(-8);
+	};
+
+	/**
+	 * check if two float are close enough
+	 */
+	#isCloseEnough = (a, b) => {
+		return Math.abs(a - b) < 0.0001;
+	};
+
+	/**
+	 *
+	 * @param {Array[]} edge1
+	 * @param {Array[]} edge2
+	 * @returns
+	 */
+	#areEdgesMerged(edge1, edge2, edge_name1) {
+		let merged = true;
+
+		for (let k in edge1) {
+			if (edge_name1 === "west" || edge_name1 === "east") {
+				if (
+					this.#isCloseEnough(
+						edge1[k].z,
+						edge2[this.#edgeKey(-edge1[k].x, edge1[k].y)].z
+					)
+				) {
+					merged = false;
+					break;
+				}
+			} else if (edge_name1 === "north" || edge_name1 === "south") {
+				if (
+					this.#isCloseEnough(
+						edge1[k].z,
+						edge2[this.#edgeKey(edge1[k].x, -edge1[k].y)].z
+					)
+				) {
+					merged = false;
+					break;
+				}
+			}
+		}
+
+		return merged;
+	}
+
+	#getTerrainNameByIndices(x, y) {
+		return this.#pad(x) + "-" + this.#pad(y) + ".json";
+	}
 
 	#edgeKey(x_float, y_float) {
 		return ~~x_float + ":" + ~~y_float;
@@ -123,6 +184,11 @@ class TerrainFactory {
 		const edge1 = this.#getEdges(terrain1.position)[edge_name1];
 		const edge2 = this.#getEdges(terrain2.position)[edge_name2];
 
+		if (this.#areEdgesMerged(edge1, edge2)) {
+			// console.log("edges are not merged");
+			return;
+		}
+
 		// console.log(edge1, edge2);
 
 		const positions1 = terrain1.position;
@@ -216,22 +282,135 @@ class TerrainFactory {
 	}
 
 	/**
-	 * pad number with leading zeros, to length 8
+	 * check if a terrain file exists
+	 *
+	 * @param {number} x
+	 * @param {number} z
 	 */
-	#pad = (num) => {
-		return ("00000000" + num).slice(-8);
-	};
+	#terrainExists(x, z) {
+		const terrain_name = this.#getTerrainNameByIndices(x, z);
 
-	stitchTerrain() {
-		let student = {
-			name: "Mike",
-			age: 23,
-			gender: "Male",
-			department: "English",
-			car: "Honda",
-		};
+		return fs.existsSync(this.#terrain_path + terrain_name);
+	}
 
-		let data = JSON.stringify(student);
-		fs.writeFileSync("student-2.json", data);
+	/**
+	 * read a terrain file
+	 *
+	 * @param {number} x
+	 * @param {number} z
+	 * @returns {object}
+	 */
+	#readTerrain(x, z) {
+		const terrain_name = this.#getTerrainNameByIndices(x, z);
+
+		if (this.#terrainExists(x, z)) {
+			return JSON.parse(
+				fs.readFileSync(this.#terrain_path + terrain_name)
+			);
+		}
+	}
+
+	/**
+	 * save a terrain file
+	 *
+	 * @param {number} x
+	 * @param {number} z
+	 * @param {TerrainStruct} terrain
+	 */
+	#saveTerrain(x, z, terrain) {
+		const terrain_name = this.#getTerrainNameByIndices(x, z);
+
+		fs.writeFileSync(
+			this.#terrain_path + terrain_name,
+			JSON.stringify(terrain)
+		);
+	}
+
+	/**
+	 * check the surrronding terrains, and merge them if they exist
+	 */
+	mergeSurroundingTerrains(x, z) {
+		const terrain = this.#readTerrain(x, z);
+
+		const west_terrain = this.#readTerrain(x - 1, z);
+		const north_terrain = this.#readTerrain(x, z - 1);
+		const east_terrain = this.#readTerrain(x + 1, z);
+		const south_terrain = this.#readTerrain(x, z + 1);
+
+		if (west_terrain) {
+			this.mergeTerrain(terrain, west_terrain, "west");
+			this.#saveTerrain(x - 1, z, west_terrain);
+		}
+
+		if (north_terrain) {
+			this.mergeTerrain(terrain, north_terrain, "north");
+			this.#saveTerrain(x, z - 1, north_terrain);
+		}
+
+		if (east_terrain) {
+			this.mergeTerrain(terrain, east_terrain, "east");
+			this.#saveTerrain(x + 1, z, east_terrain);
+		}
+
+		if (south_terrain) {
+			this.mergeTerrain(terrain, south_terrain, "south");
+			this.#saveTerrain(x, z + 1, south_terrain);
+		}
+
+		this.#saveTerrain(x, z, terrain);
+	}
+
+	// stitchTerrain() {
+	// 	let student = {
+	// 		name: "Mike",
+	// 		age: 23,
+	// 		gender: "Male",
+	// 		department: "English",
+	// 		car: "Honda",
+	// 	};
+
+	// 	let data = JSON.stringify(student);
+	// 	fs.writeFileSync("student-2.json", data);
+	// }
+
+	/**
+	 * going from the center, in a spiral manner, going out to a given radius
+	 */
+	iterateTerrain(radius) {
+		let x = 0;
+		let y = 0;
+
+		let dx = 0;
+		let dy = -1;
+
+		for (let i = 0; i < radius ** 2; i++) {
+			if (
+				-radius / 2 <= x &&
+				x <= radius / 2 &&
+				-radius / 2 <= y &&
+				y <= radius / 2
+			) {
+				const terrain = this.generateTerrain();
+				this.#saveTerrain(x, y, terrain);
+
+				this.mergeSurroundingTerrains(x, y);
+			}
+
+			if (x === y || (x < 0 && x === -y) || (x > 0 && x === 1 - y)) {
+				[dx, dy] = [-dy, dx];
+			}
+
+			[x, y] = [x + dx, y + dy];
+		}
+	}
+
+	fetchTerrain(x, z) {
+		const terrain_name = this.#getTerrainNameByIndices(x, z);
+
+		return JSON.parse(fs.readFileSync(this.#terrain_path + terrain_name));
 	}
 }
+
+const tf = new TerrainFactory();
+
+tf.iterateTerrain(3);
