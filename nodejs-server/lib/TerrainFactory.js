@@ -16,7 +16,7 @@ class TerrainFactory {
 	 * pad number with leading zeros, to length 8
 	 */
 	#pad = (num) => {
-		return ("00000000" + num).slice(-8);
+		return ("xxxxxxxx" + num).slice(-8);
 	};
 
 	/**
@@ -194,7 +194,7 @@ class TerrainFactory {
 		const positions1 = terrain1.position;
 		const positions2 = terrain2.position;
 
-		const spread = 16;
+		const spread = 8;
 		const step = 1024 / 63;
 
 		const edge = {};
@@ -219,50 +219,39 @@ class TerrainFactory {
 
 		for (let i = 0; i < positions1.length; i += 3) {
 			for (let j = spread; j >= 0; j--) {
-				let pos1_key;
-				let pos2_key;
+				let pos1_x;
+				let pos1_y;
+				let pos2_x;
+				let pos2_y;
 
 				if (edge_name1 === "west") {
-					pos1_key = this.#edgeKey(
-						positions1[i] - step * j,
-						positions1[i + 1]
-					);
+					pos1_x = positions1[i] - step * j;
+					pos1_y = positions1[i + 1];
 
-					pos2_key = this.#edgeKey(
-						-positions2[i] - step * j,
-						positions2[i + 1]
-					);
+					pos2_x = -positions2[i] - step * j;
+					pos2_y = positions2[i + 1];
 				} else if (edge_name1 === "north") {
-					pos1_key = this.#edgeKey(
-						positions1[i],
-						positions1[i + 1] + step * j
-					);
+					pos1_x = positions1[i];
+					pos1_y = positions1[i + 1] + step * j;
 
-					pos2_key = this.#edgeKey(
-						positions2[i],
-						-positions2[i + 1] + step * j
-					);
+					pos2_x = positions2[i];
+					pos2_y = -positions2[i + 1] + step * j;
 				} else if (edge_name1 === "east") {
-					pos1_key = this.#edgeKey(
-						positions1[i] + step * j,
-						positions1[i + 1]
-					);
+					pos1_x = positions1[i] + step * j;
+					pos1_y = positions1[i + 1];
 
-					pos2_key = this.#edgeKey(
-						-positions2[i] + step * j,
-						positions2[i + 1]
-					);
+					pos2_x = -positions2[i] + step * j;
+					pos2_y = positions2[i + 1];
 				} else if (edge_name1 === "south") {
-					pos1_key = this.#edgeKey(
-						positions1[i],
-						positions1[i + 1] - step * j
-					);
+					pos1_x = positions1[i];
+					pos1_y = positions1[i + 1] - step * j;
 
-					pos2_key = this.#edgeKey(
-						positions2[i],
-						-positions2[i + 1] - step * j
-					);
+					pos2_x = positions2[i];
+					pos2_y = -positions2[i + 1] - step * j;
 				}
+
+				const pos1_key = this.#edgeKey(pos1_x, pos1_y);
+				const pos2_key = this.#edgeKey(pos2_x, pos2_y);
 
 				if (edge[pos1_key]) {
 					positions1[i + 2] +=
