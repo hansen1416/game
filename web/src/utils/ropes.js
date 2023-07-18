@@ -1501,6 +1501,43 @@ export function readBuffer(buffer) {
 }
 
 /**
+ * looping in a spiral, generate a array of points, that is grow in a spiral manner
+ * https://www.baeldung.com/cs/looping-spiral
+ * 
+ * @param {number} radius 
+ * @returns {Array}
+ */
+export function spiralArray(radius) {
+	let x = 0;
+	let y = 0;
+
+	let dx = 0;
+	let dy = -1;
+
+	const arr = []
+
+	for (let i = 0; i < radius ** 2; i++) {
+		if (
+			-radius / 2 < x &&
+			x <= radius / 2 &&
+			-radius / 2 < y &&
+			y <= radius / 2
+		) {
+			arr.push([x, y])
+		}
+
+		if (x === y || (x < 0 && x === -y) || (x > 0 && x === 1 - y)) {
+			[dx, dy] = [-dy, dx];
+		}
+
+		[x, y] = [x + dx, y + dy];
+	}
+
+	return arr
+}
+
+
+/**
  * calf_l
 calf_r
 clavicle_l

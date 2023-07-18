@@ -433,9 +433,9 @@ class TerrainFactory {
 
 		for (let i = 0; i < radius ** 2; i++) {
 			if (
-				-radius / 2 <= x &&
+				-radius / 2 < x &&
 				x <= radius / 2 &&
-				-radius / 2 <= y &&
+				-radius / 2 < y &&
 				y <= radius / 2
 			) {
 				const terrain = this.generateTerrain();

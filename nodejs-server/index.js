@@ -12,13 +12,15 @@ const app = express();
 
 app.use(cors());
 
-app.get("/terrain", (req, res) => {
+app.get("/terrain/:x/:z", (req, res) => {
+	const x = parseInt(req.params.x);
+	const z = parseInt(req.params.z);
+
 	const tf = new TerrainFactory();
 
-	const data1 = tf.fetchTerrain(0, 0);
-	const data2 = tf.fetchTerrain(-1, 0);
+	const data = tf.fetchTerrain(x, z);
 
-	res.json([data1, data2]);
+	res.json(data);
 });
 
 const port = process.env.PORT || 4096;

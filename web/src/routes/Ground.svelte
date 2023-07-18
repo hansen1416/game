@@ -6,7 +6,6 @@
 	import {
 		createPoseLandmarker,
 		loadGLTF,
-		// loadJSON,
 		invokeCamera,
 		readBuffer,
 	} from "../utils/ropes";
@@ -106,18 +105,32 @@
 			loadGLTF("/glb/dors.glb"),
 			loadGLTF("/glb/daneel.glb"),
 			fetch("/motion/motion3-1.bin"),
-			// loadJSON("/json/terrain1.json"),
 			loadGLTF("/glb/trees.glb"),
-			api.get("terrain"),
+			api.get("terrain/0/0"),
+			api.get("terrain/1/0"),
+			api.get("terrain/1/1"),
+			api.get("terrain/0/1"),
+			api.get("terrain/-1/1"),
+			api.get("terrain/-1/0"),
+			api.get("terrain/-1/-1"),
+			api.get("terrain/0/-1"),
+			api.get("terrain/1/-1"),
 		]).then(
 			([
 				RAPIER,
 				dors,
 				daneel,
 				motion_data,
-				// terrain_data,
 				trees,
-				terrain_data,
+				terrain00,
+				terrain10,
+				terrain11,
+				terrain01,
+				terrain_11,
+				terrain_10,
+				terrain_1_1,
+				terrain0_1,
+				terrain1_1,
 			]) => {
 				physicsWorld = new RapierWorld(RAPIER);
 
@@ -126,14 +139,29 @@
 					physicsWorld
 				);
 
-				terrainBuiler.terrain(
-					terrain_data[0],
-					new THREE.Vector3(512, 0, 512)
-				);
-
-				terrainBuiler.terrain(
-					terrain_data[1],
-					new THREE.Vector3(-512, 0, 512)
+				terrainBuiler.terrainSeires(
+					[
+						terrain00,
+						terrain10,
+						terrain11,
+						terrain01,
+						terrain_11,
+						terrain_10,
+						terrain_1_1,
+						terrain0_1,
+						terrain1_1,
+					],
+					[
+						[0, 0],
+						[1, 0],
+						[1, 1],
+						[0, 1],
+						[-1, 1],
+						[-1, 0],
+						[-1, -1],
+						[0, -1],
+						[1, -1],
+					]
 				);
 
 				playerController = new PlayerController(
