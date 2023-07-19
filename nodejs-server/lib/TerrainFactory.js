@@ -457,6 +457,101 @@ class TerrainFactory {
 
 		return JSON.parse(fs.readFileSync(this.#terrain_path + terrain_name));
 	}
+
+	scatterTerrain(geometry, options) {
+		var defaultOptions = {
+			spread: 0.025,
+			smoothSpread: 0,
+			sizeVariance: 0.1,
+			randomness: Math.random,
+			maxSlope: 0.6283185307179586, // 36deg or 36 / 180 * Math.PI, about the angle of repose of earth
+			maxTilt: Infinity,
+			w: 0,
+			h: 0,
+		};
+
+		for (var opt in defaultOptions) {
+			if (defaultOptions.hasOwnProperty(opt)) {
+				options[opt] =
+					typeof options[opt] === "undefined"
+						? defaultOptions[opt]
+						: options[opt];
+			}
+		}
+
+		var spreadIsNumber = typeof options.spread === "number",
+			randomHeightmap,
+			randomness,
+			spreadRange = 1 / options.smoothSpread,
+			// doubleSizeVariance = options.sizeVariance * 2,
+			vertex1 = new THREE.Vector3(),
+			vertex2 = new THREE.Vector3(),
+			vertex3 = new THREE.Vector3(),
+			faceNormal = new THREE.Vector3();
+
+		const up = new THREE.Vector3(0, 0, 1);
+		// up = options.mesh.up
+		// 	.clone()
+		// 	.applyAxisAngle(new THREE.Vector3(1, 0, 0), 0.5 * Math.PI);
+		if (spreadIsNumber) {
+			randomHeightmap = options.randomness();
+			randomness =
+				typeof randomHeightmap === "number"
+					? Math.random
+					: function (k) {
+							return randomHeightmap[k];
+					  };
+		}
+
+		geometry = geometry.toNonIndexed();
+		var gArray = geometry.attributes.position.array;
+		for (var i = 0; i < geometry.attributes.position.array.length; i += 9) {
+			vertex1.set(gArray[i + 0], gArray[i + 1], gArray[i + 2]);
+			vertex2.set(gArray[i + 3], gArray[i + 4], gArray[i + 5]);
+			vertex3.set(gArray[i + 6], gArray[i + 7], gArray[i + 8]);
+			THREE.Triangle.getNormal(vertex1, vertex2, vertex3, faceNormal);
+
+			var place = false;
+			if (spreadIsNumber) {
+				var rv = randomness(i / 9);
+				if (rv < options.spread) {
+					place = true;
+				} else if (rv < options.spread + options.smoothSpread) {
+					// Interpolate rv between spread and spread + smoothSpread,
+					// then multiply that "easing" value by the probability
+					// that a mesh would get placed on a given face.
+					place =
+						THREETerrain.EaseInOut(
+							(rv - options.spread) * spreadRange
+						) *
+							options.spread >
+						Math.random();
+				}
+			} else {
+				place = options.spread(vertex1, i / 9, faceNormal, i);
+			}
+			if (place) {
+
+				// Don't place a mesh if the angle is too steep.
+				if (faceNormal.angleTo(up) > options.maxSlope) {
+					continue;
+				}
+
+				const tmppos = new THREE.Vector3()
+					.addVectors(vertex1, vertex2)
+					.add(vertex3)
+					.divideScalar(3);
+
+				console.log(tmppos);
+
+				// do something
+				// mesh.position
+				// .addVectors(vertex1, vertex2)
+				// .add(vertex3)
+				// .divideScalar(3);
+			}
+		}
+	}
 }
 
 module.exports = TerrainFactory;
@@ -465,7 +560,7 @@ module.exports = TerrainFactory;
 if (require.main === module) {
 	const terrain_factory = new TerrainFactory();
 
-	terrain_factory.iterateTerrain(3);
+	// terrain_factory.iterateTerrain(3);
 
 	// const terrain1 = terrain_factory.fetchTerrain(0, 0);
 	// const terrain2 = terrain_factory.fetchTerrain(-1, 0);
@@ -474,4 +569,25 @@ if (require.main === module) {
 
 	// terrain_factory.saveTerrain(0, 0, terrain1);
 	// terrain_factory.saveTerrain(-1, 0, terrain2);
+
+	const data = terrain_factory.fetchTerrain(0, 0);
+
+	// Define the vertices and faces of the surface
+	const geometry = new THREE.PlaneGeometry(
+		data.width,
+		data.height,
+		data.widthSegments,
+		data.heightSegments
+	);
+
+	// geometry.setAttribute(
+	// 	"normal",
+	// 	new THREE.BufferAttribute(new Float32Array(data.normal), 3)
+	// );
+	geometry.setAttribute(
+		"position",
+		new THREE.BufferAttribute(new Float32Array(data.position), 3)
+	);
+
+	terrain_factory.scatterTerrain(geometry, {})
 }
