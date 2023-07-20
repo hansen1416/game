@@ -1536,6 +1536,15 @@ export function spiralArray(radius) {
 	return arr
 }
 
+/**
+ * 
+ * @param {number} num 
+ * @returns 
+ */
+export function pad0(num) {
+	return ("00000000" + num).slice(-8);
+}
+
 
 /**
  * calf_l

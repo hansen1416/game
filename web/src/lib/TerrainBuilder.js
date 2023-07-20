@@ -35,6 +35,14 @@ export default class TerrainBuilder {
 	}
 
 	/**
+	 * 
+	 * @param {{[key: string]: THREE.Object3D}} treesAsset 
+	 */
+	loadTrees(treesAsset) {
+
+	}
+
+	/**
 	 *
 	 * @param {number[]} positions
 	 * @returns

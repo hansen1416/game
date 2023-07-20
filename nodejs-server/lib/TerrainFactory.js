@@ -8,7 +8,7 @@ const fs = require("fs");
 const path = require("path");
 
 class TerrainFactory {
-	#terrain_path = path.join(__dirname, "../terrain/");
+	#terrain_path = path.join(__dirname, "../assets/terrain/");
 
 	constructor() {}
 

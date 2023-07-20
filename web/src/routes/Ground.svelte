@@ -6,6 +6,7 @@
 	import {
 		createPoseLandmarker,
 		loadGLTF,
+		loadJSON,
 		invokeCamera,
 		readBuffer,
 	} from "../utils/ropes";
@@ -98,14 +99,15 @@
 
 		threeScene = new ThreeScene(canvas, sceneWidth, sceneHeight);
 		/** @ts-ignore */
-		threeScene.camera.position.set(0, 2000, 2000);
+		// threeScene.camera.position.set(0, 2000, 2000);
 
 		Promise.all([
 			import("@dimforge/rapier3d"),
 			loadGLTF("/glb/dors.glb"),
 			loadGLTF("/glb/daneel.glb"),
 			fetch("/motion/motion3-1.bin"),
-			loadGLTF("/glb/trees.glb"),
+			// loadGLTF("/glb/trees.glb"),
+			loadJSON("/json/trees.json"),
 			api.get("terrain/0/0"),
 			api.get("terrain/1/0"),
 			api.get("terrain/1/1"),
@@ -134,10 +136,26 @@
 			]) => {
 				physicsWorld = new RapierWorld(RAPIER);
 
+				const treesAsset = {};
+
+				for (let k in trees) {
+					// threejs load json
+					const loader = new THREE.ObjectLoader();
+
+					/**
+					 * @param {THREE.Object3D} obj
+					 */
+					loader.parse(trees[k], (obj) => {
+						treesAsset[k] = trees[k];
+					});
+				}
+
 				const terrainBuiler = new TerrainBuilder(
 					threeScene,
 					physicsWorld
 				);
+
+				terrainBuiler.loadTrees(treesAsset);
 
 				terrainBuiler.terrainSeires(
 					[
@@ -216,15 +234,6 @@
 
 				// 	threeScene.scene.add(baume[i]);
 				// }
-
-				trees.scene.children[0].traverse((node) => {
-					// @ts-ignore
-					if (node.isMesh) {
-						node.position.y = 30;
-
-						threeScene.scene.add(node);
-					}
-				});
 
 				// all models ready
 				assetReady = true;
