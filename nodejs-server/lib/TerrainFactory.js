@@ -6,6 +6,7 @@ const THREE = require("three");
 const THREETerrain = require("./THREETerrain");
 const fs = require("fs");
 const path = require("path");
+const { randomChoices } = require("../utils");
 
 class TerrainFactory {
 	#terrain_path = path.join(__dirname, "../assets/terrain/");
@@ -458,7 +459,27 @@ class TerrainFactory {
 		return JSON.parse(fs.readFileSync(this.#terrain_path + terrain_name));
 	}
 
-	scatterTerrain(geometry, options) {
+	scatterTerrain(x,z) {
+
+		const data = this.fetchTerrain(x,z)
+
+		// Define the vertices and faces of the surface
+		let geometry = new THREE.PlaneGeometry(
+			data.width,
+			data.height,
+			data.widthSegments,
+			data.heightSegments
+		);
+
+
+		geometry.setAttribute(
+			"position",
+			new THREE.BufferAttribute(new Float32Array(data.position), 3)
+		);
+
+		const options = {}
+
+
 		var defaultOptions = {
 			spread: 0.025,
 			smoothSpread: 0,
@@ -531,7 +552,6 @@ class TerrainFactory {
 				place = options.spread(vertex1, i / 9, faceNormal, i);
 			}
 			if (place) {
-
 				// Don't place a mesh if the angle is too steep.
 				if (faceNormal.angleTo(up) > options.maxSlope) {
 					continue;
@@ -570,24 +590,7 @@ if (require.main === module) {
 	// terrain_factory.saveTerrain(0, 0, terrain1);
 	// terrain_factory.saveTerrain(-1, 0, terrain2);
 
-	const data = terrain_factory.fetchTerrain(0, 0);
 
-	// Define the vertices and faces of the surface
-	const geometry = new THREE.PlaneGeometry(
-		data.width,
-		data.height,
-		data.widthSegments,
-		data.heightSegments
-	);
+	terrain_factory.scatterTerrain(0,0)
 
-	// geometry.setAttribute(
-	// 	"normal",
-	// 	new THREE.BufferAttribute(new Float32Array(data.normal), 3)
-	// );
-	geometry.setAttribute(
-		"position",
-		new THREE.BufferAttribute(new Float32Array(data.position), 3)
-	);
-
-	terrain_factory.scatterTerrain(geometry, {})
 }

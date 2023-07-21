@@ -19,6 +19,11 @@ export default class TerrainBuilder {
 	pool = [];
 
 	/**
+	 * @type {{[key: string]: THREE.InstancedMesh}}
+	 */
+	treePool = {};
+
+	/**
 	 *
 	 * @param {ThreeScene} renderer
 	 * @param {RapierWorld} physics
@@ -35,11 +40,29 @@ export default class TerrainBuilder {
 	}
 
 	/**
-	 * 
-	 * @param {{[key: string]: THREE.Object3D}} treesAsset 
+	 *
+	 * @param {{[key: string]: object}} treesData
 	 */
-	loadTrees(treesAsset) {
+	async loadTrees(treesData) {
+		for (let k in treesData) {
+			// threejs load json
+			const loader = new THREE.ObjectLoader();
 
+			/**
+			 * @param {THREE.Mesh} obj
+			 */
+			const obj = await loader.parseAsync(treesData[k]);
+
+			this.treePool[k] = new THREE.InstancedMesh(
+				// @ts-ignore
+				obj.geometry,
+				// @ts-ignore
+				obj.material,
+				1000
+			);
+		}
+
+		return true
 	}
 
 	/**

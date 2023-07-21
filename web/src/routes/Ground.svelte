@@ -106,8 +106,6 @@
 			loadGLTF("/glb/dors.glb"),
 			loadGLTF("/glb/daneel.glb"),
 			fetch("/motion/motion3-1.bin"),
-			// loadGLTF("/glb/trees.glb"),
-			loadJSON("/json/trees.json"),
 			api.get("terrain/0/0"),
 			api.get("terrain/1/0"),
 			api.get("terrain/1/1"),
@@ -117,13 +115,13 @@
 			api.get("terrain/-1/-1"),
 			api.get("terrain/0/-1"),
 			api.get("terrain/1/-1"),
+			loadJSON("/json/trees.json"),
 		]).then(
 			([
 				RAPIER,
 				dors,
 				daneel,
 				motion_data,
-				trees,
 				terrain00,
 				terrain10,
 				terrain11,
@@ -133,110 +131,91 @@
 				terrain_1_1,
 				terrain0_1,
 				terrain1_1,
+				trees,
 			]) => {
 				physicsWorld = new RapierWorld(RAPIER);
-
-				const treesAsset = {};
-
-				for (let k in trees) {
-					// threejs load json
-					const loader = new THREE.ObjectLoader();
-
-					/**
-					 * @param {THREE.Object3D} obj
-					 */
-					loader.parse(trees[k], (obj) => {
-						treesAsset[k] = trees[k];
-					});
-				}
 
 				const terrainBuiler = new TerrainBuilder(
 					threeScene,
 					physicsWorld
 				);
 
-				terrainBuiler.loadTrees(treesAsset);
+				terrainBuiler.loadTrees(trees).then(() => {
 
-				terrainBuiler.terrainSeires(
-					[
-						terrain00,
-						terrain10,
-						terrain11,
-						terrain01,
-						terrain_11,
-						terrain_10,
-						terrain_1_1,
-						terrain0_1,
-						terrain1_1,
-					],
-					[
-						[0, 0],
-						[1, 0],
-						[1, 1],
-						[0, 1],
-						[-1, 1],
-						[-1, 0],
-						[-1, -1],
-						[0, -1],
-						[1, -1],
-					]
-				);
+					// we need trees to be loaded before we can build terrain
 
-				playerController = new PlayerController(
-					threeScene,
-					physicsWorld
-				);
+					console.log(terrainBuiler.treePool)
 
-				itemsManager = new ItemsManager(threeScene, physicsWorld);
+					terrainBuiler.terrainSeires(
+						[
+							terrain00,
+							terrain10,
+							terrain11,
+							terrain01,
+							terrain_11,
+							terrain_10,
+							terrain_1_1,
+							terrain0_1,
+							terrain1_1,
+						],
+						[
+							[0, 0],
+							[1, 0],
+							[1, 1],
+							[0, 1],
+							[-1, 1],
+							[-1, 0],
+							[-1, -1],
+							[0, -1],
+							[1, -1],
+						]
+					);
 
-				itemsManager.spreadItems();
+					playerController = new PlayerController(
+						threeScene,
+						physicsWorld
+					);
 
-				// todo, consider put players position at some where invisible, adjust them later
-				// player1
-				playerController.addPlayer(
-					dors.scene.children[0],
-					{
-						x: 0,
-						y: 0,
-						z: 0,
-					},
-					{ x: 0, y: 0, z: 0 },
-					true
-				);
+					itemsManager = new ItemsManager(threeScene, physicsWorld);
 
-				// player2
-				playerController.addPlayer(
-					daneel.scene.children[0],
-					{
-						x: 0,
-						y: 0,
-						z: 10,
-					},
-					{
-						x: 0,
-						y: -Math.PI,
-						z: 0,
-					}
-				);
+					itemsManager.spreadItems();
 
-				// running animation
-				motion_data.arrayBuffer().then((buffer) => {
-					playerController.setAnimationData(readBuffer(buffer));
+					// todo, consider put players position at some where invisible, adjust them later
+					// player1
+					playerController.addPlayer(
+						dors.scene.children[0],
+						{
+							x: 0,
+							y: 0,
+							z: 0,
+						},
+						{ x: 0, y: 0, z: 0 },
+						true
+					);
+
+					// player2
+					playerController.addPlayer(
+						daneel.scene.children[0],
+						{
+							x: 0,
+							y: 0,
+							z: 10,
+						},
+						{
+							x: 0,
+							y: -Math.PI,
+							z: 0,
+						}
+					);
+
+					// running animation
+					motion_data.arrayBuffer().then((buffer) => {
+						playerController.setAnimationData(readBuffer(buffer));
+					});
+
+					// all models ready
+					assetReady = true;
 				});
-
-				// const baume =
-				// 	trees.scene.children[0].children[0].children[0].children;
-
-				// for (let i = 0; i < baume.length; i++) {
-				// 	// console.log(baume[i]);
-
-				// 	baume[i].position.y = 50;
-
-				// 	threeScene.scene.add(baume[i]);
-				// }
-
-				// all models ready
-				assetReady = true;
 			}
 		);
 	});
