@@ -459,9 +459,8 @@ class TerrainFactory {
 		return JSON.parse(fs.readFileSync(this.#terrain_path + terrain_name));
 	}
 
-	scatterTerrain(x,z) {
-
-		const data = this.fetchTerrain(x,z)
+	scatterTerrain(x, z) {
+		const data = this.fetchTerrain(x, z);
 
 		// Define the vertices and faces of the surface
 		let geometry = new THREE.PlaneGeometry(
@@ -471,14 +470,12 @@ class TerrainFactory {
 			data.heightSegments
 		);
 
-
 		geometry.setAttribute(
 			"position",
 			new THREE.BufferAttribute(new Float32Array(data.position), 3)
 		);
 
-		const options = {}
-
+		const options = {};
 
 		var defaultOptions = {
 			spread: 0.025,
@@ -524,6 +521,8 @@ class TerrainFactory {
 					  };
 		}
 
+		const trees_pool = [];
+
 		geometry = geometry.toNonIndexed();
 		var gArray = geometry.attributes.position.array;
 		for (var i = 0; i < geometry.attributes.position.array.length; i += 9) {
@@ -557,12 +556,14 @@ class TerrainFactory {
 					continue;
 				}
 
-				const tmppos = new THREE.Vector3()
-					.addVectors(vertex1, vertex2)
-					.add(vertex3)
-					.divideScalar(3);
+				trees_pool.push(
+					new THREE.Vector3()
+						.addVectors(vertex1, vertex2)
+						.add(vertex3)
+						.divideScalar(3)
+				);
 
-				console.log(tmppos);
+				// console.log(tmppos);
 
 				// do something
 				// mesh.position
@@ -571,6 +572,19 @@ class TerrainFactory {
 				// .divideScalar(3);
 			}
 		}
+
+		const trees_type = randomChoices(
+			Array(12).fill(0.08).concat(0.04),
+			trees_pool.length
+		);
+
+		for (let i = 0; i < trees_pool.length; i++) {
+			trees_pool[i] = { type: trees_type[i], pos: trees_pool[i] };
+		}
+
+		data.trees = trees_pool;
+
+		this.#saveTerrain(x, z, data);
 	}
 }
 
@@ -590,7 +604,5 @@ if (require.main === module) {
 	// terrain_factory.saveTerrain(0, 0, terrain1);
 	// terrain_factory.saveTerrain(-1, 0, terrain2);
 
-
-	terrain_factory.scatterTerrain(0,0)
-
+	// terrain_factory.scatterTerrain(0, 0);
 }
