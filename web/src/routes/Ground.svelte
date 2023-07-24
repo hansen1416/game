@@ -1,12 +1,11 @@
 <script>
 	import { onDestroy, onMount } from "svelte";
-	import * as THREE from "three";
+	// import * as THREE from "three";
 	// @ts-ignore
 	import { cloneDeep } from "lodash";
 	import {
 		createPoseLandmarker,
 		loadGLTF,
-		loadJSON,
 		invokeCamera,
 		readBuffer,
 	} from "../utils/ropes";
@@ -83,7 +82,7 @@
 	const sceneHeight = document.documentElement.clientHeight;
 
 	onMount(() => {
-		if (true) {
+		if (false) {
 			invokeCamera(video, () => {
 				cameraReady = true;
 			});
@@ -336,7 +335,7 @@
 
 <style>
 	.bg {
-		background-color: #0f2027;
+		background-color: #005C97;
 	}
 
 	.controls {

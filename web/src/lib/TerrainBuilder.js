@@ -54,6 +54,10 @@ export default class TerrainBuilder {
 				this.treesPool[idx] = new THREE.InstancedMesh(
 					node.geometry,
 					node.material,
+					// new THREE.PointsMaterial({
+					// 	color: 0x00ff00,
+					// 	size: 0.1,
+					// }),
 					instance_size
 				);
 
@@ -167,7 +171,7 @@ export default class TerrainBuilder {
 
 		// scatter trees on the land
 		if (data.trees) {
-			for (let i = 0; i < data.trees.length; i++) {
+			for (let i = 0; i < data.trees.length/5; i++) {
 				const tree = data.trees[i];
 
 				dummy.position.set(
