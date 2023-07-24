@@ -99,7 +99,7 @@
 
 		threeScene = new ThreeScene(canvas, sceneWidth, sceneHeight);
 		/** @ts-ignore */
-		// threeScene.camera.position.set(0, 2000, 2000);
+		threeScene.camera.position.set(0, 2000, 2000);
 
 		Promise.all([
 			import("@dimforge/rapier3d"),
