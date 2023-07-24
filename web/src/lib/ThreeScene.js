@@ -89,6 +89,9 @@ export default class ThreeScene {
 		this.scene.add(this.light);
 		this.scene.add(this.light.target);
 
+		// env fog
+		// this.scene.fog = new THREE.Fog(0x000000, 50, 200);
+
 		this.renderer = new THREE.WebGLRenderer({
 			canvas: canvas,
 			alpha: true,

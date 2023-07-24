@@ -6,7 +6,6 @@ import * as THREE from "three";
 import ThreeScene from "./ThreeScene";
 import RapierWorld from "./RapierWorld";
 import { ImprovedNoise } from "three/addons/math/ImprovedNoise.js";
-import { pad0 } from "../utils/ropes";
 
 let instance;
 
@@ -14,33 +13,12 @@ export default class TerrainBuilder {
 	/**
 	 * @type {{[key: string]: THREE.InstancedMesh}}
 	 */
-	treePool = {};
+	treesPool = {};
 
-	treesRotation = {
-		"00000001": new THREE.Quaternion(-0.707107, 0, 0, 0.707107),
-		"00000002": new THREE.Quaternion(-0.707107, 0, 0, 0.707107),
-		"00000003": new THREE.Quaternion(
-			-0.173308,
-			0.012277,
-			-0.117975,
-			0.977699
-		),
-		"00000004": new THREE.Quaternion(
-			-0.272871,
-			-0.29189,
-			-0.710903,
-			0.578756
-		),
-		"00000005": new THREE.Quaternion(-0.707107, 0, 0, 0.707107),
-		"00000006": new THREE.Quaternion(-0.707107, 0, 0, 0.707107),
-		"00000007": new THREE.Quaternion(-0.707107, 0, 0, 0.707107),
-		"00000008": new THREE.Quaternion(-0.707107, 0, 0, 0.707107),
-		"00000009": new THREE.Quaternion(-0.707107, 0, 0, 0.707107),
-		"00000010": new THREE.Quaternion(-0.707107, 0, 0, 0.707107),
-		"00000011": new THREE.Quaternion(-0.707107, 0, 0, 0.707107),
-		"00000012": new THREE.Quaternion(-0.707107, 0, 0, 0.707107),
-		"00000013": new THREE.Quaternion(-0.707107, 0, 0, 0.707107),
-	};
+	/**
+	 * @type {{[key: string]: {quaternion: THREE.Quaternion, scale: THREE.Vector3}}}
+	 */
+	treesTransform = {};
 
 	/**
 	 *
@@ -59,33 +37,40 @@ export default class TerrainBuilder {
 	}
 
 	/**
-	 *
-	 * @param {{[key: string]: object}} treesData
+	 * add tree instance to `treesPool`, and keep their roation and scale in `treesTransform`
+	 * @param {object} treesGLB
 	 */
-	async loadTrees(treesData) {
-		for (let k in treesData) {
-			// threejs load json
-			const loader = new THREE.ObjectLoader();
+	async loadTrees(treesGLB) {
+		// throw trees out of the scene
+		const dummy = new THREE.Object3D();
+		dummy.position.set(0, -10000, 0);
+		dummy.updateMatrix();
 
-			/**
-			 * @param {THREE.Mesh} obj
-			 */
-			const obj = await loader.parseAsync(treesData[k]);
+		const instance_size = 1000;
+		let idx = 0;
 
-			this.treePool[k] = new THREE.InstancedMesh(
-				// @ts-ignore
-				obj.geometry,
-				// @ts-ignore
-				obj.material,
-				1000
-			);
+		treesGLB.scene.children[0].traverse((node) => {
+			if (node.isMesh) {
+				this.treesPool[idx] = new THREE.InstancedMesh(
+					node.geometry,
+					node.material,
+					instance_size
+				);
 
-			// hide InstancedMesh pool somewhere far away
+				this.treesTransform[idx] = {
+					quaternion: node.parent.quaternion.clone(),
+					scale: node.parent.scale.clone().multiplyScalar(0.1),
+				};
 
-			this.renderer.scene.add(this.treePool[k]);
+				for (let i = 0; i < instance_size; i++) {
+					this.treesPool[idx].setMatrixAt(i, dummy.matrix);
+				}
 
-			this.treePool[k].instanceMatrix.needsUpdate = true;
-		}
+				this.renderer.scene.add(this.treesPool[idx]);
+
+				idx += 1;
+			}
+		});
 
 		return true;
 	}
@@ -158,6 +143,7 @@ export default class TerrainBuilder {
 			geometry,
 			new THREE.MeshStandardMaterial({
 				color: 0x0b549d,
+				side: THREE.DoubleSide,
 			})
 		);
 
@@ -177,25 +163,28 @@ export default class TerrainBuilder {
 		const tree_idx = Array(13).fill(0);
 
 		const dummy = new THREE.Object3D();
+		const depth_adjustment = 1;
 
-		if (data.trees && false) {
+		// scatter trees on the land
+		if (data.trees) {
 			for (let i = 0; i < data.trees.length; i++) {
 				const tree = data.trees[i];
 
-				dummy.position.set(tree.pos.x, tree.pos.z, -tree.pos.y);
-				dummy.rotation.set(Math.PI / 2, 0, 0);
-
+				dummy.position.set(
+					origin.x + tree.pos.x,
+					origin.y + tree.pos.z - depth_adjustment,
+					origin.z - tree.pos.y
+				);
+				dummy.setRotationFromQuaternion(
+					this.treesTransform[tree.type].quaternion
+				);
+				dummy.scale.copy(this.treesTransform[tree.type].scale);
 				dummy.updateMatrix();
 
-				this.treePool[pad0(tree.type + 1)].setMatrixAt(
+				this.treesPool[tree.type].setMatrixAt(
 					tree_idx[tree.type],
 					dummy.matrix
 				);
-
-				console.log(tree_idx[tree.type], dummy.matrix, tree.pos);
-				// this.treePool[
-				// 	pad0(tree.type + 1)
-				// ].instanceMatrix.needsUpdate = true;
 
 				tree_idx[tree.type] += 1;
 			}

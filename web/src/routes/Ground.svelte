@@ -83,7 +83,7 @@
 	const sceneHeight = document.documentElement.clientHeight;
 
 	onMount(() => {
-		if (false) {
+		if (true) {
 			invokeCamera(video, () => {
 				cameraReady = true;
 			});
@@ -99,7 +99,7 @@
 
 		threeScene = new ThreeScene(canvas, sceneWidth, sceneHeight);
 		/** @ts-ignore */
-		threeScene.camera.position.set(0, 2000, 2000);
+		// threeScene.camera.position.set(0, 2000, 2000);
 
 		Promise.all([
 			import("@dimforge/rapier3d"),
@@ -115,7 +115,7 @@
 			api.get("terrain/-1/-1"),
 			api.get("terrain/0/-1"),
 			api.get("terrain/1/-1"),
-			loadJSON("/json/trees.json"),
+			loadGLTF("/glb/trees.glb"),
 		]).then(
 			([
 				RAPIER,
@@ -143,7 +143,8 @@
 				terrainBuiler.loadTrees(trees).then(() => {
 					// we need trees to be loaded before we can build terrain
 
-					// console.log(terrainBuiler.treePool);
+					// console.log(terrainBuiler.treesPool);
+					// console.log(terrainBuiler.treesTransform);
 
 					terrainBuiler.terrainSeires(
 						[

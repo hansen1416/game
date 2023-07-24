@@ -3,7 +3,7 @@
 	import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 	import { onDestroy, onMount } from "svelte";
 	import THREETerrain from "../lib/THREETerrain";
-	import Api from "../request/Api";
+	import { loadGLTF } from "../utils/ropes";
 
 	let scene, camera, light, renderer, controls, canvas;
 	let world, lines;
@@ -53,7 +53,7 @@
 			uv: Array.from(terrain.geometry.getAttribute("uv").array),
 		};
 
-		console.log(json_data);
+		// console.log(json_data);
 
 		const positions = terrain.geometry.attributes.position.array;
 
@@ -86,7 +86,10 @@
 
 		scene.add(terrain);
 
-		Promise.all([import("@dimforge/rapier3d")]).then(([RAPIER]) => {
+		Promise.all([
+			import("@dimforge/rapier3d"),
+			loadGLTF("/glb/trees.glb"),
+		]).then(([RAPIER, trees]) => {
 			const gravity = { x: 0.0, y: -9.81, z: 0.0 };
 
 			world = new RAPIER.World(gravity);
@@ -111,6 +114,32 @@
 				.setRestitution(0);
 
 			world.createCollider(clDesc, terrainBody);
+
+			let i = 0;
+
+			trees.scene.children[0].traverse((node) => {
+				if (node.isMesh) {
+					// console.log(node)
+
+					// const tree_mesh = node.parent.clone()
+					const qua = node.parent.quaternion;
+					const sca = node.parent.scale;
+
+					const tree_mesh = node.clone();
+
+					tree_mesh.setRotationFromQuaternion(qua);
+					tree_mesh.scale.set(sca.x, sca.y, sca.z);
+
+					tree_mesh.position.set(i * 100, 0, 0);
+
+					i += 1;
+
+					scene.add(tree_mesh);
+
+					console.log(tree_mesh.geometry);
+					console.log(tree_mesh.material);
+				}
+			});
 		});
 
 		animate();
@@ -143,7 +172,7 @@
 			75,
 			sceneWidth / sceneHeight,
 			0.01,
-			2000
+			3000
 		);
 		//@ts-ignore
 		camera.position.set(0, 1000, 1000);
@@ -180,7 +209,7 @@
 		controls.update();
 		renderer.render(scene, camera);
 
-		if ((import.meta.env.DEV && scene, world)) {
+		if (false && import.meta.env.DEV && scene && world) {
 			if (!lines) {
 				let material = new THREE.LineBasicMaterial({
 					color: 0xffffff, // @ts-ignore
