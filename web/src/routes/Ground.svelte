@@ -141,10 +141,9 @@
 				);
 
 				terrainBuiler.loadTrees(trees).then(() => {
-
 					// we need trees to be loaded before we can build terrain
 
-					console.log(terrainBuiler.treePool)
+					// console.log(terrainBuiler.treePool);
 
 					terrainBuiler.terrainSeires(
 						[

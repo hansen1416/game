@@ -1,11 +1,12 @@
 /**
- * @typedef {{width: number, height: number, widthSegments: number, heightSegments: number, position: number[]}} TerrainStruct
+ * @typedef {{width: number, height: number, widthSegments: number, heightSegments: number, position: number[], trees: object[]}} TerrainStruct
  */
 
 import * as THREE from "three";
 import ThreeScene from "./ThreeScene";
 import RapierWorld from "./RapierWorld";
 import { ImprovedNoise } from "three/addons/math/ImprovedNoise.js";
+import { pad0 } from "../utils/ropes";
 
 let instance;
 
@@ -14,6 +15,32 @@ export default class TerrainBuilder {
 	 * @type {{[key: string]: THREE.InstancedMesh}}
 	 */
 	treePool = {};
+
+	treesRotation = {
+		"00000001": new THREE.Quaternion(-0.707107, 0, 0, 0.707107),
+		"00000002": new THREE.Quaternion(-0.707107, 0, 0, 0.707107),
+		"00000003": new THREE.Quaternion(
+			-0.173308,
+			0.012277,
+			-0.117975,
+			0.977699
+		),
+		"00000004": new THREE.Quaternion(
+			-0.272871,
+			-0.29189,
+			-0.710903,
+			0.578756
+		),
+		"00000005": new THREE.Quaternion(-0.707107, 0, 0, 0.707107),
+		"00000006": new THREE.Quaternion(-0.707107, 0, 0, 0.707107),
+		"00000007": new THREE.Quaternion(-0.707107, 0, 0, 0.707107),
+		"00000008": new THREE.Quaternion(-0.707107, 0, 0, 0.707107),
+		"00000009": new THREE.Quaternion(-0.707107, 0, 0, 0.707107),
+		"00000010": new THREE.Quaternion(-0.707107, 0, 0, 0.707107),
+		"00000011": new THREE.Quaternion(-0.707107, 0, 0, 0.707107),
+		"00000012": new THREE.Quaternion(-0.707107, 0, 0, 0.707107),
+		"00000013": new THREE.Quaternion(-0.707107, 0, 0, 0.707107),
+	};
 
 	/**
 	 *
@@ -52,6 +79,12 @@ export default class TerrainBuilder {
 				obj.material,
 				1000
 			);
+
+			// hide InstancedMesh pool somewhere far away
+
+			this.renderer.scene.add(this.treePool[k]);
+
+			this.treePool[k].instanceMatrix.needsUpdate = true;
 		}
 
 		return true;
@@ -138,6 +171,35 @@ export default class TerrainBuilder {
 		mesh.position.copy(origin);
 
 		this.renderer.scene.add(mesh);
+
+		// add trees
+
+		const tree_idx = Array(13).fill(0);
+
+		const dummy = new THREE.Object3D();
+
+		if (data.trees && false) {
+			for (let i = 0; i < data.trees.length; i++) {
+				const tree = data.trees[i];
+
+				dummy.position.set(tree.pos.x, tree.pos.z, -tree.pos.y);
+				dummy.rotation.set(Math.PI / 2, 0, 0);
+
+				dummy.updateMatrix();
+
+				this.treePool[pad0(tree.type + 1)].setMatrixAt(
+					tree_idx[tree.type],
+					dummy.matrix
+				);
+
+				console.log(tree_idx[tree.type], dummy.matrix, tree.pos);
+				// this.treePool[
+				// 	pad0(tree.type + 1)
+				// ].instanceMatrix.needsUpdate = true;
+
+				tree_idx[tree.type] += 1;
+			}
+		}
 
 		const heightMap = new Float32Array(
 			this.heightmapFromPosition(data.position)
