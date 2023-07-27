@@ -71,7 +71,7 @@ model.learn(total_timesteps=10_000)
 # Evaluate the trained agent
 mean_reward, std_reward = evaluate_policy(model, env, n_eval_episodes=100)
 
-print(f"mean_reward:{mean_reward:.2f} +/- {std_reward:.2f}")
+print(f"pre save mean_reward:{mean_reward:.2f} +/- {std_reward:.2f}")
 
 save_dir = "/tmp/gym/"
 os.makedirs(save_dir, exist_ok=True)
@@ -79,17 +79,13 @@ os.makedirs(save_dir, exist_ok=True)
 # The model will be saved under PPO_tutorial.zip
 model.save(f"{save_dir}/PPO_tutorial")
 
-# sample an observation from the environment
-obs = model.env.observation_space.sample()
-
-# Check prediction before saving
-print("pre saved", model.predict(obs, deterministic=True))
-
 del model  # delete trained model to demonstrate loading
 
 loaded_model = PPO.load(f"{save_dir}/PPO_tutorial")
+
+mean_reward, std_reward = evaluate_policy(loaded_model, env, n_eval_episodes=100)
 # Check that the prediction is the same after loading (for the same observation)
-print("loaded", loaded_model.predict(obs, deterministic=True))
+print(f"loaded mean_reward:{mean_reward:.2f} +/- {std_reward:.2f}")
 
 # record_video("CartPole-v1", model, video_length=500, prefix="ppo-cartpole")
 
