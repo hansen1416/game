@@ -62,6 +62,8 @@ class MyMonitorWrapper(gym.Wrapper):
         # === YOUR CODE HERE ===#
         # Initialize the variables that will be used
         # to store the episode length and episode reward
+        self.episode_length = 0
+        self.episode_reward = 0
 
         # ====================== #
 
@@ -72,10 +74,8 @@ class MyMonitorWrapper(gym.Wrapper):
         obs = self.env.reset(**kwargs)
         # === YOUR CODE HERE ===#
         # Reset the variables
-
-
-        print("reset")
-        print(kwargs)
+        self.episode_length = 0
+        self.episode_reward = 0
 
         # ====================== #
         return obs
@@ -89,12 +89,17 @@ class MyMonitorWrapper(gym.Wrapper):
         obs, reward, terminated, truncated, info = self.env.step(action)
         # === YOUR CODE HERE ===#
         # Update the current episode reward and episode length
+        self.episode_length = self.episode_length + 1
+        self.episode_reward = reward + self.episode_reward
 
         # ====================== #
 
         if terminated or truncated:
             # === YOUR CODE HERE ===#
             # Store the episode length and episode reward in the info dict
+            print(self.episode_length)
+            print(self.episode_reward)
+            print(info)
             pass
 
             # ====================== #
