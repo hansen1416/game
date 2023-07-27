@@ -233,7 +233,8 @@ class EvalCallback(BaseCallback):
             # Save the agent if needed
             # and update self.best_mean_reward
 
-            print("Best mean reward: {:.2f}".format(self.best_mean_reward))
+            print(self.best_mean_reward)
+            # print("Best mean reward: {:.2f}".format(self.best_mean_reward))
 
             # ====================== #
         return True
