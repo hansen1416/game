@@ -194,7 +194,54 @@ autosave_callback = SaveOnBestTrainingRewardCallback(
     check_freq=20, log_dir=log_dir, verbose=1)
 
 
+class EvalCallback(BaseCallback):
+    """
+    Callback for evaluating an agent.
+
+    :param eval_env: (gym.Env) The environment used for initialization
+    :param n_eval_episodes: (int) The number of episodes to test the agent
+    :param eval_freq: (int) Evaluate the agent every eval_freq call of the callback.
+    """
+
+    def __init__(self, eval_env, n_eval_episodes=5, eval_freq=20):
+        super().__init__()
+        self.eval_env = eval_env
+        self.n_eval_episodes = n_eval_episodes
+        self.eval_freq = eval_freq
+        self.best_mean_reward = -np.inf
+
+    def _on_step(self):
+        """
+        This method will be called by the model.
+
+        :return: (bool)
+        """
+
+        # self.n_calls is automatically updated because
+        # we derive from BaseCallback
+        if self.n_calls % self.eval_freq == 0:
+            # === YOUR CODE HERE ===#
+            # Evaluate the agent:
+            # you need to do self.n_eval_episodes loop using self.eval_env
+            # hint: you can use self.model.predict(obs, deterministic=True)
+            # sample an observation from the environment
+            obs = model.env.observation_space.sample()
+
+            # use the model to predict the next action
+            self.best_mean_reward = model.predict(obs, deterministic=True)
+
+            # Save the agent if needed
+            # and update self.best_mean_reward
+
+            print("Best mean reward: {:.2f}".format(self.best_mean_reward))
+
+            # ====================== #
+        return True
+
+
 env = make_vec_env(env_id, n_envs=1, monitor_dir=log_dir)
+
+eval_callback = EvalCallback(env, n_eval_episodes=5, eval_freq=100)
 
 if True:
     model = SAC(
@@ -206,8 +253,12 @@ if True:
         seed=0,
     )
 
-    with ProgressBarManager(2000) as progress_callback:
-        model.learn(total_timesteps=2000, callback=[progress_callback, autosave_callback])
+    # with ProgressBarManager(2000) as progress_callback:
+    #     model.learn(total_timesteps=2000, callback=[
+    #                 progress_callback, autosave_callback])
+
+    model.learn(total_timesteps=2000, callback=eval_callback)
+
 
 # tuned_model = SAC(
 #     "MlpPolicy",
