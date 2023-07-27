@@ -184,6 +184,6 @@ if False:
 # print(f"mean_reward:{mean_reward:.2f} +/- {std_reward:.2f}")
 
 else:
-    loaded_model = SAC.load(os.path.join(log_dir, "best_model"))
+    loaded_model = SAC.load(os.path.join(log_dir, "best_model.zip"))
 
     record_video(env, loaded_model, video_length=500, prefix="mlp-tuned-")
