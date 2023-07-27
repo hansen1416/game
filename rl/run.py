@@ -51,8 +51,57 @@ def evaluate(
 
     return mean_episode_reward
 
+class MyMonitorWrapper(gym.Wrapper):
+    """
+    :param env: (gym.Env) Gym environment that will be wrapped
+    """
+
+    def __init__(self, env):
+        # Call the parent constructor, so we can access self.env later
+        super().__init__(env)
+        # === YOUR CODE HERE ===#
+        # Initialize the variables that will be used
+        # to store the episode length and episode reward
+
+        # ====================== #
+
+    def reset(self, **kwargs):
+        """
+        Reset the environment
+        """
+        obs = self.env.reset(**kwargs)
+        # === YOUR CODE HERE ===#
+        # Reset the variables
+
+
+        print("reset")
+        print(kwargs)
+
+        # ====================== #
+        return obs
+
+    def step(self, action):
+        """
+        :param action: ([float] or int) Action taken by the agent
+        :return: (np.ndarray, float, bool, bool, dict)
+            observation, reward, is the episode over?, is the episode truncated?, additional information
+        """
+        obs, reward, terminated, truncated, info = self.env.step(action)
+        # === YOUR CODE HERE ===#
+        # Update the current episode reward and episode length
+
+        # ====================== #
+
+        if terminated or truncated:
+            # === YOUR CODE HERE ===#
+            # Store the episode length and episode reward in the info dict
+            pass
+
+            # ====================== #
+        return obs, reward, terminated, truncated, info
 
 env = gym.make("CartPole-v1")
+env = MyMonitorWrapper(env=env)
 
 model = PPO(MlpPolicy, env, verbose=0)
 
