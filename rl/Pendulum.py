@@ -132,7 +132,7 @@ class SaveOnBestTrainingRewardCallback(BaseCallback):
 
 env_id = "Pendulum-v1"
 
-eval_env = gym.make(env_id)
+# eval_env = gym.make(env_id)
 
 # default_model = SAC(
 #     "MlpPolicy",
@@ -156,17 +156,30 @@ os.makedirs(log_dir, exist_ok=True)
 callback = SaveOnBestTrainingRewardCallback(
     check_freq=20, log_dir=log_dir, verbose=1)
 
-tuned_model = SAC(
+env = make_vec_env(env_id, n_envs=1, monitor_dir=log_dir)
+
+model = SAC(
     "MlpPolicy",
-    env_id,
+    env,
     batch_size=256,
     verbose=1,
     policy_kwargs=dict(net_arch=[256, 256]),
     seed=0,
-).learn(1000, callback=callback)
+)
 
-mean_reward, std_reward = evaluate_policy(
-    tuned_model, eval_env, n_eval_episodes=100)
-print(f"mean_reward:{mean_reward:.2f} +/- {std_reward:.2f}")
+model.learn(total_timesteps=5000, callback=callback)
+
+# tuned_model = SAC(
+#     "MlpPolicy",
+#     env_id,
+#     batch_size=256,
+#     verbose=1,
+#     policy_kwargs=dict(net_arch=[256, 256]),
+#     seed=0,
+# ).learn(1000, callback=callback)
+
+# mean_reward, std_reward = evaluate_policy(
+#     tuned_model, eval_env, n_eval_episodes=100)
+# print(f"mean_reward:{mean_reward:.2f} +/- {std_reward:.2f}")
 
 # record_video(env_id, tuned_model, video_length=500, prefix="mlp-tuned-")
