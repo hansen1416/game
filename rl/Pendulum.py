@@ -158,16 +158,17 @@ callback = SaveOnBestTrainingRewardCallback(
 
 env = make_vec_env(env_id, n_envs=1, monitor_dir=log_dir)
 
-model = SAC(
-    "MlpPolicy",
-    env,
-    batch_size=256,
-    verbose=1,
-    policy_kwargs=dict(net_arch=[256, 256]),
-    seed=0,
-)
+if False:
+    model = SAC(
+        "MlpPolicy",
+        env,
+        batch_size=256,
+        verbose=1,
+        policy_kwargs=dict(net_arch=[256, 256]),
+        seed=0,
+    )
 
-model.learn(total_timesteps=5000, callback=callback)
+    model.learn(total_timesteps=5000, callback=callback)
 
 # tuned_model = SAC(
 #     "MlpPolicy",
@@ -182,4 +183,7 @@ model.learn(total_timesteps=5000, callback=callback)
 #     tuned_model, eval_env, n_eval_episodes=100)
 # print(f"mean_reward:{mean_reward:.2f} +/- {std_reward:.2f}")
 
-# record_video(env_id, tuned_model, video_length=500, prefix="mlp-tuned-")
+else:
+    loaded_model = SAC.load(os.path.join(log_dir, "best_model"))
+
+    record_video(env, loaded_model, video_length=500, prefix="mlp-tuned-")
