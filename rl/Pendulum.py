@@ -8,6 +8,8 @@ from stable_baselines3.common.monitor import Monitor
 from stable_baselines3.common.vec_env import DummyVecEnv
 from stable_baselines3.common.env_util import make_vec_env
 from stable_baselines3.common.results_plotter import load_results, ts2xy
+from tqdm.auto import tqdm
+
 
 from utils import record_video
 
@@ -88,12 +90,14 @@ class SaveOnBestTrainingRewardCallback(BaseCallback):
     :param verbose: (int)
     """
 
-    def __init__(self, check_freq, log_dir, verbose=1):
+    def __init__(self, check_freq, log_dir, pbar, verbose=1):
         super().__init__(verbose)
         self.check_freq = check_freq
         self.log_dir = log_dir
         self.save_path = os.path.join(log_dir, "best_model")
         self.best_mean_reward = -np.inf
+        # progress bar
+        self._pbar = pbar
 
     def _init_callback(self) -> None:
         # Create folder if needed
@@ -101,6 +105,11 @@ class SaveOnBestTrainingRewardCallback(BaseCallback):
             os.makedirs(self.save_path, exist_ok=True)
 
     def _on_step(self) -> bool:
+
+        # Update the progress bar:
+        self._pbar.n = self.num_timesteps
+        self._pbar.update(0)
+
         if self.n_calls % self.check_freq == 0:
 
             # Retrieve training reward
@@ -130,6 +139,7 @@ class SaveOnBestTrainingRewardCallback(BaseCallback):
         return True
 
 
+
 env_id = "Pendulum-v1"
 
 # eval_env = gym.make(env_id)
@@ -152,13 +162,30 @@ env_id = "Pendulum-v1"
 log_dir = "/tmp/gym/"
 os.makedirs(log_dir, exist_ok=True)
 
+# this callback uses the 'with' block, allowing for correct initialisation and destruction
+class ProgressBarManager(object):
+    def __init__(self, total_timesteps):  # init object with total timesteps
+        self.pbar = None
+        self.total_timesteps = total_timesteps
+
+    def __enter__(self):  # create the progress bar and callback, return the callback
+        self.pbar = tqdm(total=self.total_timesteps)
+
+        return SaveOnBestTrainingRewardCallback(check_freq=20, log_dir=log_dir, pbar=self.pbar)
+
+    def __exit__(self, exc_type, exc_val, exc_tb):  # close the callback
+        self.pbar.n = self.total_timesteps
+        self.pbar.update(0)
+        self.pbar.close()
+
+
 # Create Callback
-callback = SaveOnBestTrainingRewardCallback(
-    check_freq=20, log_dir=log_dir, verbose=1)
+# callback = SaveOnBestTrainingRewardCallback(
+#     check_freq=20, log_dir=log_dir, verbose=1)
 
 env = make_vec_env(env_id, n_envs=1, monitor_dir=log_dir)
 
-if False:
+if True:
     model = SAC(
         "MlpPolicy",
         env,
@@ -168,7 +195,8 @@ if False:
         seed=0,
     )
 
-    model.learn(total_timesteps=5000, callback=callback)
+    with ProgressBarManager(2000) as callback:
+        model.learn(total_timesteps=2000, callback=callback)
 
 # tuned_model = SAC(
 #     "MlpPolicy",
