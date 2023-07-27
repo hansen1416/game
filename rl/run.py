@@ -97,10 +97,8 @@ class MyMonitorWrapper(gym.Wrapper):
         if terminated or truncated:
             # === YOUR CODE HERE ===#
             # Store the episode length and episode reward in the info dict
-            print(self.episode_length)
-            print(self.episode_reward)
-            print(info)
-            pass
+            info['episode_length'] = self.episode_length
+            info['episode_reward'] = self.episode_reward
 
             # ====================== #
         return obs, reward, terminated, truncated, info
