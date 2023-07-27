@@ -33,7 +33,11 @@ def record_video(env_id, model, video_length=500, prefix="", video_folder="video
     :param prefix: (str)
     :param video_folder: (str)
     """
-    eval_env = DummyVecEnv([lambda: gym.make(env_id, render_mode="rgb_array")])
+    if type(env_id) == str:
+        eval_env = DummyVecEnv([lambda: gym.make(env_id, render_mode="rgb_array")])
+    else:
+        eval_env = env_id
+        
     # Start the video at step=0 and record 500 steps
     eval_env = VecVideoRecorder(
         eval_env,
