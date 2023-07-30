@@ -7,16 +7,23 @@ import time
 from collections import deque
 from stable_baselines3.common.env_checker import check_env
 from stable_baselines3 import PPO
+from stable_baselines3.common.evaluation import evaluate_policy
 import os
 
 
 def collision_with_apple(apple_position, score):
+    """
+    when snake eats apple, reposition the apple and increase the score by 1
+    """
     apple_position = [random.randrange(1, 50)*10, random.randrange(1, 50)*10]
     score += 1
     return apple_position, score
 
 
 def collision_with_boundaries(snake_head):
+    """
+    if snake collides with boundaries, terminate the game
+    """
     if snake_head[0] >= 500 or snake_head[0] < 0 or snake_head[1] >= 500 or snake_head[1] < 0:
         return 1
     else:
@@ -24,6 +31,9 @@ def collision_with_boundaries(snake_head):
 
 
 def collision_with_self(snake_position):
+    """
+    when snake collides with its body, terminate the game
+    """
     snake_head = snake_position[0]
     if snake_head in snake_position[1:]:
         return 1
@@ -84,11 +94,13 @@ class SnekEnv(gym.Env):
         elif button_direction == 3:
             self.snake_head[1] -= 10
 
+        apple_reward = 0
         # Increase Snake length on eating apple
         if self.snake_head == self.apple_position:
             self.apple_position, self.score = collision_with_apple(
                 self.apple_position, self.score)
             self.snake_position.insert(0, list(self.snake_head))
+            apple_reward = 10000
 
         else:
             self.snake_position.insert(0, list(self.snake_head))
@@ -103,7 +115,16 @@ class SnekEnv(gym.Env):
             cv2.imshow('a', self.img)
             self.done = True
 
-        self.total_reward = len(self.snake_position) - 3  # start length is 3
+        # add euclidean distance
+        euclidean_dist_to_apple = np.linalg.norm(
+            np.array(self.snake_head) - np.array(self.apple_position))
+        # self.total_reward = len(self.snake_position) - \
+        #     3 - euclidean_dist_to_apple
+
+        self.total_reward = (
+            (250 - euclidean_dist_to_apple) + apple_reward)/100
+
+        # self.total_reward = len(self.snake_position) - 3  # start length is 3
 
         self.reward = self.total_reward - self.prev_reward
         self.prev_reward = self.total_reward
@@ -192,24 +213,44 @@ def run_env_demo():
             print('reward', reward)
 
 
-models_dir = f"models/{int(time.time())}/"
-logdir = f"logs/{int(time.time())}/"
+def train_agent():
 
-if not os.path.exists(models_dir):
-    os.makedirs(models_dir)
+    models_dir = f"models/{int(time.time())}/"
+    logdir = f"logs/{int(time.time())}/"
 
-if not os.path.exists(logdir):
-    os.makedirs(logdir)
+    if not os.path.exists(models_dir):
+        os.makedirs(models_dir)
 
-env = SnekEnv()
-env.reset()
+    if not os.path.exists(logdir):
+        os.makedirs(logdir)
 
-model = PPO('MlpPolicy', env, verbose=1, tensorboard_log=logdir)
+    env = SnekEnv()
+    env.reset()
 
-TIMESTEPS = 10000
-iters = 0
-while True:
-    iters += 1
+    model = PPO('MlpPolicy', env, verbose=1, tensorboard_log=logdir)
+
+    TIMESTEPS = 1000
+    # iters = 0
+    # while True:
+    #     iters += 1
     model.learn(total_timesteps=TIMESTEPS,
                 reset_num_timesteps=False, tb_log_name=f"PPO")
-    model.save(f"{models_dir}/{TIMESTEPS*iters}")
+    model.save(f"{models_dir}/{TIMESTEPS}")
+
+
+train_agent()
+
+
+def evaludate_trained():
+
+    model = PPO.load("models/1690624005/10000")
+
+    env = SnekEnv()
+
+    mean_reward, std_reward = evaluate_policy(
+        model, env, n_eval_episodes=10, warn=False)
+
+    print(f"mean_reward: {mean_reward:.2f} +/- {std_reward:.2f}")
+
+
+# evaludate_trained()
