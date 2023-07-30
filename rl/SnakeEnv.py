@@ -9,6 +9,7 @@ from stable_baselines3.common.env_checker import check_env
 from stable_baselines3 import PPO
 from stable_baselines3.common.evaluation import evaluate_policy
 import os
+from pathlib import Path
 
 
 def collision_with_apple(apple_position, score):
@@ -195,13 +196,14 @@ class SnekEnv(gym.Env):
         pass
 
 
-env = SnekEnv()
-# It will check your custom environment and output additional warnings if needed
-check_env(env)
+# env = SnekEnv()
+# # It will check your custom environment and output additional warnings if needed
+# check_env(env)
 
 
 def run_env_demo():
     episodes = 50
+    env = SnekEnv()
 
     for episode in range(episodes):
         done = False
@@ -215,8 +217,8 @@ def run_env_demo():
 
 def train_agent():
 
-    models_dir = f"models/{int(time.time())}/"
-    logdir = f"logs/{int(time.time())}/"
+    models_dir = os.path.join('models', 'snake-ppo')
+    logdir = os.path.join('logs', 'snake-ppo')
 
     if not os.path.exists(models_dir):
         os.makedirs(models_dir)
@@ -224,26 +226,48 @@ def train_agent():
     if not os.path.exists(logdir):
         os.makedirs(logdir)
 
+    paths = sorted(Path(models_dir).iterdir(), key=os.path.getmtime)
+
+    last_model = None
+    last_iter = 0
+
     env = SnekEnv()
     env.reset()
 
-    model = PPO('MlpPolicy', env, verbose=1, tensorboard_log=logdir)
+    if len(paths) > 0:
+        # get last model file
+        last_model = paths[-1]
 
-    TIMESTEPS = 1000
-    # iters = 0
-    # while True:
-    #     iters += 1
-    model.learn(total_timesteps=TIMESTEPS,
-                reset_num_timesteps=False, tb_log_name=f"PPO")
-    model.save(f"{models_dir}/{TIMESTEPS}")
+        # get last iteration
+        last_iter = int(os.path.splitext(last_model.name)[0])
+
+        last_model = PPO.load(last_model, env, verbose=1,
+                              tensorboard_log=logdir)
+
+    if last_model:
+        model = last_model
+    else:
+
+        model = PPO('MlpPolicy', env, verbose=1, tensorboard_log=logdir)
+
+    TIMESTEPS = 10000
+    iters = 0
+    while True:
+        iters += 1
+        model.learn(total_timesteps=TIMESTEPS,
+                    reset_num_timesteps=False, tb_log_name=f"{last_iter+TIMESTEPS * iters}")
+        model.save(f"{models_dir}/{last_iter+TIMESTEPS * iters}")
+
+        if iters > 8:
+            break
 
 
-train_agent()
+# train_agent()
 
 
 def evaludate_trained():
 
-    model = PPO.load("models/1690624005/10000")
+    model = PPO.load("models/snake-ppo/100000")
 
     env = SnekEnv()
 
@@ -253,4 +277,4 @@ def evaludate_trained():
     print(f"mean_reward: {mean_reward:.2f} +/- {std_reward:.2f}")
 
 
-# evaludate_trained()
+evaludate_trained()
