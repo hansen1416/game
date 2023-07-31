@@ -51,15 +51,19 @@ def merge_all_devices_scv():
 # when read csv, set encode to utf_8_sig
 # merge_all_devices_scv()
 
-df_devices = pd.read_csv(os.path.join('data', 'All_device.csv'), encoding='utf_8_sig')
+# df_devices = pd.read_csv(os.path.join('data', 'All_device.csv'), encoding='utf_8_sig')
+# general_data = pd.read_csv(os.path.join('data', 'General.csv'))
 
-general_data = pd.read_csv(os.path.join('data', 'General.csv'))
+df_devices = pd.read_csv(os.path.join('data', 'match_device.csv'), encoding='utf_8_sig')
+df_gateway = pd.read_csv(os.path.join('data', 'match_gateway.csv'))
 
 # print(general_data.head())
 
 # joint two dataframe by key
-df_all = pd.merge(general_data, df_devices, left_on='object-name', right_on='对象名称')
+df_all = pd.merge(df_gateway, df_devices, left_on='object-name', right_on='对象名称')
+# df_all = pd.merge(df_devices, df_gateway, left_on='对象名称', right_on='object-name')
 
-# print(df_all.shape)
+df_all = df_all.drop_duplicates(ignore_index=True)
+print(df_all.shape)
 
-df_all.to_csv('Matched.csv', index=None, encoding='utf_8_sig')
+df_all.to_csv('Matched2.csv', index=None, encoding='utf_8_sig')
