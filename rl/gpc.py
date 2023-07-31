@@ -57,11 +57,17 @@ def merge_all_devices_scv():
 df_devices = pd.read_csv(os.path.join('data', 'match_device.csv'), encoding='utf_8_sig')
 df_gateway = pd.read_csv(os.path.join('data', 'match_gateway.csv'))
 
+df_devices['对象名称'] = df_devices['对象名称'].str.replace(r'\s+', '', regex=True)
+df_gateway['object-name-new'] = df_gateway['object-name-new'].str.replace(r'\s+', '', regex=True)
+
+# df_devices.to_csv('df_devices.csv', index=None, encoding='utf_8_sig')
+# df_gateway.to_csv('df_gateway.csv', index=None)
+
 # print(general_data.head())
 
 # joint two dataframe by key
-df_all = pd.merge(df_gateway, df_devices, left_on='object-name', right_on='对象名称')
-# df_all = pd.merge(df_devices, df_gateway, left_on='对象名称', right_on='object-name')
+# df_all = pd.merge(df_gateway, df_devices, left_on='object-name-new', right_on='对象名称')
+df_all = pd.merge(df_devices, df_gateway, left_on='对象名称', right_on='object-name-new')
 
 df_all = df_all.drop_duplicates(ignore_index=True)
 print(df_all.shape)
