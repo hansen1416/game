@@ -2,7 +2,7 @@ import os
 import pybullet as p
 import pybullet_data
 
-p.connect(p.GUI)
+p.connect(p.GRAPHICS_SERVER)
 pandaUid = p.loadURDF(os.path.join(
     pybullet_data.getDataPath(), "franka_panda/panda.urdf"), useFixedBase=True)
 
