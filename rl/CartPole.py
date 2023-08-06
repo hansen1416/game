@@ -51,6 +51,7 @@ def evaluate(
 
     return mean_episode_reward
 
+
 class MyMonitorWrapper(gym.Wrapper):
     """
     :param env: (gym.Env) Gym environment that will be wrapped
@@ -103,6 +104,7 @@ class MyMonitorWrapper(gym.Wrapper):
             # ====================== #
         return obs, reward, terminated, truncated, info
 
+
 env = gym.make("CartPole-v1")
 env = MyMonitorWrapper(env=env)
 
@@ -135,7 +137,8 @@ del model  # delete trained model to demonstrate loading
 
 loaded_model = PPO.load(f"{save_dir}/PPO_tutorial")
 
-mean_reward, std_reward = evaluate_policy(loaded_model, env, n_eval_episodes=100)
+mean_reward, std_reward = evaluate_policy(
+    loaded_model, env, n_eval_episodes=100)
 # Check that the prediction is the same after loading (for the same observation)
 print(f"loaded mean_reward:{mean_reward:.2f} +/- {std_reward:.2f}")
 
