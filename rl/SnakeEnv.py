@@ -47,6 +47,30 @@ SNAKE_LEN_GOAL = 30
 N_DISCRETE_ACTIONS = 4
 
 
+class CustomActionSpace(spaces.Discrete):
+    def __init__(self, n):
+        super().__init__(n)
+
+    def sample(self):
+        if self.previous_action is not None:
+            legal_actions = self.get_legal_actions(self.previous_action)
+            return legal_actions.index(super().sample())
+        else:
+            return super().sample()
+
+    def get_legal_actions(self, previous_action):
+        # replace with your own logic to determine legal actions based on previous action
+
+        if previous_action == 0:
+            return [0, 2, 3]
+        elif previous_action == 1:
+            return [1, 2, 3]
+        elif previous_action == 2:
+            return [0, 1, 2]
+        elif previous_action == 3:
+            return [0, 1, 3]
+
+
 class SnekEnv(gym.Env):
     """Custom Environment that follows gym interface"""
 
@@ -56,7 +80,8 @@ class SnekEnv(gym.Env):
         # Define action and observation space
         # They must be gym.spaces objects
         # Example when using discrete actions:
-        self.action_space = spaces.Discrete(N_DISCRETE_ACTIONS)
+        # self.action_space = spaces.Discrete(N_DISCRETE_ACTIONS)
+        self.action_space = CustomActionSpace(N_DISCRETE_ACTIONS)
         # Example for using image as input (channel-first; channel-last also works):
         self.observation_space = spaces.Box(low=-500, high=500,
                                             shape=(5+SNAKE_LEN_GOAL,), dtype=np.int64)
@@ -75,14 +100,15 @@ class SnekEnv(gym.Env):
             cv2.rectangle(self.img, (position[0], position[1]),
                           (position[0]+10, position[1]+10), (0, 255, 0), 3)
 
-        # Takes step after fixed time
-        t_end = time.time() + 0.05
-        k = -1
-        while time.time() < t_end:
-            if k == -1:
-                k = cv2.waitKey(1)
-            else:
-                continue
+        if False:
+            # Takes step after fixed time
+            t_end = time.time() + 0.001
+            k = -1
+            while time.time() < t_end:
+                if k == -1:
+                    k = cv2.waitKey(1)
+                else:
+                    continue
 
         button_direction = action
         # Change the head position based on the button direction
@@ -109,6 +135,7 @@ class SnekEnv(gym.Env):
 
         # On collision kill the snake and print the score
         if collision_with_boundaries(self.snake_head) == 1 or collision_with_self(self.snake_position) == 1:
+        # if collision_with_boundaries(self.snake_head) == 1:
             font = cv2.FONT_HERSHEY_SIMPLEX
             self.img = np.zeros((500, 500, 3), dtype='uint8')
             cv2.putText(self.img, 'Your Score is {}'.format(
