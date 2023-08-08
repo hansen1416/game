@@ -2,12 +2,16 @@ import os
 import pybullet as p
 import pybullet_data
 import numpy as np
+from PIL import Image
 
 CURRENT_DIR = os.path.dirname(os.path.realpath(__file__))
 
 def render(pybullet_scene):
     width = 320
     height = 200
+
+    pybullet_scene.setRealTimeSimulation(1)
+
     img_arr = pybullet_scene.getCameraImage(
         width,
         height,
@@ -29,11 +33,11 @@ def render(pybullet_scene):
         lightDirection=[1, 1, 1],
     )
 
-    width, height, rgba, depth, mask = img_arr
+    width, height, rgbPixels, depth, mask = img_arr
     
-    rgba = np.array(rgba)
-    depth = np.array(depth)
-    mask = np.array(mask)
+    # rgba = np.array(rgba)
+    # depth = np.array(depth)
+    # mask = np.array(mask)
 
     # # Count the occurrence of each item
     # unique, counts = np.unique(rgba, return_counts=True)
@@ -46,7 +50,24 @@ def render(pybullet_scene):
     # print(rgba)
     # print(depth)
     # print(mask)
-    np.save(os.path.join(os.path.dirname(CURRENT_DIR), 'data', 'pybullet.npy'), rgba)
+
+    # img = Image.fromarray(np.array(rgbPixels), mode='RGBA')
+
+    # img.save(os.path.join(os.path.dirname(CURRENT_DIR), 'data', 'pybullet.png'))
+
+    # np.save(os.path.join(os.path.dirname(CURRENT_DIR), 'data', 'pybullet.npy'), rgba)
+
+    rgba = bytes(rgbPixels)
+    # Make a new image object from the bytes
+    img = Image.frombytes('RGBA', (width, height), rgba)
+
+    img.save(os.path.join(os.path.dirname(CURRENT_DIR), 'data', 'pybullet.png'))
+
+
+
+
+
+
 
 client_id = p.connect(p.DIRECT)
 
