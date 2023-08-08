@@ -1,10 +1,12 @@
 import os
 import pybullet as p
 import pybullet_data
-import numpy as np
 from PIL import Image
+from stable_baselines3.common.env_checker import check_env
+from gymenv import SimpleDrivingEnv
+from stable_baselines3 import PPO
 
-CURRENT_DIR = os.path.dirname(os.path.realpath(__file__))
+PROJECT_DIR = os.path.dirname(os.path.realpath(__file__))
 
 
 def render(pybullet_scene):
@@ -18,9 +20,9 @@ def render(pybullet_scene):
         height,
         viewMatrix=pybullet_scene.computeViewMatrixFromYawPitchRoll(
             cameraTargetPosition=[0, 0, 0],
-            distance=1,
-            yaw=0,
-            pitch=0,
+            distance=6,
+            yaw=45,
+            pitch=-30,
             roll=0,
             upAxisIndex=2,
         ),
@@ -39,35 +41,51 @@ def render(pybullet_scene):
     # Make a new image object from the bytes
     img = Image.frombytes('RGBA', (width, height), bytes(rgbPixels))
 
-    img.save(os.path.join(os.path.dirname(CURRENT_DIR), 'data', 'pybullet.png'))
+    img.save(os.path.join(os.path.dirname(PROJECT_DIR), 'data', 'pybullet.png'))
 
 
-client_id = p.connect(p.DIRECT)
+def demo():
 
-# The module pybullet_data provides many example Universal Robotic Description Format (URDF) files.
-p.setAdditionalSearchPath(pybullet_data.getDataPath())
+    client_id = p.connect(p.DIRECT)
 
-
-car_urdf = os.path.join(CURRENT_DIR, "urdf", "simplecar.urdf")
-car_id = p.loadURDF(fileName=car_urdf,
-                    basePosition=[0, 0, 0.1],
-                    physicsClientId=client_id)
-
-plane_urdf = os.path.join(CURRENT_DIR, "urdf", "simpleplane.urdf")
-planeId = p.loadURDF(fileName=plane_urdf,
-                     basePosition=[0, 0, 0.1],
-                     physicsClientId=client_id)
+    # The module pybullet_data provides many example Universal Robotic Description Format (URDF) files.
+    p.setAdditionalSearchPath(pybullet_data.getDataPath())
 
 
-# p.resetSimulation(client_id)
+    car_urdf = os.path.join(PROJECT_DIR, "urdf", "simplecar.urdf")
+    car_id = p.loadURDF(fileName=car_urdf,
+                        basePosition=[0, 0, 0.1],
+                        physicsClientId=client_id)
 
-ct = 0
+    plane_urdf = os.path.join(PROJECT_DIR, "urdf", "simpleplane.urdf")
+    planeId = p.loadURDF(fileName=plane_urdf,
+                        basePosition=[0, 0, 0.1],
+                        physicsClientId=client_id)
 
-while ct < 300:
 
-    ct += 1
+    # p.resetSimulation(client_id)
 
-    p.stepSimulation(physicsClientId=client_id)
-# p.stepSimulation(physicsClientId=client_id)
+    ct = 0
 
-render(p)
+    while ct < 300:
+
+        ct += 1
+
+        p.stepSimulation(physicsClientId=client_id)
+    # p.stepSimulation(physicsClientId=client_id)
+
+    render(p)
+
+
+env = SimpleDrivingEnv()
+
+# check_env(env)
+
+env.reset()
+
+model = PPO('MlpPolicy', env, verbose=1, tensorboard_log=os.path.join(PROJECT_DIR, 'logs'))
+
+TIMESTEPS=10000
+
+model.learn(total_timesteps=TIMESTEPS,
+            reset_num_timesteps=False, tb_log_name=f"{TIMESTEPS}")
