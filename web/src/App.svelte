@@ -2,18 +2,12 @@
 	import { Router, Route } from "svelte-routing";
 	import Ground from "./routes/Ground.svelte";
 	import Terrain from "./routes/Terrain.svelte";
-	import Playground from "./routes/Playground.svelte";
+	import Boxing from "./routes/Boxing.svelte";
 </script>
 
 <Router>
-	<!-- <nav>
-		<Link to="/">Home</Link>
-		<Link to="/playground">Playground</Link>
-		<Link to="/blog">Blog</Link>
-	</nav> -->
-
 	<!-- <Route path="/blog/:id" component={BlogPost} /> -->
 	<Route path="/ground" component={Ground} />
 	<Route path="/terrain" component={Terrain} />
-	<Route path="/playground" component={Playground} />
+	<Route path="/boxing" component={Boxing} />
 </Router>

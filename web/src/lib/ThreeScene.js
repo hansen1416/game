@@ -29,7 +29,7 @@ export default class ThreeScene {
 	 * @param {number} height
 	 * @returns
 	 */
-	constructor(canvas, width, height, ) {
+	constructor(canvas, width, height) {
 		// make it a singleton, so we only have 1 threejs scene
 		if (instance) {
 			return instance;
