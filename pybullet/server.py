@@ -6,6 +6,7 @@ from PIL import Image
 
 CURRENT_DIR = os.path.dirname(os.path.realpath(__file__))
 
+
 def render(pybullet_scene):
     width = 320
     height = 200
@@ -34,39 +35,11 @@ def render(pybullet_scene):
     )
 
     width, height, rgbPixels, depth, mask = img_arr
-    
-    # rgba = np.array(rgba)
-    # depth = np.array(depth)
-    # mask = np.array(mask)
 
-    # # Count the occurrence of each item
-    # unique, counts = np.unique(rgba, return_counts=True)
-
-    # print(unique)
-    # print(counts)
-
-    # # print(width)
-    # # print(height)
-    # print(rgba)
-    # print(depth)
-    # print(mask)
-
-    # img = Image.fromarray(np.array(rgbPixels), mode='RGBA')
-
-    # img.save(os.path.join(os.path.dirname(CURRENT_DIR), 'data', 'pybullet.png'))
-
-    # np.save(os.path.join(os.path.dirname(CURRENT_DIR), 'data', 'pybullet.npy'), rgba)
-
-    rgba = bytes(rgbPixels)
     # Make a new image object from the bytes
-    img = Image.frombytes('RGBA', (width, height), rgba)
+    img = Image.frombytes('RGBA', (width, height), bytes(rgbPixels))
 
     img.save(os.path.join(os.path.dirname(CURRENT_DIR), 'data', 'pybullet.png'))
-
-
-
-
-
 
 
 client_id = p.connect(p.DIRECT)
@@ -75,16 +48,15 @@ client_id = p.connect(p.DIRECT)
 p.setAdditionalSearchPath(pybullet_data.getDataPath())
 
 
-
 car_urdf = os.path.join(CURRENT_DIR, "urdf", "simplecar.urdf")
 car_id = p.loadURDF(fileName=car_urdf,
-                        basePosition=[0, 0, 0.1],
-                        physicsClientId=client_id)
+                    basePosition=[0, 0, 0.1],
+                    physicsClientId=client_id)
 
-plane_urdf = os.path.join(CURRENT_DIR,"urdf", "simpleplane.urdf")
+plane_urdf = os.path.join(CURRENT_DIR, "urdf", "simpleplane.urdf")
 planeId = p.loadURDF(fileName=plane_urdf,
-                        basePosition=[0, 0, 0.1],
-                        physicsClientId=client_id)
+                     basePosition=[0, 0, 0.1],
+                     physicsClientId=client_id)
 
 
 # p.resetSimulation(client_id)
