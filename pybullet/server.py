@@ -3,6 +3,8 @@ import pybullet as p
 import pybullet_data
 import numpy as np
 
+CURRENT_DIR = os.path.dirname(os.path.realpath(__file__))
+
 def render(pybullet_scene):
     width = 320
     height = 200
@@ -11,7 +13,7 @@ def render(pybullet_scene):
         height,
         viewMatrix=pybullet_scene.computeViewMatrixFromYawPitchRoll(
             cameraTargetPosition=[0, 0, 0],
-            distance=10,
+            distance=1,
             yaw=0,
             pitch=0,
             roll=0,
@@ -33,34 +35,46 @@ def render(pybullet_scene):
     depth = np.array(depth)
     mask = np.array(mask)
 
-    counts = np.bincount(rgba)
+    # # Count the occurrence of each item
+    # unique, counts = np.unique(rgba, return_counts=True)
 
-    print(counts)
+    # print(unique)
+    # print(counts)
 
-    # print(width)
-    # print(height)
-    print(rgba)
-    print(depth)
-    print(mask)
+    # # print(width)
+    # # print(height)
+    # print(rgba)
+    # print(depth)
+    # print(mask)
+    np.save(os.path.join(os.path.dirname(CURRENT_DIR), 'data', 'pybullet.npy'), rgba)
 
 client_id = p.connect(p.DIRECT)
 
+# The module pybullet_data provides many example Universal Robotic Description Format (URDF) files.
+p.setAdditionalSearchPath(pybullet_data.getDataPath())
 
-car_urdf = os.path.join("urdf", "simplecar.urdf")
+
+
+car_urdf = os.path.join(CURRENT_DIR, "urdf", "simplecar.urdf")
 car_id = p.loadURDF(fileName=car_urdf,
                         basePosition=[0, 0, 0.1],
                         physicsClientId=client_id)
 
+plane_urdf = os.path.join(CURRENT_DIR,"urdf", "simpleplane.urdf")
+planeId = p.loadURDF(fileName=plane_urdf,
+                        basePosition=[0, 0, 0.1],
+                        physicsClientId=client_id)
 
-p.resetSimulation(client_id)
+
+# p.resetSimulation(client_id)
 
 ct = 0
 
-while ct < 1:
+while ct < 300:
 
     ct += 1
 
-    p.stepSimulation()
-
+    p.stepSimulation(physicsClientId=client_id)
+# p.stepSimulation(physicsClientId=client_id)
 
 render(p)
