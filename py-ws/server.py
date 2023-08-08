@@ -2,7 +2,7 @@ import asyncio
 import websockets
  
 # Server data
-PORT = 7890
+PORT = 5173
 print("Server listening on Port " + str(PORT))
 
 # A set of connected ws clients
@@ -28,6 +28,6 @@ async def echo(websocket, path):
         connected.remove(websocket)
 
 # Start the server
-start_server = websockets.serve(echo, "localhost", PORT)
+start_server = websockets.serve(echo, "0.0.0.0", PORT)
 asyncio.get_event_loop().run_until_complete(start_server)
 asyncio.get_event_loop().run_forever()
