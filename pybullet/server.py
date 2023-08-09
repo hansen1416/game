@@ -22,7 +22,7 @@ def render(pybullet_scene):
         height,
         viewMatrix=pybullet_scene.computeViewMatrixFromYawPitchRoll(
             cameraTargetPosition=[0, 0, 0],
-            distance=6,
+            distance=1.4,
             yaw=45,
             pitch=-30,
             roll=0,
@@ -45,6 +45,21 @@ def render(pybullet_scene):
 
     img.save(os.path.join(os.path.dirname(PROJECT_DIR), 'data', 'pybullet.png'))
 
+
+def _train():
+    env = SimpleDrivingEnv()
+
+    # check_env(env)
+
+    env.reset()
+
+    model = PPO('MlpPolicy', env, verbose=1, tensorboard_log=os.path.join(PROJECT_DIR, 'logs'))
+
+    TIMESTEPS=10000
+
+    model.learn(total_timesteps=TIMESTEPS,
+                reset_num_timesteps=False, tb_log_name=f"{TIMESTEPS}")
+    
 
 def demo():
 
@@ -69,19 +84,33 @@ def demo():
                         basePosition=[0, 0, 0.1],
                         physicsClientId=client_id)
 
+    n_joints = p.getNumJoints(arm_id, physicsClientId=client_id)
 
-    joints = p.getJointInfo(bodyUniqueId=arm_id, physicsClientId=client_id)
+    # print("=============")
 
-    print(joints)
+    # print(n_joints)
 
-    # p.setJointMotorControlArray(arm_id, p.getJointInfo(),
-    #                             controlMode=p.POSITION_CONTROL,
-    #                             targetPositions=[steering_angle] * 2,
-    #                             physicsClientId=self.client)
+    # print("=============")
+
+    # joints1 = p.getJointInfo(arm_id, 0 ,physicsClientId=client_id)
+
+    # print(joints1)
+
+    # joints2 = p.getJointInfo(arm_id, 1 ,physicsClientId=client_id)
+
+    # print(joints2)
+
+    p.setJointMotorControlArray(arm_id, [0,1],
+                                controlMode=p.POSITION_CONTROL,
+                                targetPositions=[1, 2],
+                                physicsClientId=client_id)
 
     # p.resetSimulation(client_id)
 
     action_space = gym.spaces.box.Box(low=np.array([0, -.6], dtype=np.float32),high=np.array([1, .6], dtype=np.float32))
+
+    print(action_space)
+    print(action_space.sample())
 
     ct = 0
 
@@ -94,16 +123,5 @@ def demo():
 
     render(p)
 
-def _train():
-    env = SimpleDrivingEnv()
 
-    # check_env(env)
-
-    env.reset()
-
-    model = PPO('MlpPolicy', env, verbose=1, tensorboard_log=os.path.join(PROJECT_DIR, 'logs'))
-
-    TIMESTEPS=10000
-
-    model.learn(total_timesteps=TIMESTEPS,
-                reset_num_timesteps=False, tb_log_name=f"{TIMESTEPS}")
+demo()
