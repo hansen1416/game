@@ -5,6 +5,8 @@ from PIL import Image
 from stable_baselines3.common.env_checker import check_env
 from gymenv import SimpleDrivingEnv
 from stable_baselines3 import PPO
+import gymnasium as gym
+import numpy as np
 
 PROJECT_DIR = os.path.dirname(os.path.realpath(__file__))
 
@@ -52,8 +54,13 @@ def demo():
     p.setAdditionalSearchPath(pybullet_data.getDataPath())
 
 
-    car_urdf = os.path.join(PROJECT_DIR, "urdf", "simplecar.urdf")
-    car_id = p.loadURDF(fileName=car_urdf,
+    # car_urdf = os.path.join(PROJECT_DIR, "urdf", "simplecar.urdf")
+    # car_id = p.loadURDF(fileName=car_urdf,
+    #                     basePosition=[0, 0, 0.1],
+    #                     physicsClientId=client_id)
+
+    arm_urdf = os.path.join(PROJECT_DIR, "urdf", "simplearm.urdf")
+    arm_id = p.loadURDF(fileName=arm_urdf,
                         basePosition=[0, 0, 0.1],
                         physicsClientId=client_id)
 
@@ -63,11 +70,22 @@ def demo():
                         physicsClientId=client_id)
 
 
+    joints = p.getJointInfo(bodyUniqueId=arm_id, physicsClientId=client_id)
+
+    print(joints)
+
+    # p.setJointMotorControlArray(arm_id, p.getJointInfo(),
+    #                             controlMode=p.POSITION_CONTROL,
+    #                             targetPositions=[steering_angle] * 2,
+    #                             physicsClientId=self.client)
+
     # p.resetSimulation(client_id)
+
+    action_space = gym.spaces.box.Box(low=np.array([0, -.6], dtype=np.float32),high=np.array([1, .6], dtype=np.float32))
 
     ct = 0
 
-    while ct < 300:
+    while ct < 1:
 
         ct += 1
 
@@ -76,16 +94,16 @@ def demo():
 
     render(p)
 
+def _train():
+    env = SimpleDrivingEnv()
 
-env = SimpleDrivingEnv()
+    # check_env(env)
 
-# check_env(env)
+    env.reset()
 
-env.reset()
+    model = PPO('MlpPolicy', env, verbose=1, tensorboard_log=os.path.join(PROJECT_DIR, 'logs'))
 
-model = PPO('MlpPolicy', env, verbose=1, tensorboard_log=os.path.join(PROJECT_DIR, 'logs'))
+    TIMESTEPS=10000
 
-TIMESTEPS=10000
-
-model.learn(total_timesteps=TIMESTEPS,
-            reset_num_timesteps=False, tb_log_name=f"{TIMESTEPS}")
+    model.learn(total_timesteps=TIMESTEPS,
+                reset_num_timesteps=False, tb_log_name=f"{TIMESTEPS}")
