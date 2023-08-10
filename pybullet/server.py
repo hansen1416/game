@@ -10,7 +10,6 @@ import numpy as np
 
 PROJECT_DIR = os.path.dirname(os.path.realpath(__file__))
 
-
 def render(pybullet_scene):
     width = 320
     height = 200
@@ -22,7 +21,7 @@ def render(pybullet_scene):
         height,
         viewMatrix=pybullet_scene.computeViewMatrixFromYawPitchRoll(
             cameraTargetPosition=[0, 0, 0],
-            distance=1.4,
+            distance=2,
             yaw=45,
             pitch=-30,
             roll=0,
@@ -86,31 +85,17 @@ def demo():
 
     n_joints = p.getNumJoints(arm_id, physicsClientId=client_id)
 
-    # print("=============")
-
-    # print(n_joints)
-
-    # print("=============")
-
-    # joints1 = p.getJointInfo(arm_id, 0 ,physicsClientId=client_id)
-
-    # print(joints1)
-
-    # joints2 = p.getJointInfo(arm_id, 1 ,physicsClientId=client_id)
-
-    # print(joints2)
 
     p.setJointMotorControlArray(arm_id, [0,1],
                                 controlMode=p.POSITION_CONTROL,
-                                targetPositions=[1, 2],
+                                targetPositions=[1, 5],
                                 physicsClientId=client_id)
 
-    # p.resetSimulation(client_id)
 
-    action_space = gym.spaces.box.Box(low=np.array([0, -.6], dtype=np.float32),high=np.array([1, .6], dtype=np.float32))
+    # action_space = gym.spaces.box.Box(low=np.array([0, -.6], dtype=np.float32),high=np.array([1, .6], dtype=np.float32))
 
-    print(action_space)
-    print(action_space.sample())
+    # print(action_space)
+    # print(action_space.sample())
 
     ct = 0
 
