@@ -120,7 +120,7 @@ def demo():
 
     p.setJointMotorControlArray(arm_id, [0],
                                 controlMode=p.POSITION_CONTROL,
-                                targetPositions=[2],
+                                targetPositions=[20],
                                 physicsClientId=client_id)
 
     # action_space = gym.spaces.box.Box(low=np.array([0, -.6], dtype=np.float32),high=np.array([1, .6], dtype=np.float32))
