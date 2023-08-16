@@ -120,7 +120,7 @@ def demo():
 
     maxForce = 0
 
-    p.setJointMotorControl2(arm_id, [0],
+    p.setJointMotorControl2(arm_id, jointIndex=[0],
                             controlMode=p.POSITION_CONTROL,
                             targetPositions=[3],
                             physicsClientId=client_id, force=maxForce)
