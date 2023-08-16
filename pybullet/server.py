@@ -132,7 +132,7 @@ def demo():
 
     ct = 0
 
-    while ct < 100:
+    while ct < 1:
 
         ct += 1
 
