@@ -88,6 +88,18 @@ def _train():
                 reset_num_timesteps=False, tb_log_name=f"{TIMESTEPS}")
 
 
+def display_joints_info(urdf_id, client_id=None):
+    n_joints = p.getNumJoints(urdf_id, physicsClientId=client_id)
+
+    print("==========joints info=========")
+
+    for i in range(n_joints):
+        joint = Joint(*p.getJointInfo(urdf_id, i, physicsClientId=client_id))
+        print(joint)
+
+    print("==========joints info=========")
+
+
 def demo():
 
     client_id = p.connect(p.DIRECT)
@@ -110,13 +122,10 @@ def demo():
                          basePosition=[0, 0, 0.1],
                          physicsClientId=client_id)
 
-    # n_joints = p.getNumJoints(arm_id, physicsClientId=client_id)
+    base_info = p.getBasePositionAndOrientation(
+        arm_id, physicsClientId=client_id)
 
-    # print("==========joints info=========")
-
-    # for i in range(n_joints):
-    #     joint = Joint(*p.getJointInfo(arm_id, i, physicsClientId=client_id))
-    #     print(joint)
+    print(base_info)
 
     maxForce = 0
 
