@@ -128,7 +128,7 @@ def demo():
     # print(base_info)
 
     p.resetBasePositionAndOrientation(
-        arm_id, (0, 0, 3), base_info[1], physicsClientId=client_id)
+        arm_id, (0, 0, 2), base_info[1], physicsClientId=client_id)
 
     # maxForce = 0
 
