@@ -125,14 +125,17 @@ def demo():
     base_info = p.getBasePositionAndOrientation(
         arm_id, physicsClientId=client_id)
 
-    print(base_info)
+    # print(base_info)
 
-    maxForce = 0
+    p.resetBasePositionAndOrientation(
+        arm_id, (0, 0, 0), base_info[1], physicsClientId=client_id)
 
-    p.setJointMotorControl2(arm_id, jointIndex=0,
-                            controlMode=p.POSITION_CONTROL,
-                            targetPosition=3,
-                            physicsClientId=client_id, force=maxForce)
+    # maxForce = 0
+
+    # p.setJointMotorControl2(arm_id, jointIndex=0,
+    #                         controlMode=p.POSITION_CONTROL,
+    #                         targetPosition=3,
+    #                         physicsClientId=client_id, force=maxForce)
 
     # action_space = gym.spaces.box.Box(low=np.array([0, -.6], dtype=np.float32),high=np.array([1, .6], dtype=np.float32))
 
@@ -141,7 +144,7 @@ def demo():
 
     ct = 0
 
-    while ct < 10:
+    while ct < 1:
 
         ct += 1
 
