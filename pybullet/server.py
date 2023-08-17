@@ -2,10 +2,10 @@ import os
 import pybullet as p
 import pybullet_data
 from PIL import Image
-from stable_baselines3.common.env_checker import check_env
-from gymenv import SimpleDrivingEnv
-from stable_baselines3 import PPO
-import gymnasium as gym
+# from stable_baselines3.common.env_checker import check_env
+# from gymenv import SimpleDrivingEnv
+# from stable_baselines3 import PPO
+# import gymnasium as gym
 import numpy as np
 from dataclasses import dataclass
 
@@ -48,7 +48,7 @@ def render(pybullet_scene):
         height,
         viewMatrix=pybullet_scene.computeViewMatrixFromYawPitchRoll(
             cameraTargetPosition=[0, 0, 0],
-            distance=6,
+            distance=3,
             yaw=45,
             pitch=-30,
             roll=0,
@@ -72,20 +72,20 @@ def render(pybullet_scene):
     img.save(os.path.join(os.path.dirname(PROJECT_DIR), 'data', 'pybullet.png'))
 
 
-def _train():
-    env = SimpleDrivingEnv()
+# def _train():
+#     env = SimpleDrivingEnv()
 
-    # check_env(env)
+#     # check_env(env)
 
-    env.reset()
+#     env.reset()
 
-    model = PPO('MlpPolicy', env, verbose=1,
-                tensorboard_log=os.path.join(PROJECT_DIR, 'logs'))
+#     model = PPO('MlpPolicy', env, verbose=1,
+#                 tensorboard_log=os.path.join(PROJECT_DIR, 'logs'))
 
-    TIMESTEPS = 10000
+#     TIMESTEPS = 10000
 
-    model.learn(total_timesteps=TIMESTEPS,
-                reset_num_timesteps=False, tb_log_name=f"{TIMESTEPS}")
+#     model.learn(total_timesteps=TIMESTEPS,
+#                 reset_num_timesteps=False, tb_log_name=f"{TIMESTEPS}")
 
 
 def display_joints_info(urdf_id, client_id=None):
@@ -102,7 +102,8 @@ def display_joints_info(urdf_id, client_id=None):
 
 def demo():
 
-    client_id = p.connect(p.DIRECT)
+    # client_id = p.connect(p.DIRECT)
+    client_id = p.connect(p.GUI)
 
     # The module pybullet_data provides many example Universal Robotic Description Format (URDF) files.
     p.setAdditionalSearchPath(pybullet_data.getDataPath())
@@ -119,7 +120,7 @@ def demo():
 
     plane_urdf = os.path.join(PROJECT_DIR, "urdf", "simpleplane.urdf")
     planeId = p.loadURDF(fileName=plane_urdf,
-                         basePosition=[0, 0, 0.1],
+                         basePosition=[0, 0, -0.1],
                          physicsClientId=client_id)
 
     base_info = p.getBasePositionAndOrientation(
@@ -128,7 +129,7 @@ def demo():
     # print(base_info)
 
     p.resetBasePositionAndOrientation(
-        arm_id, (0, 1, 0), base_info[1], physicsClientId=client_id)
+        arm_id, (0, 0, 1), base_info[1], physicsClientId=client_id)
 
     # maxForce = 0
 
@@ -144,14 +145,14 @@ def demo():
 
     ct = 0
 
-    while ct < 1:
+    while True:
 
         ct += 1
 
         p.stepSimulation(physicsClientId=client_id)
     # p.stepSimulation(physicsClientId=client_id)
 
-    render(p)
+    # render(p)
 
 
 demo()
