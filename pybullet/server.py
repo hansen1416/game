@@ -48,7 +48,7 @@ def render(pybullet_scene):
         height,
         viewMatrix=pybullet_scene.computeViewMatrixFromYawPitchRoll(
             cameraTargetPosition=[0, 0, 0],
-            distance=2,
+            distance=6,
             yaw=45,
             pitch=-30,
             roll=0,
