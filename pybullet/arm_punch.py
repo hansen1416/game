@@ -30,6 +30,9 @@ planeId = p.loadURDF(fileName=plane_urdf,
                      physicsClientId=client_id)
 
 
+# Set gravity
+p.setGravity(0, 0, -9.8)
+
 # Define the camera rotation
 cameraDistance = 4.0
 cameraYaw = 0
@@ -37,7 +40,7 @@ cameraPitch = -40
 
 # Get the joint indices
 jointIndices = [i for i in range(p.getNumJoints(arm_id))]
-print(jointIndices)
+# print(jointIndices)
 
 # Set the initial joint positions
 jointPositions = [0 for _ in jointIndices]
@@ -50,19 +53,39 @@ cycleDuration = 2.0
 timeStep = 1. / 240.
 
 zahlen = 0
+targetPos = [0.5, 0.2, 0.3]
 
 while True:
 
     zahlen += 1
 
-    for i in range(len(jointIndices)):
+    # for i in range(len(jointIndices)):
+    # for i in range(1):
+    for i in [0]:
         # Calculate the new joint position
-        jointPositions[i] = math.sin(
-            2.0 * math.pi * (time.time() % cycleDuration) / cycleDuration)
+        # jointPositions[i] = math.sin(
+        #     2.0 * math.pi * (time.time() % cycleDuration) / cycleDuration)
+
+        # print(jointPositions[i])
+
+        # You need to know the index of the end effector link. Let's say it's the last link
+        endEffectorLinkIndex = i
+
+        # Calculate the inverse kinematics
+        jointPoses = p.calculateInverseKinematics(
+            arm_id, endEffectorLinkIndex, targetPos)
+
+        print(jointPoses)
+
+        cartesian_pos, cartesian_orientation = p.getLinkState(
+            arm_id, i, physicsClientId=client_id)[:2]
+
+        print(cartesian_pos)
+        # print(cartesian_orientation)
 
         # Set the new joint position
-        p.setJointMotorControl2(
-            arm_id, jointIndices[i], p.POSITION_CONTROL, jointPositions[i])
+        # p.setJointMotorControl2(
+        #     arm_id, jointIndices[i], p.POSITION_CONTROL, jointPositions[i])
 
     # Update the camera rotation
     cameraYaw += 0.1
