@@ -28,6 +28,11 @@ class Joint:
 
 
 def display_joints_info(urdf_id, client_id=None):
+    """
+    type of the joint, this also implies the number of position and velocity variables.
+    JOINT_REVOLUTE, JOINT_PRISMATIC, JOINT_SPHERICAL, JOINT_PLANAR, JOINT_FIXED. 
+    See the section on Base, Joint and Links for more details.
+    """
     n_joints = p.getNumJoints(urdf_id, physicsClientId=client_id)
 
     print("==========joints info=========")
