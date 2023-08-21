@@ -8,8 +8,8 @@ import pybullet_data
 PROJECT_DIR = os.path.dirname(os.path.realpath(__file__))
 
 
-# client_id = p.connect(p.DIRECT)
-client_id = p.connect(p.GUI)
+client_id = p.connect(p.DIRECT)
+# client_id = p.connect(p.GUI)
 
 # The module pybullet_data provides many example Universal Robotic Description Format (URDF) files.
 p.setAdditionalSearchPath(pybullet_data.getDataPath())
@@ -87,10 +87,10 @@ while True:
         # p.setJointMotorControl2(
         #     arm_id, jointIndices[i], p.POSITION_CONTROL, jointPositions[i])
 
-    # Update the camera rotation
-    cameraYaw += 0.1
-    p.resetDebugVisualizerCamera(
-        cameraDistance, cameraYaw, cameraPitch, [0, 0, 0])
+    # # Update the camera rotation
+    # cameraYaw += 0.1
+    # p.resetDebugVisualizerCamera(
+    #     cameraDistance, cameraYaw, cameraPitch, [0, 0, 0])
 
     # Step the simulation
     p.stepSimulation(physicsClientId=client_id)
